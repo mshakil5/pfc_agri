@@ -13,7 +13,9 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\CompanyDetailsController;
 use App\Http\Controllers\Admin\SubSubCategoryController;
 use App\Http\Controllers\Admin\LandlordController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PropertyController;
+use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TenantController;
 use Illuminate\Support\Facades\Route;
 
@@ -117,6 +119,23 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/about', [AboutController::class, 'index'])->name('admin.about');
     Route::get('/about-us', [AboutController::class, 'homepageAbout'])->name('admin.aboutUs');
     Route::post('/about', [AboutController::class, 'store']);
+
+
+    // Tag
+    Route::get('/tags', [TagController::class, 'index'])->name('alltags');
+    Route::post('/tags', [TagController::class, 'store']);
+    Route::get('/tags/{id}/edit', [TagController::class, 'edit']);
+    Route::post('/tags-update', [TagController::class, 'update']);
+    Route::delete('/tags/{id}', [TagController::class, 'destroy'])->name('tag.destroy');
+    Route::post('/tags-status', [TagController::class, 'toggleStatus']);
+
+    // Product 
+    Route::get('/products', [ProductController::class, 'index'])->name('allproducts');
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit']);
+    Route::post('/products-update', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+    Route::post('/products-status', [ProductController::class, 'toggleStatus']);
 
 
 });

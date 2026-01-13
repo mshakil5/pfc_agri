@@ -32,6 +32,8 @@
                 @php
                     $productActive = Route::is(
                         'allcategory',
+                        'allproducts',
+                        'alltags',
                     );
                     $settingsRoute = Route::is(
                         'admin.companyDetails',
@@ -140,6 +142,14 @@
                             <li class="nav-item">
                                 <a href="{{ route('allcategory') }}" 
                                   class="nav-link {{ Route::is('allcategory') ? 'active' : '' }}">Category</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('allproducts') }}" 
+                                  class="nav-link {{ Route::is('allproducts') ? 'active' : '' }}">Product</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('alltags') }}" 
+                                  class="nav-link {{ Route::is('alltags') ? 'active' : '' }}">Tag</a>
                             </li>
                         </ul>
                     </div>

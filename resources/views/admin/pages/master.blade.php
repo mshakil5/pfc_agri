@@ -45,6 +45,8 @@
 
       <link href="{{ asset('resources/backend/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 
+      <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+
       {{-- <link href="{{ asset('resources/backend/libs/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
       <link href="{{ asset('resources/backend/libs/quill/quill.bubble.css') }}" rel="stylesheet" type="text/css" />
       <link href="{{ asset('resources/backend/libs/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" /> --}}
@@ -129,6 +131,7 @@
       <script src="{{ asset('resources/backend/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
       <script src="{{ asset('resources/backend/libs/dropzone/dropzone-min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
 
       <!-- App js -->
       <script src="{{ asset('resources/backend/js/app.js') }}"></script>
