@@ -43,6 +43,7 @@
                         'admin.mail-body',
                         'sections.index',
                         'allslider',
+                        'admin.about',
                         'admin.home-footer',
                         'admin.copyright'
                     );
@@ -178,7 +179,11 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.aboutUs') }}" 
-                                  class="nav-link {{ Route::is('admin.aboutUs') ? 'active' : '' }}">About Us</a>
+                                  class="nav-link {{ Route::is('admin.aboutUs') ? 'active' : '' }}">About Us Homepage</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.about') }}" 
+                                  class="nav-link {{ Route::is('admin.about') ? 'active' : '' }}">About Us</a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.privacy-policy') }}" 

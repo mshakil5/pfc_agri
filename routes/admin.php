@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\UserController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\SubSubCategoryController;
 use App\Http\Controllers\Admin\LandlordController;
 use App\Http\Controllers\Admin\PropertyController;
 use App\Http\Controllers\Admin\TenantController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], function(){
     Route::get('/dashboard', [HomeController::class, 'adminHome'])->name('admin.dashboard');
@@ -53,8 +55,6 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/company/seo-meta', [CompanyDetailsController::class, 'seoMeta'])->name('admin.company.seo-meta');
     Route::post('/company/seo-meta/update', [CompanyDetailsController::class, 'seoMetaUpdate'])->name('admin.company.seo-meta.update');
 
-    Route::get('/about-us', [CompanyDetailsController::class, 'aboutUs'])->name('admin.aboutUs');
-    Route::post('/about-us', [CompanyDetailsController::class, 'aboutUsUpdate'])->name('admin.aboutUs');
 
     Route::get('/privacy-policy', [CompanyDetailsController::class, 'privacyPolicy'])->name('admin.privacy-policy');
     Route::post('/privacy-policy', [CompanyDetailsController::class, 'privacyPolicyUpdate'])->name('admin.privacy-policy');
@@ -73,7 +73,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
 
     Route::get('/master', [MasterController::class, 'index'])->name('master.index');
     Route::post('/master', [MasterController::class, 'store'])->name('master.store');
-    Route::get('/master/{id}/edit', [MasterController::class, 'edit'])->name('master.edit');
+    Route::get('/master/{id}/edit', [MasterController::class, 'edit'])->name('master.edit');    
     Route::post('/master-update', [MasterController::class, 'update'])->name('master.update');
     Route::delete('/master/{id}', [MasterController::class, 'destroy'])->name('master.delete');
 
@@ -112,5 +112,11 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/tenant-update', [TenantController::class, 'update']);
     Route::delete('/tenant/{id}', [TenantController::class, 'delete'])->name('tenant.delete');
     Route::post('/tenant-status', [TenantController::class, 'toggleStatus']);
+    
+    // About
+    Route::get('/about', [AboutController::class, 'index'])->name('admin.about');
+    Route::get('/about-us', [AboutController::class, 'homepageAbout'])->name('admin.aboutUs');
+    Route::post('/about', [AboutController::class, 'store']);
+
 
 });
