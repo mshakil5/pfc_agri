@@ -28,9 +28,18 @@ Auth::routes([
     'verify' => false,
 ]);
 
-Route::get('/', [HomeController::class, 'dashboard'])->name('home');
+Route::get('/', [FrontendController::class, 'index'])->name('home');
+// Route::get('/', [HomeController::class, 'dashboard'])->name('home');
 
 Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
+Route::post('/contact', [FrontendController::class, 'storeContact'])->name('contact.store');
+
+
+
+Route::get('/research-and-development', [FrontendController::class, 'rAndD'])->name('rAndD');
+Route::get('/inquire', [FrontendController::class, 'inquire'])->name('inquire');
+Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('aboutUs');
 
 Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user', 'verified']], function(){
   
