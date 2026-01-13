@@ -71,35 +71,58 @@ class SliderController extends Controller
 
     public function sliderStore(Request $request)
     {
+        // Validation: Ignore unique check if updating the same record
+        $id = $request->codeid;
         $request->validate([
-            'title'=>'required|unique:sliders,title',
+            'title' => 'required|unique:sliders,title,' . $id,
+            'image' => $id ? 'nullable|image' : 'required|image', // image required only on create
         ]);
 
-        $data = new Slider();
+        // Find existing or create new instance
+        $data = Slider::findOrNew($id);
+
         $data->title = $request->title;
+        $data->sub_title = $request->sub_title;
+        $data->hero_badge = $request->hero_badge;
         $data->link = $request->link;
-        $data->created_by = auth()->id();
+        
+        // Handle JSON Arrays (Buttons and Features)
+        $data->buttons = $request->buttons; 
+        $data->stat_card = $request->features;
 
-        $lastSerial = Slider::max('serial');
-        $data->serial = $lastSerial ? $lastSerial + 1 : 1;
+        // Set Serial only for new records
+        if (!$data->exists) {
+            $lastSerial = Slider::max('serial');
+            $data->serial = $lastSerial ? $lastSerial + 1 : 1;
+            $data->created_by = auth()->id();
+        }
 
+        // Image Upload Logic
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $name = mt_rand(10000000,99999999).'.webp';
-            $path = public_path('images/slider/');
-            if(!file_exists($path)) mkdir($path,0755,true);
+            // Delete old image if updating
+            if ($data->image && file_exists(public_path('images/slider/' . $data->image))) {
+                unlink(public_path('images/slider/' . $data->image));
+            }
 
-            Image::make($file)
-                ->resize(1200,null,fn($c)=>$c->aspectRatio())
-                ->encode('webp',50)
-                ->save($path.$name);
+            $file = $request->file('image');
+            $name = mt_rand(10000000, 99999999) . '.webp';
+            $path = public_path('images/slider/');
+            if (!file_exists($path)) mkdir($path, 0755, true);
+
+            \Image::make($file)
+                ->resize(1200, null, fn($c) => $c->aspectRatio())
+                ->encode('webp', 50)
+                ->save($path . $name);
 
             $data->image = $name;
         }
 
         $data->save();
+        
         Cache::forget('active_sliders');
-        return response()->json(['message'=>'Slider created successfully!'],200);
+        
+        $message = $id ? 'Slider updated successfully!' : 'Slider created successfully!';
+        return response()->json(['message' => $message], 200);
     }
 
     public function sliderEdit($id)

@@ -29,21 +29,64 @@
                                     <label class="form-label">Slider Title <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="title" name="title">
                                 </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Sub Title </label>
+                                    <input type="text" class="form-control" id="sub_title" name="sub_title">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Hero Badge </label>
+                                    <input type="text" class="form-control" id="hero_badge" name="hero_badge">
+                                </div>
 
                                 <div class="col-md-12">
-                                    <label class="form-label">Slider Link</label>
-                                    <input type="text" class="form-control" id="link" name="link"
-                                        placeholder="Enter link (optional)">
+                                    <label class="form-label"><b>Slider Buttons</b></label>
+                                    <div id="buttons-container">
+                                        <div class="row g-2 mb-2 button-row">
+                                            <div class="col-md-5">
+                                                <input type="text" name="buttons[0][label]" class="form-control" placeholder="Button Name">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input type="text" name="buttons[0][link]" class="form-control" placeholder="Button Link">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="add-button" class="btn btn-dark btn-sm mt-2">+ Add More Button</button>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Slider Image</label>
                                     <input type="file" class="form-control" id="image" accept="image/*"
-                                        onchange="previewImage(event, '#preview-image')">
+                                        onchange="previewImage(event, '#preview-image')" name="image">
                                     <img id="preview-image" src="#" alt="" class="img-thumbnail rounded mt-3"
                                         style="max-width: 300px;">
                                 </div>
+
+                                <!-- Aminities -->
+                                <div class="col-md-12">
+                                    <label class="form-label"><b>Features</b></label>
+                                    <div id="features-container">
+                                        <div class="row g-2 mb-2 button-row">
+                                            <div class="col-md-5">
+                                                <input type="text" name="features[0][value]" class="form-control" placeholder="Values">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input type="text" name="features[0][title]" class="form-control" placeholder="Title">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="add-features-button" class="btn btn-dark btn-sm mt-2">+ Add More Button</button>
+                                </div>
+                                <!-- Aminities -->
+
+
                             </div>
+
                         </form>
                     </div>
                     <div class="card-footer text-end">
@@ -216,7 +259,7 @@
             });
 
             var url = "{{ URL::to('/admin/slider') }}";
-            var upurl = "{{ URL::to('/admin/slider-update') }}";
+            var upurl = "{{ URL::to('/admin/slider') }}";
 
             $.ajaxSetup({
                 headers: {
@@ -224,83 +267,108 @@
                 }
             });
 
-            $("#addBtn").click(function() {
-                var form_data = new FormData();
-                form_data.append("title", $("#title").val());
-                form_data.append("link", $("#link").val());
-                var featureImgInput = document.getElementById('image');
-                if (featureImgInput.files && featureImgInput.files[0]) form_data.append("image",
-                    featureImgInput.files[0]);
+            $("#addBtn").click(function(e) {
+                e.preventDefault(); // Prevent default button behavior
+                
+                // Get the form element
+                let formElement = document.getElementById('createThisForm');
+                let form_data = new FormData(formElement);
+                
+                // Determine the URL (assuming you have these variables defined)
+                let requestUrl = ($("#addBtn").val() == 'Update') ? upurl : url;
 
-                if ($(this).val() == 'Create') {
-                    $.ajax({
-                        url: url,
-                        type: "POST",
-                        data: form_data,
-                        contentType: false,
-                        processData: false,
-                        success: function(d) {
-                            showSuccess(d.message);
-                            $("#addThisFormContainer").slideUp(300);
-                            setTimeout(() => {
-                                $("#newBtn").show();
-                            }, 300);
-                            reloadTable('#sliderTable');
-                            clearform();
-                        },
-                        error: function(xhr) {
+                $.ajax({
+                    url: requestUrl,
+                    type: "POST",
+                    data: form_data,
+                    contentType: false,
+                    processData: false,
+                    success: function(d) {
+                        showSuccess(d.message);
+                        $("#addThisFormContainer").slideUp(300);
+                        setTimeout(() => {
+                            $("#newBtn").show();
+                        }, 300);
+                        reloadTable('#sliderTable');
+                        clearform();
+                    },
+                    error: function(xhr) {
+                        if(xhr.status === 422) {
+                            // Validation errors
+                            let errors = xhr.responseJSON.errors;
+                            showError(Object.values(errors).flat()[0]);
+                        } else {
                             showError(xhr.responseJSON?.message ?? "Something went wrong!");
                         }
-                    });
-                }
-
-                if ($(this).val() == 'Update') {
-                    form_data.append("codeid", $("#codeid").val());
-                    $.ajax({
-                        url: upurl,
-                        type: "POST",
-                        data: form_data,
-                        contentType: false,
-                        processData: false,
-                        success: function(d) {
-                            showSuccess(d.message);
-                            $("#addThisFormContainer").slideUp(300); // hide form
-                            setTimeout(() => {
-                                $("#newBtn").show();
-                            }, 300); // show button after hiding
-                            reloadTable('#sliderTable');
-                            clearform();
-                        },
-                        error: function(xhr) {
-                            showError(xhr.responseJSON?.message ?? "Something went wrong!");
-                        }
-                    });
-                }
+                    }
+                });
             });
 
             $("#contentContainer").on('click', '#EditBtn', function() {
-                $("#cardTitle").text('Update this data');
-                codeid = $(this).attr('rid');
-                $.get(url + '/' + codeid + '/edit', {}, function(d) {
-                    populateForm(d);
+                $("#cardTitle").text('Update Slider Information');
+                let codeid = $(this).attr('rid');
+                $.get(url + '/' + codeid + '/edit', function(data) {
+                    populateForm(data);
                 });
             });
 
             function populateForm(data) {
-                $("#title").val(data.title);
-                $("#link").val(data.link);
+                // Basic Fields
                 $("#codeid").val(data.id);
+                $("#title").val(data.title);
+                $("#sub_title").val(data.sub_title);
+                $("#hero_badge").val(data.hero_badge);
+                $("#link").val(data.link);
+
+                // 1. Handle Buttons (JSON Array)
+                let buttonContainer = $("#buttons-container");
+                buttonContainer.empty(); // Clear existing rows
+                if (data.buttons && data.buttons.length > 0) {
+                    data.buttons.forEach((btn, index) => {
+                        addButtonRow(buttonContainer, 'buttons', index, btn.label, btn.link);
+                    });
+                } else {
+                    addButtonRow(buttonContainer, 'buttons', 0, '', ''); // Add one empty row if none exist
+                }
+
+                // 2. Handle Features / Stat Cards (JSON Array)
+                let featureContainer = $("#features-container");
+                featureContainer.empty(); // Clear existing rows
+                // Note: Your JSON shows 'stat_card', adjust key name if necessary
+                let features = data.stat_card || data.features || []; 
+                if (features.length > 0) {
+                    features.forEach((feat, index) => {
+                        addFeatureRow(featureContainer, 'features', index, feat.value, feat.title);
+                    });
+                } else {
+                    addFeatureRow(featureContainer, 'features', 0, '', '');
+                }
+
+                // Image Preview
+                let imgSrc = data.image ? '/images/slider/' + data.image : '#';
+                $('#preview-image').attr('src', imgSrc);
+
+                // UI Toggle
                 $("#addBtn").val('Update').html('Update');
-                $("#addThisFormContainer").show();
+                $("#addThisFormContainer").slideDown(300);
                 $("#newBtn").hide();
-                document.getElementById('preview-image').src = data.image ? '/images/slider/' + data.image : '#';
+
             }
 
             function clearform() {
                 $('#createThisForm')[0].reset();
+                $("#codeid").val('');
+                
+                // Reset dynamic sections to just one empty row
+                $("#buttons-container").html('');
+                addButtonRow($("#buttons-container"), 'buttons', 0, '', '');
+                
+                $("#features-container").html('');
+                addFeatureRow($("#features-container"), 'features', 0, '', '');
+
                 $("#addBtn").val('Create').html('Create');
                 $('#preview-image').attr('src', '#');
-                $("#cardTitle").text('Add new Slider');
+                $("#cardTitle").text('Add New Slider');
             }
         });
 
@@ -313,6 +381,88 @@
                 reader.readAsDataURL(event.target.files[0]);
             }
         }
+
+        let buttonIndex = 1;
+        document.getElementById('add-button').addEventListener('click', function() {
+            const container = document.getElementById('buttons-container');
+            const html = `
+                <div class="row g-2 mb-2 button-row">
+                    <div class="col-md-5">
+                        <input type="text" name="buttons[${buttonIndex}][label]" class="form-control" placeholder="Button Name">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="buttons[${buttonIndex}][link]" class="form-control" placeholder="Button Link">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+            buttonIndex++;
+        });
+
+
+        let featurebuttonIndex = 1;
+        document.getElementById('add-features-button').addEventListener('click', function() {
+            const container = document.getElementById('features-container');
+            const html = `
+                <div class="row g-2 mb-2 button-row">
+                    <div class="col-md-5">
+                        <input type="text" name="buttons[${featurebuttonIndex}][label]" class="form-control" placeholder="Value">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="buttons[${featurebuttonIndex}][link]" class="form-control" placeholder="Title">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+            featurebuttonIndex++;
+        });
+
+        // Remove row functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-btn')) {
+                e.target.closest('.button-row').remove();
+            }
+        });
+
+        function addButtonRow(container, prefix, index, label = '', link = '') {
+            let html = `
+                <div class="row g-2 mb-2 button-row">
+                    <div class="col-md-5">
+                        <input type="text" name="${prefix}[${index}][label]" value="${label}" class="form-control" placeholder="Button Name">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="${prefix}[${index}][link]" value="${link}" class="form-control" placeholder="Button Link">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                    </div>
+                </div>`;
+            container.append(html);
+        }
+
+        function addFeatureRow(container, prefix, index, value = '', title = '') {
+            let html = `
+                <div class="row g-2 mb-2 button-row">
+                    <div class="col-md-5">
+                        <input type="text" name="${prefix}[${index}][value]" value="${value}" class="form-control" placeholder="Values">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="${prefix}[${index}][title]" value="${title}" class="form-control" placeholder="Title">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                    </div>
+                </div>`;
+            container.append(html);
+        }
+
+
+
+
     </script>
 
 @endsection
