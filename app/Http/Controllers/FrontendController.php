@@ -9,6 +9,7 @@ use App\Models\About;
 use App\Models\Category;
 use App\Models\CompanyDetails;
 use App\Models\Master;
+use App\Models\Research;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -47,7 +48,8 @@ class FrontendController extends Controller
 
     public function rAndD()
     {
-        return view('frontend.rAndD');
+        $data = Research::orderby('id', 'DESC')->get();
+        return view('frontend.rAndD', compact('data'));
     }
 
     public function inquire()

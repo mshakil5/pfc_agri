@@ -138,38 +138,58 @@
             <p class="text-muted">Explore the projects we're actively developing to bring new solutions to market.</p>
         </div>
 
-        <div class="project-card">
+        @forelse($data as $project)
+        <div class="project-card mb-4"> {{-- Added mb-4 for spacing between cards --}}
             <div class="row g-0">
                 <div class="col-lg-5">
-                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475" class="project-img w-100" alt="Tech">
+                    {{-- Check if image exists, otherwise show placeholder --}}
+                    <img src="{{ $project->feature_image ? asset($project->feature_image) : asset('images/placeholder.webp') }}" 
+                         class="project-img w-100 h-100" 
+                         style="object-fit: cover;"
+                         alt="{{ $project->title }}">
                 </div>
                 <div class="col-lg-7 p-4 p-md-5">
                     <div class="mb-3">
-                        <span class="status-label status-in-progress">In Progress</span>
-                        <span class="ms-3 text-muted small"><i class="far fa-calendar"></i> Started Mar 2024</span>
+                        <span class="status-label status-in-progress">
+                            {{ $project->status == 1 ? 'In Progress' : 'Completed' }}
+                        </span>
+                        <span class="ms-3 text-muted small">
+                            <i class="far fa-calendar"></i> 
+                            Started {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
+                        </span>
                     </div>
-                    <h3 class="fw-bold text-success mb-3">Smart Slurry Monitoring System</h3>
-                    <p class="text-muted small">Developing an IoT-based monitoring system for slurry storage that provides real-time levels, temperature, and gas readings for automated compliance reporting.</p>
                     
-                    <h6 class="fw-bold small mt-4">Project Timeline</h6>
-                    <div class="rd-timeline">
-                        <div class="timeline-point done">Concept Development <span class="text-muted fw-normal">(Q1 2024)</span></div>
-                        <div class="timeline-point done">Prototype Design <span class="text-muted fw-normal">(Q2 2024)</span></div>
-                        <div class="timeline-point">Field Testing Phase 1 <span class="text-muted fw-normal">(Q3 2024)</span></div>
-                        <div class="timeline-point">Commercial Launch <span class="text-muted fw-normal">(Q2 2025)</span></div>
+                    <h3 class="fw-bold text-success mb-3">{{ $project->title }}</h3>
+                    <p class="text-muted small">
+                        {{ $project->short_description }}
+                    </p>
+                    
+                    {{-- Timeline Section --}}
+                    <h6 class="fw-bold small mt-4">Project Details</h6>
+                    <div class="project-long-desc mb-3">
+                        {{-- Rendering the HTML content from the long_description --}}
+                        {!! Str::limit($project->long_description, 200) !!}
                     </div>
+
                     <div class="mt-4 pt-3 border-top">
                         <span class="text-muted small">Target Completion: </span>
-                        <span class="text-success fw-bold">June 2025</span>
+                        <span class="text-success fw-bold">
+                            {{ \Carbon\Carbon::parse($project->deadline)->format('F Y') }}
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
+        @empty
+            <div class="text-center p-5">
+                <p class="text-muted">No R&D projects found at the moment.</p>
+            </div>
+        @endforelse
 
         <div class="text-center mt-5 pt-5">
             <h2 class="fw-bold mb-3 text-success">Have an Idea for Innovation?</h2>
             <p class="text-muted mx-auto mb-4" style="max-width: 600px;">We're always looking for new challenges. If you have a problem that needs solving, we'd love to hear from you.</p>
-            <a href="#" class="btn btn-success btn-lg px-5 py-3 shadow">Share Your Ideas</a>
+            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">Share Your Ideas</a>
         </div>
     </div>
 </section>
