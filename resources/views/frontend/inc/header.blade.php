@@ -83,6 +83,10 @@
         </div>
     </div>
 
+    @php
+        $categories = \App\Models\Category::with('products')->where('status', 1)->get();
+    @endphp
+
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3">
         <div class="container">
             <a class="navbar-brand fw-bold text-success" href="{{route('home')}}">PFC Agri</a>
@@ -99,10 +103,9 @@
                             Products
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="product.html">Slurry Management</a></li>
-                            <li><a class="dropdown-item" href="product.html">Wet Management</a></li>
-                            <li><a class="dropdown-item" href="product.html">Field Preparation</a></li>
-                            <li><a class="dropdown-item" href="product.html">Woodland Management</a></li>
+                            @foreach ($categories as $category)
+                            <li><a class="dropdown-item" href="{{ route('category.show', $category->slug) }}">{{$category->name}}</a></li>
+                            @endforeach
                         </ul>
                     </li>
 

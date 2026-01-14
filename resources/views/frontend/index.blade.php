@@ -212,14 +212,15 @@
         </div>
     </section>
 
+    @if($about)
     <section class="about-section">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <div class="about-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=800&q=80" alt="Farming Background" class="main-about-img">
+                        <img src="{{ asset('images/about/' . $about->image) }}" alt="{{ $about->title }}" class="main-about-img">
                         <div class="experience-badge">
-                            <div class="badge-number">35+</div>
+                            <div class="badge-number">{{ $about->year }}+</div>
                             <div>
                                 <div class="fw-bold mb-0">Years</div>
                                 <small class="text-muted">In Business</small>
@@ -229,58 +230,41 @@
                 </div>
 
                 <div class="col-lg-6">
-                    <p class="section-tag mb-2">About Us</p>
-                    <h2 class="about-title mb-4">A Family Business Built on Trust & Innovation</h2>
-                    <p class="text-muted mb-5">
-                        PFC Agri Solutions is a family-run farming business that combines generations of agricultural knowledge with innovative technological solutions. We understand farming because we are farmers ourselves, and we're committed to providing products that make a real difference to your operation.
-                    </p>
+                    <p class="section-tag mb-2">{{ $about->title }}</p>
+                    <h2 class="about-title mb-4">{{ $about->sub_title }}</h2>
+                    <div class="text-muted mb-5">
+                        {{-- Use {!! !!} if the long_description contains HTML from a text editor --}}
+                        {!! $about->long_description !!}
+                    </div>
 
                     <div class="row">
-                        <div class="col-sm-6">
-                            <div class="feature-box">
-                                <div class="feature-icon"><i class="fas fa-users"></i></div>
-                                <div class="feature-content">
-                                    <h6>Family Owned</h6>
-                                    <p>Three generations of farming expertise</p>
+                        @php
+                            $amenities = json_decode($about->amenities, true);
+                        @endphp
+
+                        @if(!empty($amenities))
+                            @foreach($amenities as $item)
+                            <div class="col-sm-6">
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="{{ $item['icon'] }}"></i></div>
+                                    <div class="feature-content">
+                                        <h6>{{ $item['title'] }}</h6>
+                                        <p>{{ $item['subtitle'] }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="feature-box">
-                                <div class="feature-icon"><i class="fas fa-award"></i></div>
-                                <div class="feature-content">
-                                    <h6>Quality Assured</h6>
-                                    <p>Premium products with proven performance</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="feature-box">
-                                <div class="feature-icon"><i class="fas fa-leaf"></i></div>
-                                <div class="feature-content">
-                                    <h6>Sustainable</h6>
-                                    <p>Eco-conscious farming solutions</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="feature-box">
-                                <div class="feature-icon"><i class="fas fa-tools"></i></div>
-                                <div class="feature-content">
-                                    <h6>Full Support</h6>
-                                    <p>Expert advice and after-sales service</p>
-                                </div>
-                            </div>
-                        </div>
+                            @endforeach
+                        @endif
                     </div>
 
                     <div class="mt-4">
-                        <a href="#" class="btn btn-learn-more">Learn More About Us &rarr;</a>
+                        <a href="{{ route('aboutUs') }}" class="btn btn-learn-more">Learn More About Us &rarr;</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    @endif
 
     <section class="blog-section">
         <div class="container">
@@ -621,8 +605,8 @@
                     <h2 class="fw-bold mb-3" style="color: #00a651;">Ready to Transform Your Farming Operation?</h2>
                     <p class="text-muted mb-4">Get in touch with our team to discuss your requirements. We're here to help you find the right solutions for your agricultural needs.</p>
                     <div class="d-flex gap-3">
-                        <a href="#" class="btn btn-success btn-lg px-4 rounded-1" style="background-color: var(--pfc-green);">Inquire Now &rarr;</a>
-                        <a href="#" class="btn btn-outline-success btn-lg px-4 rounded-1">Browse Products</a>
+                        <a href="{{route('inquire')}}" class="btn btn-success btn-lg px-4 rounded-1" style="background-color: var(--pfc-green);">Inquire Now &rarr;</a>
+                        <a href="{{route('category.show')}}" class="btn btn-outline-success btn-lg px-4 rounded-1">Browse Products</a>
                     </div>
                 </div>
                 <div class="col-lg-5">
@@ -632,7 +616,7 @@
                                 <div class="contact-icon-box"><i class="fas fa-phone"></i></div>
                                 <div>
                                     <h6 class="mb-0 fw-bold">Call Us</h6>
-                                    <p class="mb-0 text-muted">+44 (0) 1234 567890</p>
+                                    <p class="mb-0 text-muted"> {{ $company->phone1 }}</p>
                                 </div>
                             </div>
                         </div>
@@ -641,7 +625,7 @@
                                 <div class="contact-icon-box"><i class="fas fa-envelope"></i></div>
                                 <div>
                                     <h6 class="mb-0 fw-bold">Email Us</h6>
-                                    <p class="mb-0 text-muted">info@pfcagri.co.uk</p>
+                                    <p class="mb-0 text-muted"> {{ $company->email1 }} </p>
                                 </div>
                             </div>
                         </div>

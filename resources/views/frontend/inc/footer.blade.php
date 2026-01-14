@@ -1,3 +1,8 @@
+
+@php
+    $categories = \App\Models\Category::with('products')->where('status', 1)->get();
+@endphp
+
 <footer class="main-footer">
     <div class="container">
         <div class="row g-5">
@@ -13,18 +18,17 @@
             </div>
             <div class="col-lg-3 col-6">
                 <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">Quick Links</h6>
-                <a href="#" class="footer-link">Home</a>
-                <a href="#" class="footer-link">About Us</a>
-                <a href="#" class="footer-link">Products</a>
-                <a href="#" class="footer-link">R&D Projects</a>
-                <a href="#" class="footer-link">Inquire Now</a>
+                <a href="{{ route('home') }}" class="footer-link">Home</a>
+                <a href="{{ route('aboutUs') }}" class="footer-link">About Us</a>
+                <a href="{{ route('category.show') }}" class="footer-link">Products</a>
+                <a href="{{ route('rAndD') }}" class="footer-link">R&D Projects</a>
+                <a href="{{ route('inquire') }}" class="footer-link">Inquire Now</a>
             </div>
             <div class="col-lg-3 col-6">
                 <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">Our Products</h6>
-                <a href="#" class="footer-link">Slurry Management</a>
-                <a href="#" class="footer-link">Wet Bale Management</a>
-                <a href="#" class="footer-link">Field Preparation</a>
-                <a href="#" class="footer-link">Woodland Management</a>
+                @foreach ($categories as $category)
+                    <a class="footer-link" href="{{ route('category.show', $category->slug) }}">{{$category->name}}</a>
+                @endforeach
             </div>
             <div class="col-lg-3">
                 <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">Contact Us</h6>

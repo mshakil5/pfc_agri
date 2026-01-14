@@ -152,7 +152,7 @@
                       href="#sidebarFrontpage" data-bs-toggle="collapse" role="button"
                       aria-expanded="{{ $frontPageActive ? 'true' : 'false' }}" 
                       aria-controls="sidebarFrontpage">
-                        <i class="ri-shopping-bag-3-line"></i> <span>Front Page</span>
+                        <i class="ri-shopping-bag-3-line"></i> <span>Home Page</span>
                     </a>
                     <div class="collapse menu-dropdown {{ $frontPageActive ? 'show' : '' }}" id="sidebarFrontpage">
                         <ul class="nav nav-sm flex-column">
