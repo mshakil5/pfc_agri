@@ -9,16 +9,70 @@
                 <i class="fab fa-instagram me-3"></i>
                 <i class="fab fa-linkedin-in me-3"></i>
                 <i class="fas fa-globe me-2"></i>
+                @php
+                    $locale = app()->getLocale();
+                @endphp
+
                 <div class="dropdown d-inline">
-                    <span class="dropdown-toggle" data-bs-toggle="dropdown">English</span>
+                    <span class="dropdown-toggle d-flex align-items-center gap-2 cursor-pointer"
+                        data-bs-toggle="dropdown">
+                        {{-- <img src="{{ asset('resources/flags/' . ($locale ?? 'gb') . '.svg') }}"
+                            width="18" height="14" alt="flag"> --}}
+                        <span class="text-capitalize">
+                            {{ match($locale) {
+                                'de' => 'German',
+                                'fr' => 'French',
+                                'es' => 'Spanish',
+                                'it' => 'Italian',
+                                default => 'English'
+                            } }}
+                        </span>
+                    </span>
+
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">English</a></li>
-                        <li><a class="dropdown-item" href="#">Italian</a></li>
-                        <li><a class="dropdown-item" href="#">Spanish</a></li>
-                        <li><a class="dropdown-item" href="#">German</a></li>
-                        <li><a class="dropdown-item" href="#">French</a></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{{ url('lang/en') }}">
+                                <img src="{{ asset('resources/flags/gb.svg') }}" width="18" height="14">
+                                English
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{{ url('lang/it') }}">
+                                <img src="{{ asset('resources/flags/it.svg') }}" width="18" height="14">
+                                Italian
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{{ url('lang/es') }}">
+                                <img src="{{ asset('resources/flags/es.svg') }}" width="18" height="14">
+                                Spanish
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{{ url('lang/de') }}">
+                                <img src="{{ asset('resources/flags/de.svg') }}" width="18" height="14">
+                                German
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{{ url('lang/fr') }}">
+                                <img src="{{ asset('resources/flags/fr.svg') }}" width="18" height="14">
+                                French
+                            </a>
+                        </li>
                     </ul>
                 </div>
+
+
             </div>
         </div>
     </div>

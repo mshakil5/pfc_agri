@@ -5,6 +5,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FrontendController;
 
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
+
+Route::get('/lang/{locale}', function ($locale) {
+    if (! in_array($locale, ['en', 'it', 'es', 'de', 'fr'])) {
+        abort(400);
+    }
+
+    Session::put('locale', $locale);
+    App::setLocale($locale);
+
+    return redirect()->back();
+});
+
 // cache clear
 Route::get('/clear', function() {
   Auth::logout();

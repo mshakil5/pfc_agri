@@ -18,7 +18,6 @@ class FrontendController extends Controller
     public function index()
     {
         $slider = Slider::orderby('id')->first();
-        // dd($slider);
         return view('frontend.index', compact('slider'));
     }
 
