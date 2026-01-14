@@ -46,6 +46,12 @@
                             </div>
 
                             <div class="col-md-12">
+                                    <label class="form-label">Long Description</label>
+                                    <textarea class="form-control summernote" id="long_description" name="long_description"
+                                        placeholder="Enter long description (optional)">{!! $about->long_description !!}</textarea>
+                                </div>
+
+                            <div class="col-md-12">
                                 <label class="form-label">About Image</label>
                                 <input type="file" class="form-control" id="image" accept="image/*" onchange="previewImage(event, '#preview-image')" name="image">
                                 
@@ -163,5 +169,16 @@
             reader.readAsDataURL(event.target.files[0]);
         }
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.summernote').summernote({
+            height: 200, // set editor height
+            minHeight: null, // set minimum height of editor
+            maxHeight: null, // set maximum height of editor
+            focus: true // set focus to editable area after initializing summernote
+        });
+    });
 </script>
 @endsection

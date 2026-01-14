@@ -51,6 +51,11 @@
             z-index: 1060;     /* Higher than Bootstrap's sticky-top (1020) */
         }
 
+        .top-bar .social-link {
+            text-decoration: none;
+            color: #fff;
+        }
+
         /* 2. Fix Dropdown visibility and stacking */
         .top-bar .dropdown-menu { 
             font-size: 0.85rem; 

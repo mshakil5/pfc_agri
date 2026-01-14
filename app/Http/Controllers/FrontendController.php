@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Models\ContactEmail;
 use App\Mail\ContactMail;
+use App\Models\About;
 use App\Models\Category;
+use App\Models\Master;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -26,8 +28,16 @@ class FrontendController extends Controller
 
     public function aboutUs()
     {
-        return view('frontend.about');
+        $data = About::where('pages', 'about')->first();
+        // dd($data);
+        if ($data) {
+            $data->amenities = json_decode($data->amenities, true);
+        }
+
+        return view('frontend.about', compact('data'));
     }
+
+
 
     public function rAndD()
     {

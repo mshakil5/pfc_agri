@@ -88,7 +88,7 @@
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <label>Phone (2)</label>
-                                        <input type="number" class="form-control @error('phone2') is-invalid @enderror"
+                                        <input type="text" class="form-control @error('phone2') is-invalid @enderror"
                                             id="phone2" name="phone2" value="{{ $data->phone2 }}">
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@
                                 <div class="col-sm-3 d-none">
                                     <div class="form-group">
                                         <label>Phone (3)</label>
-                                        <input type="number" class="form-control @error('phone3') is-invalid @enderror"
+                                        <input type="text" class="form-control @error('phone3') is-invalid @enderror"
                                             id="phone3" name="phone3" value="{{ $data->phone3 }}">
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                                 <div class="col-sm-3 d-none">
                                     <div class="form-group">
                                         <label>Phone (4)</label>
-                                        <input type="number" class="form-control @error('phone4') is-invalid @enderror"
+                                        <input type="text" class="form-control @error('phone4') is-invalid @enderror"
                                             id="phone4" name="phone4" value="{{ $data->phone4 }}">
                                     </div>
                                 </div>
@@ -129,17 +129,16 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Address (1)</label>
-                                        <input type="text" class="form-control @error('address1') is-invalid @enderror"
-                                            id="address1" name="address1" value="{{ $data->address1 }}">
+                                        <textarea  class="form-control summernote @error('address1') is-invalid @enderror"
+                                            id="address1" name="address1" cols="30" rows="10">{{ $data->address1 }}</textarea>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Address (2)</label>
-                                        <input type="text"
-                                            class="form-control @error('address2') is-invalid @enderror" id="address2"
-                                            name="address2" value="{{ $data->address2 }}">
+                                        <label>Business Hours</label>
+                                        <textarea  class="form-control summernote @error('address1') is-invalid @enderror"
+                                            id="address2" name="address2" cols="30" rows="10">{{ $data->address2 }}</textarea>
                                     </div>
                                 </div>
 
@@ -388,4 +387,17 @@
         </div>
     </div>
 
+@endsection
+
+@section('script')
+<script>
+    $(document).ready(function() {
+        $('.summernote').summernote({
+            height: 200, // set editor height
+            minHeight: null, // set minimum height of editor
+            maxHeight: null, // set maximum height of editor
+            focus: true // set focus to editable area after initializing summernote
+        });
+    });
+</script>
 @endsection

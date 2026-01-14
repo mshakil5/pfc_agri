@@ -37,6 +37,7 @@ class AboutController extends Controller
         $about->sub_title = $request->sub_title;
         $about->header_title = $request->header_title;
         $about->header_subtitle = $request->header_subtitle;
+        $about->long_description = $request->long_description;
         $about->year = $request->year;
 
         if ($request->hasFile('image')) {

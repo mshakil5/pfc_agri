@@ -2,89 +2,91 @@
 
 @section('content')
 
-
+    @php
+        $company = App\Models\CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'linkedin', 'website', 'phone1', 'email1', 'address1','address2','company_logo','copyright','google_map')->first();
+    @endphp
 
     <style>
         /* --- Contact Hero Header --- */
-    .contact-hero {
-        background-color: #00a651; /* Brand Green */
-        color: white;
-        padding: 80px 0;
-        text-align: center;
-    }
+        .contact-hero {
+            background-color: #00a651; /* Brand Green */
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
 
-    /* --- Contact Section Layout --- */
-    .contact-container {
-        padding: 80px 0;
-        background-color: #f8fafc;
-    }
+        /* --- Contact Section Layout --- */
+        .contact-container {
+            padding: 80px 0;
+            background-color: #f8fafc;
+        }
 
-    .contact-info-card, .contact-form-card {
-        background: white;
-        border-radius: 15px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        border: none;
-    }
+        .contact-info-card, .contact-form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: none;
+        }
 
-    /* Sidebar Info Styles */
-    .info-item {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
+        /* Sidebar Info Styles */
+        .info-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-    .info-icon-box {
-        width: 45px;
-        height: 45px;
-        background-color: #f0fdf4;
-        color: #00a651;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
+        .info-icon-box {
+            width: 45px;
+            height: 45px;
+            background-color: #f0fdf4;
+            color: #00a651;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
 
-    /* Form Styles */
-    .form-label {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #333;
-        margin-bottom: 8px;
-    }
+        /* Form Styles */
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
 
-    .form-label span {
-        color: #00a651;
-    }
+        .form-label span {
+            color: #00a651;
+        }
 
-    .form-control, .form-select {
-        padding: 12px 15px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        font-size: 0.95rem;
-    }
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
 
-    .form-control:focus, .form-select:focus {
-        border-color: #00a651;
-        box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
-    }
+        .form-control:focus, .form-select:focus {
+            border-color: #00a651;
+            box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+        }
 
-    .btn-send {
-        background-color: #00a651;
-        color: white;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 600;
-        border: none;
-        transition: 0.3s;
-    }
+        .btn-send {
+            background-color: #00a651;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+        }
 
-    .btn-send:hover {
-        background-color: #008d44;
-        transform: translateY(-2px);
-    }
+        .btn-send:hover {
+            background-color: #008d44;
+            transform: translateY(-2px);
+        }
     </style>
 
 
@@ -109,7 +111,7 @@
                         <div class="info-icon-box"><i class="fas fa-phone"></i></div>
                         <div>
                             <p class="fw-bold mb-0">Phone</p>
-                            <p class="text-muted small mb-0">+44 (0) 1234 567890</p>
+                            <p class="text-muted small mb-0">{{ $company->phone1 }}</p>
                         </div>
                     </div>
 
@@ -117,7 +119,7 @@
                         <div class="info-icon-box"><i class="fas fa-envelope"></i></div>
                         <div>
                             <p class="fw-bold mb-0">Email</p>
-                            <p class="text-muted small mb-0">info@pfcagri.co.uk</p>
+                            <p class="text-muted small mb-0">{{ $company->email1 }}</p>
                         </div>
                     </div>
 
@@ -125,7 +127,11 @@
                         <div class="info-icon-box"><i class="fas fa-map-marker-alt"></i></div>
                         <div>
                             <p class="fw-bold mb-0">Address</p>
-                            <p class="text-muted small mb-0">PFC Agri Solutions<br>Farm Road, Rural County<br>United Kingdom</p>
+                            <p class="text-muted small mb-0">
+                                {!! $company->address1 !!}
+                                
+                                
+                            </p>
                         </div>
                     </div>
 
@@ -133,7 +139,9 @@
                         <div class="info-icon-box"><i class="fas fa-clock"></i></div>
                         <div>
                             <p class="fw-bold mb-0">Business Hours</p>
-                            <p class="text-muted small mb-0">Mon - Fri: 8:00 AM - 6:00 PM<br>Sat: 9:00 AM - 1:00 PM<br>Sun: Closed</p>
+                            <p class="text-muted small mb-0">
+                                {!! $company->address2 !!}
+                            </p>
                         </div>
                     </div>
 

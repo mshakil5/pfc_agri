@@ -1,14 +1,20 @@
     <div class="top-bar">
         <div class="container d-flex justify-content-between align-items-center">
             <div>
-                <i class="fas fa-phone me-2"></i> +44 (0) 10nal 123456 
-                <i class="fas fa-envelope ms-4 me-2"></i> info@pfcagri.co.uk
+                <i class="fas fa-phone me-2"></i> {{ $company->phone1 }}
+                <i class="fas fa-envelope ms-4 me-2"></i> {{ $company->email1 }}
             </div>
             <div class="d-flex align-items-center">
-                <i class="fab fa-facebook-f me-3"></i>
-                <i class="fab fa-instagram me-3"></i>
-                <i class="fab fa-linkedin-in me-3"></i>
-                <i class="fas fa-globe me-2"></i>
+                <a href="{{ $company->facebook }}" class="social-link"><i class="fab fa-facebook-f me-3"></i></a>
+                <a href="{{ $company->instagram }}" class="social-link"><i class="fab fa-instagram me-3"></i></a>
+                <a href="{{ $company->linkedin }}" class="social-link"><i class="fab fa-linkedin-in me-3"></i></a>
+                <a href="{{ $company->website }}" class="social-link"><i class="fas fa-globe me-2"></i></a>
+                
+                
+                
+                
+
+
                 @php
                     $locale = app()->getLocale();
                 @endphp

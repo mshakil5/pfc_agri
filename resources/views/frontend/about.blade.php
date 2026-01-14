@@ -82,11 +82,12 @@
 </style>
 
 
+@if($data)
 <section class="pfc-about-header">
     <div class="container">
-        <h1 class="fw-bold mb-3">About PFC Agri Solutions</h1>
+        <h1 class="fw-bold mb-3">{{ $data->header_title }}</h1>
         <p class="lead opacity-90 mx-auto" style="max-width: 750px;">
-            A family farming business delivering innovative technological solutions to the agricultural industry since 1985.
+            {{ $data->header_subtitle }}
         </p>
     </div>
 </section>
@@ -95,17 +96,18 @@
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <p class="section-tag mb-1">OUR STORY</p>
-                <h2 class="fw-bold mb-4" style="color: var(--pfc-green);">Rooted in Farming, Growing with Innovation</h2>
-                <p class="text-muted">PFC Agri Solutions began as a small family farm in the heart of the British countryside. Over three generations, we've grown from traditional farming into a leading supplier of innovative agricultural solutions.</p>
-                <p class="text-muted">Our journey has always been guided by a simple principle: we only recommend products that we would use on our own farm. This hands-on approach means we truly understand the challenges our customers face and can provide solutions that work in real-world conditions.</p>
-                <p class="text-muted">Today, we're proud to combine our deep agricultural roots with cutting-edge technology, offering a comprehensive range of products from slurry management to field preparation equipment.</p>
+                <p class="section-tag mb-1">{{ $data->sub_title }}</p>
+                <h2 class="fw-bold mb-4" style="color: var(--pfc-green);">{{ $data->title }}</h2>
+                
+                <p class="text-muted">
+                   {!! $data->long_description !!}
+                </p>
             </div>
             <div class="col-lg-6">
                 <div class="story-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80" alt="Sunset over farm">
+                    <img src="{{ asset('images/about/' . $data->image) }}" alt="{{ $data->title }}">
                     <div class="years-badge">
-                        <h3 class="fw-bold mb-0">35+</h3>
+                        <h3 class="fw-bold mb-0">{{ $data->year }}+</h3>
                         <p class="small mb-0">Years of Excellence</p>
                     </div>
                 </div>
@@ -120,37 +122,21 @@
         <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">Our Core Values</h2>
         
         <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="value-card">
-                    <div class="value-icon-box"><i class="fas fa-users"></i></div>
-                    <h5 class="fw-bold">Family Values</h5>
-                    <p class="small text-muted mb-0">Three generations of farming expertise passed down, ensuring authentic understanding of agricultural challenges.</p>
+            @if(!empty($data->amenities))
+                @foreach($data->amenities as $item)
+                <div class="col-lg-3 col-md-6">
+                    <div class="value-card">
+                        <div class="value-icon-box"><i class="{{ $item['icon'] }}"></i></div>
+                        <h5 class="fw-bold">{{ $item['title'] }}</h5>
+                        <p class="small text-muted mb-0">{{ $item['subtitle'] }}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="value-card">
-                    <div class="value-icon-box"><i class="fas fa-ribbon"></i></div>
-                    <h5 class="fw-bold">Quality First</h5>
-                    <p class="small text-muted mb-0">We only supply products we would use ourselves. Every item is tested and proven in real farming conditions.</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="value-card">
-                    <div class="value-icon-box"><i class="fas fa-leaf"></i></div>
-                    <h5 class="fw-bold">Sustainability</h5>
-                    <p class="small text-muted mb-0">Committed to environmentally responsible solutions that protect our land for future generations.</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="value-card">
-                    <div class="value-icon-box"><i class="fas fa-bullseye"></i></div>
-                    <h5 class="fw-bold">Innovation</h5>
-                    <p class="small text-muted mb-0">Constantly seeking and developing new technologies to improve farming efficiency and outcomes.</p>
-                </div>
-            </div>
+                @endforeach
+            @endif
         </div>
     </div>
 </section>
+@endif
 
 
 <style>

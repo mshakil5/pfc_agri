@@ -3,12 +3,12 @@
         <div class="row g-5">
             <div class="col-lg-3">
                 <h4 class="fw-bold mb-4">PFC Agri Solutions</h4>
-                <p class="small opacity-75 mb-4">A family-run farming business delivering innovative technological solutions for modern agriculture. Quality products, trusted service.</p>
+                <p class="small opacity-75 mb-4">{{ $company->footer_content }}</p>
                 <div class="d-flex">
-                    <a href="#" class="social-circle"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-circle"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-circle"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="social-circle"><i class="fab fa-youtube"></i></a>
+                    <a href="{{ $company->facebook }}" class="social-circle"><i class="fab fa-facebook-f"></i></a>
+                    <a href="{{ $company->instagram }}" class="social-circle"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ $company->linkedin }}" class="social-circle"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ $company->youtube }}" class="social-circle"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
@@ -34,16 +34,16 @@
                 </div>
                 <div class="d-flex gap-3 mb-3">
                     <i class="fas fa-phone"></i>
-                    <p class="small opacity-75">+44 (0) 1234 567890</p>
+                    <p class="small opacity-75">{{ $company->phone1 }}</p>
                 </div>
                 <div class="d-flex gap-3">
                     <i class="fas fa-envelope"></i>
-                    <p class="small opacity-75">info@pfcagri.co.uk</p>
+                    <p class="small opacity-75">{{ $company->email1 }}</p>
                 </div>
             </div>
         </div>
         <div class="footer-bottom text-center">
-            <p class="mb-0">© 2026 PFC Agri Solutions. All rights reserved. | Family Farming Innovation</p>
+            <p class="mb-0">{{ $company->copyright }}</p>
         </div>
     </div>
 </footer>
