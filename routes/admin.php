@@ -120,5 +120,13 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/research', [ResearchController::class, 'research'])->name('admin.research');
     Route::post('/research', [ResearchController::class, 'researchUpdate']);
 
+    Route::get('/initiatives', [ResearchController::class, 'initiatives'])->name('admin.initiatives');
+    Route::post('/initiatives', [ResearchController::class, 'store']);
+    Route::get('/initiatives/{id}/edit', [ResearchController::class, 'edit']);
+    Route::post('/initiatives-update', [ResearchController::class, 'update']);
+    Route::delete('/initiatives/{id}', [ResearchController::class, 'destroy'])->name('initiatives.destroy');
+    Route::post('/initiatives-status', [ResearchController::class, 'toggleStatus']);
+
+
 
 });
