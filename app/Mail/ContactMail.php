@@ -21,11 +21,10 @@ class ContactMail extends Mailable
 
     public function build()
     {
-        return $this->subject('New Contact')
+        return $this->subject('New Inquires')
                     ->view('emails.contact')
                     ->with([
-                        'first_name' => $this->contact->first_name,
-                        'last_name'  => $this->contact->last_name,
+                        'full_name' => $this->contact->full_name,
                         'email'      => $this->contact->email,
                         'phone'      => $this->contact->phone,
                         'subjectText'    => $this->contact->subject ?? 'New query from website',

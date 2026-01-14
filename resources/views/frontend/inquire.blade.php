@@ -154,44 +154,63 @@
                 <div class="contact-form-card">
                     <h4 class="fw-bold mb-2" style="color: #00a651;">Send us a Message</h4>
                     <p class="text-muted small mb-4">Fill out the form below and we'll get back to you as soon as possible.</p>
+
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" id="callback">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     
-                    <form>
+                    <form action="{{ route('contact.store') }}" method="POST">
+                        @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Full Name <span>*</span></label>
-                                <input type="text" class="form-control" placeholder="John Smith" required>
+                                <input type="text" name="full_name" class="form-control" placeholder="John Smith" required value="{{ old('full_name') }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Email Address <span>*</span></label>
-                                <input type="email" class="form-control" placeholder="john@example.com" required>
+                                <input type="email" name="email" class="form-control" placeholder="john@example.com" required value="{{ old('email') }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" placeholder="+44 1234 567890">
+                                <input type="tel" name="phone" class="form-control" placeholder="+44 1234 567890" value="{{ old('phone') }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Subject</label>
-                                <select class="form-select">
+                                <select name="subject" class="form-select">
                                     <option selected disabled>Select a subject</option>
-                                    <option>Product Inquiry</option>
-                                    <option>Technical Support</option>
-                                    <option>Partnership</option>
-                                    <option>Other</option>
+                                    <option value="Product Inquiry">Product Inquiry</option>
+                                    <option value="Technical Support">Technical Support</option>
+                                    <option value="Partnership">Partnership</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Product Interest</label>
-                                <select class="form-select">
+                                <select name="category_id" class="form-select">
                                     <option selected disabled>Select a product category (optional)</option>
-                                    <option>Slurry Management</option>
-                                    <option>Wet Bale Management</option>
-                                    <option>Field Preparation</option>
-                                    <option>Woodland Management</option>
+                                    @foreach ($categories as $cat)
+                                        <option value="{{$cat->id}}"> {{ $cat->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Your Message <span>*</span></label>
-                                <textarea class="form-control" rows="5" placeholder="Please describe your inquiry in detail..." required></textarea>
+                                <textarea name="message" class="form-control" rows="5" placeholder="Please describe your inquiry in detail..." required>{{ old('message') }}</textarea>
                             </div>
                             <div class="col-12 mt-4">
                                 <button type="submit" class="btn-send"><i class="fas fa-paper-plane me-2"></i> Send Message</button>

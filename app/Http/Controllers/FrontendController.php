@@ -52,54 +52,53 @@ class FrontendController extends Controller
 
     public function inquire()
     {
-        return view('frontend.inquire');
+        $categories = Category::with('products')->where('status', 1)->get();
+        return view('frontend.inquire', compact('categories'));
     }
 
     public function storeContact(Request $request)
     {
-
-        
         try {
-
+            // 1. Validation matching new form names
             $request->validate([
-                'first_name' => 'required|string|min:2|max:50',
-                'last_name'  => 'required|string|min:2|max:50',
-                'email' => 'required|email|max:50',
-                'preferred_date' => 'required|date',
-                'dob' => 'nullable|date|after_or_equal:' . now()->subYears(5)->format('Y-m-d'),
-                'phone' => ['required'],
-                'subject' => 'nullable|string|max:255',
-                'message' => 'nullable|string|max:2000',
+                'full_name'   => 'required|string|min:2|max:100',
+                'email'       => 'required|email|max:100',
+                'phone'       => 'nullable|string|max:20',
+                'subject'     => 'nullable|string',
+                'category_id' => 'nullable|exists:categories,id', 
+                'message'     => 'required|string|min:10|max:3000',
             ]);
 
             $contact = new Contact();
-            $contact->first_name = $request->input('first_name');
-            $contact->last_name  = $request->input('last_name');
-            $contact->email      = $request->input('email');
-            $contact->phone      = $request->input('phone');
-            $contact->subject    = $request->input('subject');
-            $contact->dob        = $request->input('dob');
-            $contact->preferred_date        = $request->input('preferred_date');
-            $contact->message    = $request->input('message');
-            $contact->pref_time  = $request->input('prefTime');
-            $contact->nursery    = $request->input('nursery');
+            $names = explode(' ', $request->input('full_name'), 2);
+            $contact->first_name = $names[0];
+            $contact->last_name  = $names[1] ?? ''; 
+            
+            $contact->full_name       = $request->input('full_name');
+            $contact->email       = $request->input('email');
+            $contact->phone       = $request->input('phone');
+            $contact->subject     = $request->input('subject');
+            $contact->category_id = $request->input('category_id');
+            $contact->message     = $request->input('message');
+            
             $contact->save();
 
+            // 3. Email Notification
             $contactEmails = ContactEmail::where('status', 1)->pluck('email');
 
-            foreach ($contactEmails as $contactEmail) {
-                Mail::to($contactEmail)->send(new ContactMail($contact));
+            if ($contactEmails->count() > 0) {
+                foreach ($contactEmails as $email) {
+                    Mail::to($email)->send(new ContactMail($contact));
+                }
             }
 
-
-            return redirect()->to(url()->previous() . '#callback')
-                            ->with('success', 'Your message has been sent successfully!');
+            return redirect()->back()->with('success', 'Your message has been sent successfully!');
             
         } catch (ValidationException $e) {
-            throw ValidationException::withMessages($e->errors())
-                ->redirectTo(url()->previous() . '#callback');
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
         }
-
     }
 
 
