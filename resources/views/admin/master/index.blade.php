@@ -20,6 +20,10 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
+                                    <label>Pages <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="pages" name="pages">
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <label>Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name">
                                 </div>
@@ -38,6 +42,12 @@
                                 <div class="col-12 mb-3">
                                     <label>Long Description</label>
                                     <textarea class="form-control ckeditor-classic" id="long_description" name="long_description"></textarea>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label>Feature Image</label>
+                                    <input type="file" class="form-control" id="feature_image" name="feature_image"
+                                        onchange="previewImage(event, '#feature_image_preview')">
+                                    <img id="feature_image_preview" src="#" class="img-thumbnail mt-3">
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label>Meta Title</label>
@@ -143,6 +153,7 @@
                 $('#newBtn').show(100);
                 $('#createThisForm')[0].reset();
                 $('#meta_image_preview').hide();
+                $('#feature_image_preview').hide();
                 $('#name').prop('readonly', false);
             });
 
@@ -171,6 +182,7 @@
                         table.ajax.reload(null, false);
                         $('#createThisForm')[0].reset();
                         $('#meta_image_preview').hide();
+                        $('#feature_image_preview').hide();
                     },
                     error: function(xhr) {
                         if (xhr.status === 422 && xhr.responseJSON) {
@@ -198,6 +210,13 @@
                             .show();
                     } else {
                         $('#meta_image_preview').hide();
+                    }
+
+                    if (res.feature_image) {
+                        $('#feature_image_preview').attr('src', '/images/content/' + res.feature_image)
+                            .show();
+                    } else {
+                        $('#feature_image_preview').hide();
                     }
 
                     if (editors.has('short_description')) editors.get('short_description').setData(

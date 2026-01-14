@@ -41,6 +41,7 @@ class MasterController extends Controller
 
         $data = new Master();
         $data->fill($request->except('meta_image'));
+        $data->fill($request->except('feature_image'));
         $data->created_by = auth()->id();
 
         if ($request->hasFile('meta_image')) {
@@ -49,10 +50,16 @@ class MasterController extends Controller
             $image->move(public_path('images/meta_image'), $imageName);
             $data->meta_image = $imageName;
         }
+        if ($request->hasFile('feature_image')) {
+            $image = $request->file('feature_image');
+            $imageName = uniqid().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images/content'), $imageName);
+            $data->feature_image = $imageName;
+        }
 
         $data->save();
 
-        return response()->json(['message' => 'Master data created successfully.'], 201);
+        return response()->json(['message' => 'Data created successfully.'], 201);
     }
 
     public function edit($id)
@@ -70,6 +77,7 @@ class MasterController extends Controller
 
         $data = Master::findOrFail($request->id);
         $data->fill($request->except('meta_image'));
+        $data->fill($request->except('feature_image'));
         $data->updated_by = auth()->id();
 
         if ($request->hasFile('meta_image')) {
@@ -82,9 +90,20 @@ class MasterController extends Controller
             $data->meta_image = $imageName;
         }
 
+        
+        if ($request->hasFile('feature_image')) {
+            if ($data->feature_image && file_exists(public_path('images/content/'.$data->feature_image))) {
+                unlink(public_path('images/content/'.$data->feature_image));
+            }
+            $image = $request->file('feature_image');
+            $imageName = uniqid().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images/content'), $imageName);
+            $data->feature_image = $imageName;
+        }
+
         $data->save();
 
-        return response()->json(['message' => 'Master data updated successfully.'], 200);
+        return response()->json(['message' => 'Data updated successfully.'], 200);
     }
 
     public function destroy($id)
@@ -93,7 +112,10 @@ class MasterController extends Controller
         if ($data->meta_image && file_exists(public_path('images/meta_image/'.$data->meta_image))) {
             unlink(public_path('images/meta_image/'.$data->meta_image));
         }
+        if ($data->feature_image && file_exists(public_path('images/content/'.$data->feature_image))) {
+            unlink(public_path('images/content/'.$data->feature_image));
+        }
         $data->delete();
-        return response()->json(['message' => 'Master data deleted successfully.'], 200);
+        return response()->json(['message' => 'Data deleted successfully.'], 200);
     }
 }

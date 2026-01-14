@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SubSubCategoryController;
 use App\Http\Controllers\Admin\LandlordController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PropertyController;
+use App\Http\Controllers\Admin\ResearchController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TenantController;
 use Illuminate\Support\Facades\Route;
@@ -92,28 +93,6 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::delete('/category/{id}', [CategoryController::class, 'delete'])->name('category.delete');
     Route::post('/category-status', [CategoryController::class, 'toggleStatus']);
 
-    // Landlord crud
-    Route::get('/landlord', [LandlordController::class, 'index'])->name('alllandlord');
-    Route::post('/landlord', [LandlordController::class, 'store'])->name('landlord.store');
-    Route::get('/landlord/{id}/edit', [LandlordController::class, 'edit']);
-    Route::post('/landlord-update', [LandlordController::class, 'update']);
-    Route::delete('/landlord/{id}', [LandlordController::class, 'delete'])->name('landlord.delete');
-    Route::post('/landlord-status', [LandlordController::class, 'toggleStatus']);
-
-    // Property crud
-    Route::get('/property', [PropertyController::class, 'index'])->name('allproperty');
-    Route::post('/property', [PropertyController::class, 'store'])->name('property.store');
-    Route::get('/property/{id}/edit', [PropertyController::class, 'edit']);
-    Route::post('/property-update', [PropertyController::class, 'update']);
-    Route::delete('/property/{id}', [PropertyController::class, 'delete'])->name('property.delete');
-
-    // Tenant crud
-    Route::get('/tenant', [TenantController::class, 'index'])->name('alltenant');
-    Route::post('/tenant', [TenantController::class, 'store'])->name('tenant.store');
-    Route::get('/tenant/{id}/edit', [TenantController::class, 'edit']);
-    Route::post('/tenant-update', [TenantController::class, 'update']);
-    Route::delete('/tenant/{id}', [TenantController::class, 'delete'])->name('tenant.delete');
-    Route::post('/tenant-status', [TenantController::class, 'toggleStatus']);
     
     // About
     Route::get('/about', [AboutController::class, 'index'])->name('admin.about');
@@ -136,6 +115,10 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/products-update', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
     Route::post('/products-status', [ProductController::class, 'toggleStatus']);
+
+    // R&D
+    Route::get('/research', [ResearchController::class, 'research'])->name('admin.research');
+    Route::post('/research', [ResearchController::class, 'researchUpdate']);
 
 
 });

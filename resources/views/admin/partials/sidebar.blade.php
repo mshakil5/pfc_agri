@@ -107,27 +107,7 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('alllandlord') }}" class="nav-link {{ Route::is('alllandlord') ? 'active' : '' }}">
-                        <i class="ri-community-line"></i>
-                        <span>Landlords</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('allproperty') }}" class="nav-link {{ Route::is('allproperty') ? 'active' : '' }}">
-                        <i class="ri-building-4-line"></i>
-                        <span>Properties</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('alltenant') }}" class="nav-link {{ Route::is('alltenant') ? 'active' : '' }}">
-                        <i class="ri-group-line"></i>
-                        <span>Tenants</span>
-                    </a>
-                </li>
+                
 
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ $productActive ? 'active' : '' }}" 
