@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Models\ContactEmail;
 use App\Mail\ContactMail;
+use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -16,7 +17,9 @@ class FrontendController extends Controller
     
     public function index()
     {
-        return view('frontend.index');
+        $slider = Slider::orderby('id')->first();
+        // dd($slider);
+        return view('frontend.index', compact('slider'));
     }
 
     public function aboutUs()

@@ -3,27 +3,167 @@
 @section('content')
 
 
+    <style>
+        /* --- Professional Hero & Stats --- */
+        .hero-section {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            padding: 100px 0; /* More balanced padding */
+            overflow: hidden;
+        }
 
+        /* The Gradient Overlay */
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Adjust the '0.9' for darkness and '60%' for where the fade starts */
+            background: linear-gradient(to right, 
+                rgba(0, 50, 0, 0.9) 0%, 
+                rgba(0, 50, 0, 0.6) 40%, 
+                rgba(0, 50, 0, 0) 100%);
+            z-index: 1;
+        }
 
-    <section class="hero-section">
+        /* Ensure content sits above the gradient */
+        .hero-section .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge { 
+            background: rgba(118, 255, 3, 0.2); /* Tinted with your highlight color */
+            border: 1px solid rgba(118, 255, 3, 0.4);
+            color: #76ff03;
+            padding: 6px 18px; 
+            border-radius: 50px; 
+            display: inline-block; 
+            margin-bottom: 25px; 
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem); /* Responsive font sizing */
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        /* This is the green color for the second part of the title */
+        .text-highlight {
+            color: #7FD13B; /* A vibrant agricultural green */
+            display: inline-block; /* Helps with spacing on some browsers */
+        }
+
+        /* Optional: Add a text shadow if the image is very busy */
+        .hero-title span {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Professional Stat Cards */
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 15px;
+            text-align: center;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #76ff03;
+            margin-bottom: 5px;
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 991px) {
+            .hero-section {
+                text-align: center;
+                min-height: auto;
+            }
+            
+            .hero-section::before {
+                /* Change gradient to bottom-up on mobile for better text reading */
+                background: linear-gradient(to bottom, 
+                    rgba(0, 50, 0, 0.8) 0%, 
+                    rgba(0, 50, 0, 0.5) 100%);
+            }
+
+            .hero-section .btn-lg {
+                width: 100%;
+                margin-bottom: 10px;
+                margin-right: 0 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .text-highlight {
+                display: block; /* Moves the green text to a new line on mobile for impact */
+                margin-top: 5px;
+            }
+        }
+    </style>
+
+    <section class="hero-section" style="background-image: url('{{ asset('images/slider/' . $slider->image) }}')">
         <div class="container">
             <div class="row">
                 <div class="col-lg-7">
-                    <div class="hero-badge">Family Farming Since 1985</div>
-                    <h1 class="hero-title">Innovative Agricultural <br> <span class="text-highlight">Solutions for Modern Farming</span></h1>
-                    <p class="lead my-4 opacity-75">PFC Agri Solutions brings decades of family farming expertise together with cutting-edge technology to deliver products that make a real difference to your operation.</p>
+                    <div class="hero-badge">{{ $slider->hero_badge }}</div>
+                    
+                    <h1 class="hero-title">
+                        @php
+                            $words = explode(' ', $slider->title);
+                            $firstPart = implode(' ', array_slice($words, 0, 2));
+                            $secondPart = implode(' ', array_slice($words, 2));
+                        @endphp
+
+                        <span class="text-white">{{ $firstPart }}</span>
+                        <span class="text-highlight">{{ $secondPart }}</span>
+                    </h1>
+                    
+                    <p class="lead my-4 opacity-75">
+                        {{ $slider->sub_title }}
+                    </p>
+
                     <div class="mt-5 mb-5">
-                        <a href="#" class="btn btn-light btn-lg px-4 me-3 text-success fw-bold rounded-1">Explore Products &rarr;</a>
-                        <a href="#" class="btn btn-outline-light btn-lg px-4 rounded-1">Get in Touch</a>
+                        @foreach($slider->buttons as $btn)
+                            <a href="{{ $btn['link'] }}" class="btn btn-light btn-lg px-4 me-3 text-success fw-bold rounded-1">
+                                {{ $btn['label'] }} &rarr;
+                            </a>
+                        @endforeach
                     </div>
                 </div>
 
                 <div class="col-lg-12 stats-container">
                     <div class="row g-3">
-                        <div class="col-md-3"><div class="stat-card"><h3>35+</h3><p class="mb-0 small opacity-75">Years Experience</p></div></div>
-                        <div class="col-md-3"><div class="stat-card"><h3>500+</h3><p class="mb-0 small opacity-75">Happy Customers</p></div></div>
-                        <div class="col-md-3"><div class="stat-card"><h3>50+</h3><p class="mb-0 small opacity-75">Product Range</p></div></div>
-                        <div class="col-md-3"><div class="stat-card"><h3>24/7</h3><p class="mb-0 small opacity-75">Support</p></div></div>
+                        {{-- Directly loop through the attribute --}}
+                        @foreach($slider->stat_card as $stat)
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <h3>{{ $stat['value'] ?? '' }}</h3>
+                                    <p class="mb-0 small opacity-75">{{ $stat['title'] ?? '' }}</p>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -40,6 +180,8 @@
 
         <div class="container">
             <div class="row g-4">
+
+
                 <div class="col-md-6">
                     <div class="card category-card">
                         <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100" style="object-fit: cover;" alt="Slurry Management">
@@ -98,6 +240,8 @@
                         </div>
                     </div>
                 </div>
+
+                
             </div>
         </div>
     </section>

@@ -30,7 +30,7 @@
 
     <style>
         :root {
-            --pfc-green: #00a651;
+            --pfc-green: #00A651;
             --pfc-dark: #1a1a1a;
             --pfc-light-green: #d4edda;
         }
@@ -46,7 +46,7 @@
             background-color: var(--pfc-green); 
             color: white; 
             font-size: 0.85rem; 
-            padding: 8px 0; 
+            padding: 14px 0; 
             position: relative; /* Required for z-index to work */
             z-index: 1060;     /* Higher than Bootstrap's sticky-top (1020) */
         }
@@ -79,58 +79,7 @@
             margin: 0 10px;
         }
 
-        /* --- Hero & Stats Animation --- */
-        .hero-section {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            color: white;
-            padding-top: 80px;
-            padding-bottom: 50px;
-        }
-
         
-        .hero-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
-
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.1;
-        }
-        
-        .text-highlight { color: #76ff03; font-weight: 800; }
-
-        /* Stats Cards */
-        .stats-container {
-            margin-top: 60px;
-            position: relative;
-            z-index: 10;
-            /* Animation Properties */
-            opacity: 0;
-            transform: translateY(50px);
-            animation: fadeInUp 1.2s ease-out forwards;
-            animation-delay: 0.3s;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 30px;
-            text-align: center;
-            border-radius: 8px;
-        }
-
 
         /* Product Cards */
         .category-card {
