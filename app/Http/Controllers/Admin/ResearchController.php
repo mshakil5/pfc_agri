@@ -192,12 +192,12 @@ class ResearchController extends Controller
 
         // Handle Main Feature Image
         if ($request->hasFile('feature_image')) {
-            $model->feature_image = $this->uploadImage($request->file('feature_image'), 'uploads/research/', $model->image);
+            $model->feature_image = $this->uploadImage($request->file('feature_image'), 'images/research/', $model->image);
         }
 
         // Handle Meta Image
         if ($request->hasFile('meta_image')) {
-            $model->meta_image = $this->uploadImage($request->file('meta_image'), 'uploads/meta/', $model->meta_image);
+            $model->meta_image = $this->uploadImage($request->file('meta_image'), 'images/meta/', $model->meta_image);
         }
 
         $model->save();

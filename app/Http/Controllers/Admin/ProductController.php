@@ -109,7 +109,7 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $name = mt_rand(10000000,99999999).'.webp';
-            $path = public_path('uploads/products/');
+            $path = public_path('images/products/');
             if(!file_exists($path)) mkdir($path, 0755, true);
 
             Image::make($file)
@@ -117,7 +117,7 @@ class ProductController extends Controller
                 ->encode('webp', 50)
                 ->save($path.$name);
 
-            $product->image = '/uploads/products/'.$name;
+            $product->image = '/images/products/'.$name;
         }
 
         $product->save();
@@ -162,7 +162,7 @@ class ProductController extends Controller
 
             $file = $request->file('image');
             $name = mt_rand(10000000,99999999).'.webp';
-            $path = public_path('uploads/products/');
+            $path = public_path('images/products/');
             if(!file_exists($path)) mkdir($path, 0755, true);
 
             Image::make($file)
@@ -170,7 +170,7 @@ class ProductController extends Controller
                 ->encode('webp', 50)
                 ->save($path.$name);
 
-            $product->image = '/uploads/products/'.$name;
+            $product->image = '/images/products/'.$name;
         }
 
         $product->save();
