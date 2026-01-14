@@ -30,6 +30,12 @@
             <ul class="navbar-nav" id="navbar-nav">
 
                 @php
+                
+                    $frontPageActive = Route::is(
+                        'allslider',
+                        'admin.aboutUs',
+                    );
+
                     $productActive = Route::is(
                         'allcategory',
                         'allproducts',
@@ -38,17 +44,21 @@
                     $settingsRoute = Route::is(
                         'admin.companyDetails',
                         'admin.company.seo-meta',
-                        'admin.aboutUs',
                         'admin.privacy-policy',
                         'admin.terms-and-conditions',
                         'faq.index',
                         'admin.mail-body',
                         'sections.index',
-                        'allslider',
                         'admin.about',
                         'admin.home-footer',
                         'admin.copyright'
                     );
+
+                    $researchPageActive = Route::is(
+                        'admin.research',
+                        'admin.initiatives',
+                    );
+
                 @endphp
 
                 <li class="nav-item d-none">
@@ -135,10 +145,66 @@
                     </div>
                 </li>
 
+
+                
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ $frontPageActive ? 'active' : '' }}" 
+                      href="#sidebarFrontpage" data-bs-toggle="collapse" role="button"
+                      aria-expanded="{{ $frontPageActive ? 'true' : 'false' }}" 
+                      aria-controls="sidebarFrontpage">
+                        <i class="ri-shopping-bag-3-line"></i> <span>Front Page</span>
+                    </a>
+                    <div class="collapse menu-dropdown {{ $frontPageActive ? 'show' : '' }}" id="sidebarFrontpage">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('allslider') }}" 
+                                  class="nav-link {{ Route::is('allslider') ? 'active' : '' }}">Sliders
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.aboutUs') }}" 
+                                  class="nav-link {{ Route::is('admin.aboutUs') ? 'active' : '' }}">About Us</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ $researchPageActive ? 'active' : '' }}" 
+                      href="#sidebarResearchPage" data-bs-toggle="collapse" role="button"
+                      aria-expanded="{{ $researchPageActive ? 'true' : 'false' }}" 
+                      aria-controls="sidebarResearchPage">
+                        <i class="ri-shopping-bag-3-line"></i> <span>R&D</span>
+                    </a>
+                    <div class="collapse menu-dropdown {{ $researchPageActive ? 'show' : '' }}" id="sidebarResearchPage">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.research') }}" 
+                                  class="nav-link {{ Route::is('admin.research') ? 'active' : '' }}">Research
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.initiatives') }}" 
+                                  class="nav-link {{ Route::is('admin.initiatives') ? 'active' : '' }}">Initiatives</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.about') }}" class="nav-link {{ Route::is('admin.about') ? 'active' : '' }}">
+                        <i class="ri-mail-open-line"></i>
+                        <span>About Us</span>
+                    </a>
+                </li>
+
+
+
                 <li class="nav-item">
                     <a href="{{ route('contacts.index') }}" class="nav-link {{ Route::is('contacts.index') ? 'active' : '' }}">
                         <i class="ri-mail-open-line"></i>
-                        <span>Contact Messages</span>
+                        <span> Messages</span>
                     </a>
                 </li>
 
@@ -168,14 +234,6 @@
                                   class="nav-link {{ Route::is('admin.company.seo-meta') ? 'active' : '' }}">SEO</a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.aboutUs') }}" 
-                                  class="nav-link {{ Route::is('admin.aboutUs') ? 'active' : '' }}">About Us Homepage</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.about') }}" 
-                                  class="nav-link {{ Route::is('admin.about') ? 'active' : '' }}">About Us</a>
-                            </li>
-                            <li class="nav-item">
                                 <a href="{{ route('admin.privacy-policy') }}" 
                                   class="nav-link {{ Route::is('admin.privacy-policy') ? 'active' : '' }}">Privacy Policy</a>
                             </li>
@@ -202,11 +260,6 @@
                             <li class="nav-item">
                                 <a href="{{ route('faq.index') }}" 
                                   class="nav-link {{ Route::is('faq.index') ? 'active' : '' }}">FAQ</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('allslider') }}" 
-                                  class="nav-link {{ Route::is('allslider') ? 'active' : '' }}">Sliders
-                                </a>
                             </li>
                         </ul>
                     </div>

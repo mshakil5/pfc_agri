@@ -4,7 +4,7 @@ use App\Http\Controllers\ContactContoller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FrontendController;
-
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 
@@ -54,6 +54,7 @@ Route::post('/contact', [FrontendController::class, 'storeContact'])->name('cont
 Route::get('/research-and-development', [FrontendController::class, 'rAndD'])->name('rAndD');
 Route::get('/inquire', [FrontendController::class, 'inquire'])->name('inquire');
 Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('aboutUs');
+Route::get('/shop/{slug?}', [ProductController::class, 'shop'])->name('category.show');
 
 Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user', 'verified']], function(){
   

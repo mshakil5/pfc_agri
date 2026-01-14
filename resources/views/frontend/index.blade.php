@@ -175,73 +175,39 @@
         <div class="container text-center mb-5">
             <p class="section-tag mb-1">What we offer</p>
             <h2 class="fw-bold mb-3" style="color: #00a651;">Our Product Categories</h2>
-            <p class="text-muted mx-auto" style="max-width: 600px;">Comprehensive range of agricultural solutions designed to enhance your farming operations</p>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Comprehensive range of agricultural solutions designed to enhance your farming operations
+            </p>
         </div>
 
         <div class="container">
             <div class="row g-4">
-
-
-                <div class="col-md-6">
-                    <div class="card category-card">
-                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100" style="object-fit: cover;" alt="Slurry Management">
-                        <div class="card-img-overlay">
-                            <h3>Slurry Management</h3>
-                            <p class="small opacity-75">Lagoon liners, slurry bags and complete slurry handling solutions</p>
-                            <div class="mb-3">
-                                <span class="tag-pill">Lagoon Liners</span>
-                                <span class="tag-pill">Slurry Bags</span>
+                @foreach($categories as $category)
+                    <div class="col-md-6">
+                        <div class="card category-card">
+                            <img src="{{ asset($category->image) }}" 
+                                class="card-img h-100" 
+                                style="object-fit: cover;" 
+                                alt="{{ $category->name }}">
+                            
+                            <div class="card-img-overlay">
+                                <h3>{{ $category->name }}</h3>
+                                
+                                <p class="small opacity-75">{{ $category->description }}</p>
+                                
+                                <div class="mb-3">
+                                    @foreach($category->products->take(4) as $product)
+                                        <span class="tag-pill">{{ $product->title }}</span>
+                                    @endforeach
+                                </div>
+                                
+                                <a href="{{ route('category.show', $category->slug) }}" class="text-white text-decoration-none fw-bold">
+                                    View Products &rarr;
+                                </a>
                             </div>
-                            <a href="#" class="text-white text-decoration-none fw-bold">View Products &rarr;</a>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card category-card">
-                        <img src="https://images.unsplash.com/photo-1533240332313-0db49b459ad6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100" style="object-fit: cover;" alt="Wet Bale">
-                        <div class="card-img-overlay">
-                            <h3>Wet Bale Management</h3>
-                            <p class="small opacity-75">Complete wet bale preservation systems and equipment</p>
-                            <div class="mb-3">
-                                <span class="tag-pill">Applicators</span>
-                                <span class="tag-pill">Moisture Meters</span>
-                                <span class="tag-pill">Acid Preservative</span>
-                            </div>
-                            <a href="#" class="text-white text-decoration-none fw-bold">View Products &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card category-card">
-                        <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100" style="object-fit: cover;" alt="Field Prep">
-                        <div class="card-img-overlay">
-                            <h3>Field Preparation</h3>
-                            <p class="small opacity-75">Professional cultivation and tillage equipment</p>
-                            <div class="mb-3">
-                                <span class="tag-pill">Cultivators</span>
-                                <span class="tag-pill">Subsoilers</span>
-                                <span class="tag-pill">Drills</span>
-                            </div>
-                            <a href="#" class="text-white text-decoration-none fw-bold">View Products &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card category-card">
-                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="card-img h-100" style="object-fit: cover;" alt="Woodland">
-                        <div class="card-img-overlay">
-                            <h3>Woodland Management</h3>
-                            <p class="small opacity-75">Professional forestry and woodland care tools</p>
-                            <div class="mb-3">
-                                <span class="tag-pill">Saws</span>
-                                <span class="tag-pill">Trimmer Bars</span>
-                            </div>
-                            <a href="#" class="text-white text-decoration-none fw-bold">View Products &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-
-                
+                @endforeach
             </div>
         </div>
     </section>

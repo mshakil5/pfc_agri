@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Models\ContactEmail;
 use App\Mail\ContactMail;
+use App\Models\Category;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +19,9 @@ class FrontendController extends Controller
     public function index()
     {
         $slider = Slider::orderby('id')->first();
-        return view('frontend.index', compact('slider'));
+        $categories = Category::with('products')->where('status', 1)->get();
+        // dd($categories);
+        return view('frontend.index', compact('slider','categories'));
     }
 
     public function aboutUs()
