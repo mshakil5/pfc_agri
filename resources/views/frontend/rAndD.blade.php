@@ -108,13 +108,13 @@
     </style>
 
 
-<section class="rd-hero">
+@if($research)
+<section class="rd-hero" style="background-image: url('{{ asset('uploads/master/' . $research->feature_image) }}');">
     <div class="container">
-        <span class="innovation-badge">Innovation Hub</span>
-        <h1 class="fw-bold display-4">Research & Development</h1>
+        <span class="innovation-badge">{{ $research->name }}</span>
+        <h1 class="fw-bold display-4">{{ $research->short_title }}</h1>
         <p class="opacity-75 mx-auto" style="max-width: 700px;">
-            Discover the innovative projects we're working on to shape the future of agriculture. 
-            From concept to completion, follow our journey of innovation.
+            {{ $research->long_title }}
         </p>
     </div>
 </section>
@@ -122,13 +122,25 @@
 <section class="rd-counters">
     <div class="container">
         <div class="row text-center">
-            <div class="col-3 counter-item"><h2>0</h2><p class="small text-muted mb-0">Completed Projects</p></div>
-            <div class="col-3 counter-item"><h2>1</h2><p class="small text-muted mb-0">In Progress</p></div>
-            <div class="col-3 counter-item"><h2>1</h2><p class="small text-muted mb-0">In Testing</p></div>
-            <div class="col-3 counter-item"><h2>1</h2><p class="small text-muted mb-0">Planning</p></div>
+            @php
+                $counters = json_decode($research->extra1, true);
+            @endphp
+
+            @if(!empty($counters))
+                @foreach($counters as $counter)
+                    <div class="col-md-3 col-6 counter-item mb-3">
+                        <h2>{{ $counter['count'] }}</h2>
+                        <p class="small text-muted mb-0">{{ $counter['subtitle'] }}</p>
+                    </div>
+                @endforeach
+            @else
+                {{-- Fallback if JSON is empty --}}
+                <div class="col-12"><p class="text-muted">No stats available.</p></div>
+            @endif
         </div>
     </div>
 </section>
+@endif
 
 <section class="py-5 bg-light">
     <div class="container">

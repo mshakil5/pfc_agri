@@ -290,21 +290,21 @@
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-phone"></i></div>
                     <h5 class="fw-bold mb-2">Call Us</h5>
-                    <p class="mb-0 opacity-90">+44 (0) 1234 567890</p>
+                    <p class="mb-0 opacity-90">{{ $company->phone1 }}</p>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-envelope"></i></div>
                     <h5 class="fw-bold mb-2">Email Us</h5>
-                    <p class="mb-0 opacity-90">info@pfcagri.co.uk</p>
+                    <p class="mb-0 opacity-90">{{ $company->email1 }}</p>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-map-marker-alt"></i></div>
                     <h5 class="fw-bold mb-2">Visit Us</h5>
-                    <p class="small mb-0 opacity-90">PFC Agri Solutions<br>Farm Road, Rural County<br>United Kingdom</p>
+                    <p class="small mb-0 opacity-90 text-light">{!! $company->address1 !!}</p>
                 </div>
             </div>
         </div>

@@ -36,12 +36,13 @@ class FrontendController extends Controller
     public function aboutUs()
     {
         $data = About::where('pages', 'about')->first();
-        // dd($data);
         if ($data) {
             $data->amenities = json_decode($data->amenities, true);
         }
 
-        return view('frontend.about', compact('data'));
+        $company = CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'linkedin', 'website', 'phone1', 'email1', 'address1','address2','company_logo','copyright','google_map')->first();
+
+        return view('frontend.about', compact('data','company'));
     }
 
 
@@ -49,7 +50,8 @@ class FrontendController extends Controller
     public function rAndD()
     {
         $data = Research::orderby('id', 'DESC')->get();
-        return view('frontend.rAndD', compact('data'));
+        $research = Master::where('pages', 'rnd')->first();
+        return view('frontend.rAndD', compact('data','research'));
     }
 
     public function inquire()
