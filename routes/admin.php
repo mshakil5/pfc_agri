@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\CompanyDetailsController;
+use App\Http\Controllers\Admin\DealerController;
 use App\Http\Controllers\Admin\SubSubCategoryController;
 use App\Http\Controllers\Admin\LandlordController;
 use App\Http\Controllers\Admin\ProductController;
@@ -126,6 +127,13 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::post('/initiatives-update', [ResearchController::class, 'update']);
     Route::delete('/initiatives/{id}', [ResearchController::class, 'destroy'])->name('initiatives.destroy');
     Route::post('/initiatives-status', [ResearchController::class, 'toggleStatus']);
+
+    // Dealer
+    Route::get('/dealer', [DealerController::class, 'getDealer'])->name('alldealer');
+    Route::post('/dealer', [DealerController::class, 'store'])->name('dealer.store');
+    Route::get('/dealer/{id}/edit', [DealerController::class, 'edit']);
+    Route::delete('/dealer/{id}', [DealerController::class, 'delete'])->name('dealer.delete');
+    Route::post('/dealer-status', [DealerController::class, 'toggleStatus']);
 
 
 

@@ -199,6 +199,14 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('alldealer') }}" class="nav-link {{ Route::is('alldealer') ? 'active' : '' }}">
+                        <i class="ri-mail-open-line"></i>
+                        <span>Partners</span>
+                    </a>
+                </li>
+
+
 
 
                 <li class="nav-item">

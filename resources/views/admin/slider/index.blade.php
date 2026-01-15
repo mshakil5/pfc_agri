@@ -268,37 +268,36 @@
             });
 
             $("#addBtn").click(function(e) {
-                e.preventDefault(); // Prevent default button behavior
+                e.preventDefault();
+                let form_data = new FormData($('#createThisForm')[0]);
                 
-                // Get the form element
-                let formElement = document.getElementById('createThisForm');
-                let form_data = new FormData(formElement);
-                
-                // Determine the URL (assuming you have these variables defined)
-                let requestUrl = ($("#addBtn").val() == 'Update') ? upurl : url;
-
                 $.ajax({
-                    url: requestUrl,
+                    url: "{{ route('dealer.store') }}", 
                     type: "POST",
                     data: form_data,
                     contentType: false,
                     processData: false,
                     success: function(d) {
                         showSuccess(d.message);
-                        $("#addThisFormContainer").slideUp(300);
-                        setTimeout(() => {
-                            $("#newBtn").show();
-                        }, 300);
-                        reloadTable('#sliderTable');
-                        clearform();
+                        $("#FormCloseBtn").click();
+                        table.ajax.reload();
                     },
                     error: function(xhr) {
-                        if(xhr.status === 422) {
-                            // Validation errors
+                        if (xhr.status === 422) {
+                            // Get the errors object from Laravel
                             let errors = xhr.responseJSON.errors;
-                            showError(Object.values(errors).flat()[0]);
+                            let errorMessages = [];
+
+                            // Loop through the errors object
+                            Object.values(errors).forEach(function(messages) {
+                                errorMessages.push(messages[0]); // Get the first error message for each field
+                            });
+
+                            // Display all messages joined by a line break or comma
+                            showError(errorMessages.join("<br>")); 
                         } else {
-                            showError(xhr.responseJSON?.message ?? "Something went wrong!");
+                            // Handle other errors (500, 404, etc.)
+                            showError(xhr.responseJSON?.message ?? "Something went wrong. Please try again.");
                         }
                     }
                 });
