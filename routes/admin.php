@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AboutController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\UserController;
@@ -134,6 +135,9 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/dealer/{id}/edit', [DealerController::class, 'edit']);
     Route::delete('/dealer/{id}', [DealerController::class, 'delete'])->name('dealer.delete');
     Route::post('/dealer-status', [DealerController::class, 'toggleStatus']);
+
+    
+    Route::get('/blog', [BlogController::class, 'blog'])->name('blog.index');
 
 
 
