@@ -106,6 +106,13 @@ class FrontendController extends Controller
     }
 
 
+    public function blogDetails()
+    {
+        $categories = Category::with('products')->where('status', 1)->get();
+        return view('frontend.blog-detail', compact('categories'));
+    }
+
+
 
 
 

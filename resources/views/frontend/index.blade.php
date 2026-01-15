@@ -319,7 +319,7 @@
                                 <span><i class="far fa-calendar-alt"></i> Jan 1, 2026</span>
                                 <span><i class="far fa-user"></i> Michael Brown</span>
                             </div>
-                            <a href="#" class="blog-title">Sustainable Farming Practices for 2026</a>
+                            <a href="{{ route('blog.show') }}" class="blog-title">Sustainable Farming Practices for 2026</a>
                             <p class="blog-excerpt">Industry trends and innovations shaping the future of agriculture and local farming.</p>
                             <a href="#" class="read-more">Read More &rarr;</a>
                         </div>

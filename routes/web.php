@@ -55,6 +55,7 @@ Route::get('/research-and-development', [FrontendController::class, 'rAndD'])->n
 Route::get('/inquire', [FrontendController::class, 'inquire'])->name('inquire');
 Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('aboutUs');
 Route::get('/shop/{slug?}', [ProductController::class, 'shop'])->name('category.show');
+Route::get('/blog/{slug?}', [FrontendController::class, 'blogDetails'])->name('blog.show');
 
 Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user', 'verified']], function(){
   
