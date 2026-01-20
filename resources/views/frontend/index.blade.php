@@ -285,9 +285,9 @@
                                 <span><i class="far fa-calendar-alt"></i> Jan 5, 2026</span>
                                 <span><i class="far fa-user"></i> John Smith</span>
                             </div>
-                            <a href="#" class="blog-title">Maximizing Slurry Storage Efficiency</a>
+                            <a href="{{ route('blog.show') }}" class="blog-title">Maximizing Slurry Storage Efficiency</a>
                             <p class="blog-excerpt">Learn how modern lagoon liners can reduce maintenance costs and improve farm sustainability.</p>
-                            <a href="#" class="read-more">Read More &rarr;</a>
+                            <a href="{{ route('blog.show') }}" class="read-more">Read More &rarr;</a>
                         </div>
                     </div>
                 </div>
@@ -302,9 +302,9 @@
                                 <span><i class="far fa-calendar-alt"></i> Jan 3, 2026</span>
                                 <span><i class="far fa-user"></i> Sarah Johnson</span>
                             </div>
-                            <a href="#" class="blog-title">New Product Launch: Advanced Moisture Meters</a>
+                            <a href="{{ route('blog.show') }}" class="blog-title">New Product Launch: Advanced Moisture Meters</a>
                             <p class="blog-excerpt">Introducing our latest technology for precise hay and grain moisture measurement systems.</p>
-                            <a href="#" class="read-more">Read More &rarr;</a>
+                            <a href="{{ route('blog.show') }}" class="read-more">Read More &rarr;</a>
                         </div>
                     </div>
                 </div>
@@ -321,7 +321,7 @@
                             </div>
                             <a href="{{ route('blog.show') }}" class="blog-title">Sustainable Farming Practices for 2026</a>
                             <p class="blog-excerpt">Industry trends and innovations shaping the future of agriculture and local farming.</p>
-                            <a href="#" class="read-more">Read More &rarr;</a>
+                            <a href="{{ route('blog.show') }}" class="read-more">Read More &rarr;</a>
                         </div>
                     </div>
                 </div>
