@@ -89,7 +89,9 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold text-success" href="{{route('home')}}">PFC Agri</a>
+            <a class="navbar-brand fw-bold text-success" href="{{route('home')}}">
+                <img src="{{ asset('images/company/' . $company->company_logo) }}" alt="Company Logo" height="40">
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
