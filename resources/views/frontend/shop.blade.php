@@ -145,7 +145,7 @@
                                     <span class="fw-bold text-success">
                                         {{ $product->price > 0 ? '£' . number_format($product->price, 2) : 'Price on Request' }}
                                     </span>
-                                    <a href="#" class="btn btn-outline-success btn-sm rounded-pill px-3">View Details</a>
+                                    <a href="{{ route('product.detail') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">View Details</a>
                                 </div>
                             </div>
                         </div>

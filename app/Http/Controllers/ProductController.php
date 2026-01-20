@@ -30,4 +30,12 @@ class ProductController extends Controller
 
         return view('frontend.shop', compact('categories', 'products', 'currentCategory'));
     }
+
+    public function productDetail()
+    {
+        return view('frontend.product-detail');
+    }
+
+
+
 }
