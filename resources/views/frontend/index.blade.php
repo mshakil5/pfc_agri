@@ -275,56 +275,35 @@
             </div>
 
             <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="blog-card">
-                        <div class="blog-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=600&q=80" alt="Slurry Efficiency">
-                        </div>
-                        <div class="blog-content">
-                            <div class="blog-meta">
-                                <span><i class="far fa-calendar-alt"></i> Jan 5, 2026</span>
-                                <span><i class="far fa-user"></i> John Smith</span>
+                @foreach($blogs as $blog)
+                    <div class="col-lg-4 col-md-6">
+                        <div class="blog-card">
+                            <div class="blog-img-wrapper">
+                                {{-- Check if image exists, otherwise show placeholder --}}
+                                <img src="{{ $blog->image ? asset($blog->image) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                                    alt="{{ $blog->title }}">
                             </div>
-                            <a href="{{ route('blog.show') }}" class="blog-title">Maximizing Slurry Storage Efficiency</a>
-                            <p class="blog-excerpt">Learn how modern lagoon liners can reduce maintenance costs and improve farm sustainability.</p>
-                            <a href="{{ route('blog.show') }}" class="read-more">Read More &rarr;</a>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    {{-- Format date to: Jan 5, 2026 --}}
+                                    <span><i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') }}</span>
+                                    <span><i class="far fa-user"></i> {{ $blog->author_name }}</span>
+                                </div>
+                                
+                                {{-- Dynamic Title and Slug --}}
+                                <a href="{{ route('blog.show', $blog->slug) }}" class="blog-title">
+                                    {{ $blog->title }}
+                                </a>
+                                
+                                <p class="blog-excerpt">
+                                    {{ Str::limit($blog->excerpt, 100) }}
+                                </p>
+                                
+                                <a href="{{ route('blog.show', $blog->slug) }}" class="read-more">Read More &rarr;</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <div class="blog-card">
-                        <div class="blog-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80" alt="Moisture Meters">
-                        </div>
-                        <div class="blog-content">
-                            <div class="blog-meta">
-                                <span><i class="far fa-calendar-alt"></i> Jan 3, 2026</span>
-                                <span><i class="far fa-user"></i> Sarah Johnson</span>
-                            </div>
-                            <a href="{{ route('blog.show') }}" class="blog-title">New Product Launch: Advanced Moisture Meters</a>
-                            <p class="blog-excerpt">Introducing our latest technology for precise hay and grain moisture measurement systems.</p>
-                            <a href="{{ route('blog.show') }}" class="read-more">Read More &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <div class="blog-card">
-                        <div class="blog-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80" alt="Sustainable Farming">
-                        </div>
-                        <div class="blog-content">
-                            <div class="blog-meta">
-                                <span><i class="far fa-calendar-alt"></i> Jan 1, 2026</span>
-                                <span><i class="far fa-user"></i> Michael Brown</span>
-                            </div>
-                            <a href="{{ route('blog.show') }}" class="blog-title">Sustainable Farming Practices for 2026</a>
-                            <p class="blog-excerpt">Industry trends and innovations shaping the future of agriculture and local farming.</p>
-                            <a href="{{ route('blog.show') }}" class="read-more">Read More &rarr;</a>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>

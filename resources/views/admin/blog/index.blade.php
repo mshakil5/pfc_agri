@@ -1,246 +1,168 @@
 @extends('admin.pages.master')
-@section('title', 'Blog')
-
+@section('title', 'Manage Blog')
 @section('content')
-    <div class="container-fluid mb-3" id="newBtnSection">
-        <button class="btn btn-primary" id="newBtn">Add New</button>
-    </div>
 
-    <div class="container-fluid" id="addThisFormContainer" style="display:none;">
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 id="cardTitle">Add New</h4>
+<div class="container-fluid" id="newBtnSection">
+    <button type="button" class="btn btn-primary mb-3" id="newBtn">Add New Blog Post</button>
+</div>
+
+<div class="container-fluid" id="addThisFormContainer" style="display: none;">
+    <div class="card">
+        <div class="card-header"><h4 id="cardTitle">Add New Blog</h4></div>
+        <div class="card-body">
+            <form id="createThisForm">
+                @csrf
+                <input type="hidden" id="codeid" name="codeid">
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Author Name</label>
+                        <input type="text" class="form-control" name="author_name" id="author_name">
                     </div>
-                    <div class="card-body">
-                        <form id="createThisForm" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" id="codeid" name="id">
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3 d-none">
-                                    <label>Pages <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="pages" name="pages" value="blog">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="name" name="name">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>Short Title</label>
-                                    <input type="text" class="form-control" id="short_title" name="short_title">
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Long Title</label>
-                                    <input type="text" class="form-control" id="long_title" name="long_title">
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Short Description</label>
-                                    <textarea class="form-control summernote" id="short_description" name="short_description"></textarea>
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Long Description</label>
-                                    <textarea class="form-control summernote" id="long_description" name="long_description"></textarea>
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Feature Image</label>
-                                    <input type="file" class="form-control" id="feature_image" name="feature_image"
-                                        onchange="previewImage(event, '#feature_image_preview')">
-                                    <img id="feature_image_preview" src="#" class="img-thumbnail mt-3">
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Meta Title</label>
-                                    <input type="text" class="form-control" id="meta_title" name="meta_title">
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Meta Description</label>
-                                    <textarea class="form-control summernote" id="meta_description" name="meta_description"></textarea>
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Meta Keywords</label>
-                                    <input type="text" class="form-control" id="meta_keywords" name="meta_keywords">
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label>Meta Image</label>
-                                    <input type="file" class="form-control" id="meta_image" name="meta_image"
-                                        onchange="previewImage(event, '#meta_image_preview')">
-                                    <img id="meta_image_preview" src="#" class="img-thumbnail mt-3">
-                                </div>
-                            </div>
-
-                            <div class="text-end">
-                                <button type="button" id="addBtn" class="btn btn-primary" value="Create">Create</button>
-                                <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
-                            </div>
-                        </form>
+                    <div class="col-md-4 mb-3">
+                        <label>Publish Date</label>
+                        <input type="date" class="form-control" name="published_at" id="published_at">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Blog Image</label>
+                        <input type="file" class="form-control" name="image" id="imageInput" accept="image/*">
+                        <div id="imagePreviewContainer" class="mt-2" style="display:none;">
+                            <img id="imagePreview" src="" alt="Preview" style="width: 80px; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="container-fluid" id="contentContainer">
-        <div class="card">
-            <div class="card-header">
-                <h4>All Blog</h4>
-            </div>
-            <div class="card-body">
-                <table id="masterTable" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Sl</th>
-                            <th>Name</th>
-                            <th>Short Title</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+                <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
+                    @foreach(config('translatable.locales') as $index => $locale)
+                        <li class="nav-item">
+                            <a class="nav-link {{ $index == 0 ? 'active' : '' }}" data-bs-toggle="tab" href="#blog-{{ $locale }}">
+                                {{ strtoupper($locale) }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="tab-content">
+                    @foreach(config('translatable.locales') as $index => $locale)
+                        <div class="tab-pane {{ $index == 0 ? 'active' : '' }}" id="blog-{{ $locale }}">
+                            <div class="mb-3">
+                                <label>Title ({{ strtoupper($locale) }})</label>
+                                <input type="text" name="{{ $locale }}[title]" id="{{ $locale }}_title" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label>Excerpt ({{ strtoupper($locale) }})</label>
+                                <textarea name="{{ $locale }}[excerpt]" id="{{ $locale }}_excerpt" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label>Full Content ({{ strtoupper($locale) }})</label>
+                                <textarea name="{{ $locale }}[description]" id="{{ $locale }}_description" class="form-control summernote"></textarea>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-end">
+            <button type="button" id="addBtn" class="btn btn-primary">Save Post</button>
+            <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
         </div>
     </div>
+</div>
+
+<div class="container-fluid" id="contentContainer">
+    <div class="card">
+        <div class="card-body">
+            <table id="blogTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sl</th>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
-    <script>
-        $(function() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+<script>
+    $(document).ready(function() {
+        var table = $('#blogTable').DataTable({
+            processing: true, serverSide: true,
+            ajax: "{{ route('admin.blogs') }}",
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'image', name: 'image', orderable: false, searchable: false },
+                { data: 'title', name: 'title' },
+                { data: 'author_name', name: 'author_name' },
+                { data: 'published_at', name: 'published_at' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        // Submit Logic
+        $("#addBtn").click(function() {
+            let id = $("#codeid").val();
+            let url = id ? "{{ url('/admin/blogs-update') }}" : "{{ url('/admin/blogs') }}";
+            $.ajax({
+                url: url, type: "POST", data: new FormData($('#createThisForm')[0]),
+                contentType: false, processData: false,
+                success: function(d) {
+                    showSuccess(d.message);
+                    $("#addThisFormContainer").slideUp();
+                    $("#newBtn").show();
+                    table.draw();
                 }
             });
+        });
 
-            const table = $('#masterTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('blog.index') }}",
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'short_title',
-                        name: 'short_title'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
+        // Edit Logic
+        $('#contentContainer').on('click', '#EditBtn', function() {
+            let id = $(this).attr('rid');
+            $.get("/admin/blogs/" + id + "/edit", function(data) {
+                $("#codeid").val(data.id);
+                $("#author_name").val(data.author_name);
+                $("#published_at").val(data.published_at);
+                $("#image").val(data.image);
 
-            let editors = new Map();
-
-            $('#newBtn').click(function() {
-                $('#createThisForm')[0].reset();
-                $('#codeid').val('');
-                $('#cardTitle').text('Add New');
-                $('#addBtn').val('Create').text('Create');
-                $('#addThisFormContainer').show(300);
-                $('#newBtn').hide();
-            });
-
-            $('#FormCloseBtn').click(function() {
-                $('#addThisFormContainer').hide(200);
-                $('#newBtn').show(100);
-                $('#createThisForm')[0].reset();
-                $('#meta_image_preview').hide();
-                $('#feature_image_preview').hide();
-                $('#name').prop('readonly', false);
-            });
-
-            $('#addBtn').click(function() {
-                editors.forEach((editor, id) => {
-                    document.getElementById(id).value = editor.getData();
+                data.translations.forEach(function(t) {
+                    $(`#${t.locale}_title`).val(t.title);
+                    $(`#${t.locale}_excerpt`).val(t.excerpt);
+                    $(`#${t.locale}_description`).summernote('code', t.description);
                 });
 
-                var btn = this;
-                var url = $(btn).val() === 'Create' ? "{{ route('master.store') }}" :
-                    "{{ route('master.update') }}";
-                var form = document.getElementById('createThisForm');
-                var fd = new FormData(form);
-                if ($(btn).val() !== 'Create') fd.append('id', $('#codeid').val());
+                if (data.image) {
+                    $("#imagePreview").attr('src', '/' + data.image);
+                    $("#imagePreviewContainer").show();
+                } else {
+                    $("#imagePreviewContainer").hide();
+                }
+        
 
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(res) {
-                        showSuccess(res.message);
-                        $('#addThisFormContainer').hide();
-                        $('#newBtn').show();
-                        table.ajax.reload(null, false);
-                        $('#createThisForm')[0].reset();
-                        $('#meta_image_preview').hide();
-                        $('#feature_image_preview').hide();
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 422 && xhr.responseJSON) {
-                            let first = Object.values(xhr.responseJSON.errors)[0][0];
-                            showError(first);
-                        } else {
-                            showError(xhr.responseJSON?.message ?? 'Something went wrong');
-                        }
-                    }
-                });
-            });
-
-            $(document).on('click', '.EditBtn', function() {
-                var id = $(this).data('id');
-                $.get("{{ url('/admin/master') }}/" + id + "/edit", {}, function(res) {
-                    $('#codeid').val(res.id);
-                    $('#name').val(res.name).prop('readonly', true);
-                    $('#short_title').val(res.short_title);
-                    $('#long_title').val(res.long_title);
-                    $('#meta_title').val(res.meta_title);
-                    $('#meta_keywords').val(res.meta_keywords);
-
-                    if (res.meta_image) {
-                        $('#meta_image_preview').attr('src', '/images/meta_image/' + res.meta_image)
-                            .show();
-                    } else {
-                        $('#meta_image_preview').hide();
-                    }
-
-                    if (res.feature_image) {
-                        $('#feature_image_preview').attr('src', '/images/content/' + res.feature_image)
-                            .show();
-                    } else {
-                        $('#feature_image_preview').hide();
-                    }
-
-   
-                        
-                    $(".summernote").summernote('code', res.short_description);
-                    $(".summernote").summernote('code', res.long_description);
-                    $(".summernote").summernote('code', res.meta_description);
-
-                    $('#cardTitle').text('Update');
-                    $('#addBtn').val('Update').text('Update');
-                    $('#addThisFormContainer').show(300);
-                    $('#newBtn').hide();
-                });
+                $("#addThisFormContainer").slideDown();
+                $("#newBtn").hide();
+                $("#cardTitle").text('Edit Blog Post');
             });
         });
-    </script>
 
-    <script>
-    $(document).ready(function() {
-        $('.summernote').summernote({
-            height: 200, // set editor height
-            minHeight: null, // set minimum height of editor
-            maxHeight: null, // set maximum height of editor
-            focus: true // set focus to editable area after initializing summernote
+        // Toggle Buttons
+        $("#newBtn").click(function() {
+            $('#createThisForm')[0].reset();
+            $("#imagePreviewContainer").hide();
+            $(".summernote").summernote('code', '');
+            $("#codeid").val('');
+            $("#addThisFormContainer").slideDown();
+            $(this).hide();
+        });
+        $("#FormCloseBtn").click(function() {
+            $("#addThisFormContainer").slideUp();
+            $("#newBtn").show();
         });
     });
 </script>

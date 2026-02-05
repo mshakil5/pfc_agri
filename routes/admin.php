@@ -140,6 +140,14 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     
     Route::get('/blog', [BlogController::class, 'blog'])->name('blog.index');
 
+    Route::get('blogs', [BlogController::class, 'index'])->name('admin.blogs');
+    Route::post('blogs', [BlogController::class, 'store']);
+    Route::get('blogs/{id}/edit', [BlogController::class, 'edit']);
+    Route::post('blogs-update', [BlogController::class, 'update']);
+    Route::delete('blogs/{id}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+
+
+
     Route::get('/awards', [AwardController::class, 'index'])->name('admin.awards');
     Route::post('/awards', [AwardController::class, 'store']);
     Route::get('/awards/{id}/edit', [AwardController::class, 'edit']);

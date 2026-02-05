@@ -7,6 +7,7 @@ use App\Models\ContactEmail;
 use App\Mail\ContactMail;
 use App\Models\About;
 use App\Models\Award;
+use App\Models\Blog;
 use App\Models\Category;
 use App\Models\CompanyDetails;
 use App\Models\Master;
@@ -32,8 +33,14 @@ class FrontendController extends Controller
 
         $awards = Award::with('translations')->latest('year')->get();
 
+        $blogs = Blog::with('translations')
+                ->where('status', 1)
+                ->latest('published_at')
+                ->take(3)
+                ->get();
 
-        return view('frontend.index', compact('slider','categories','about','company','awards'));
+
+        return view('frontend.index', compact('slider','categories','about','company','awards','blogs'));
     }
 
     public function aboutUs()
@@ -109,10 +116,19 @@ class FrontendController extends Controller
     }
 
 
-    public function blogDetails()
+    public function blogDetails($slug)
     {
-        $categories = Category::with('products')->where('status', 1)->get();
-        return view('frontend.blog-detail', compact('categories'));
+        // Find the blog post that matches the slug in any language
+        $blog = \App\Models\Blog::whereTranslation('slug', $slug)->firstOrFail();
+        
+        // Optional: Get related posts (e.g., latest 3 excluding current)
+        $relatedPosts = \App\Models\Blog::where('id', '!=', $blog->id)
+                            ->where('status', 1)
+                            ->latest()
+                            ->take(3)
+                            ->get();
+
+        return view('frontend.blog-detail', compact('blog', 'relatedPosts'));
     }
 
 

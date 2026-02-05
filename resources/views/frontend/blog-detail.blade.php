@@ -59,6 +59,8 @@
     color: #fff;
 }
 
+.hover-green:hover { color: #00a651 !important; }
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .blog-featured-img {
@@ -74,15 +76,15 @@
 
 
 
-
 <header class="blog-header">
     <div class="container text-center">
         <div class="blog-meta mb-3 justify-content-center">
-            <span><i class="far fa-calendar-alt"></i> Jan 5, 2026</span>
-            <span><i class="far fa-user"></i> John Smith</span>
-            <span class="badge bg-success" style="background-color: #00a651 !important;">Sustainability</span>
+            <span><i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') }}</span>
+            <span><i class="far fa-user"></i> {{ $blog->author_name }}</span>
+            {{-- Using 'tag' if you added it to your table, otherwise using a generic label --}}
+            <span class="badge bg-success" style="background-color: #00a651 !important;">Article</span>
         </div>
-        <h1 class="display-4 fw-bold mb-4" style="color: #00a651;">Maximizing Slurry Storage Efficiency</h1>
+        <h1 class="display-4 fw-bold mb-4" style="color: #00a651;">{{ $blog->title }}</h1>
     </div>
 </header>
 
@@ -90,40 +92,39 @@
     <div class="container">
         <div class="row">
             <div class="col-12 mb-5">
-                <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80" class="blog-featured-img" alt="Slurry Efficiency">
+                <img src="{{ $blog->image ? asset($blog->image) : 'https://via.placeholder.com/1200x500' }}" 
+                     class="blog-featured-img" alt="{{ $blog->title }}">
             </div>
 
             <div class="col-lg-8">
                 <article class="article-content">
-                    <p class="lead">
-                        Proper slurry storage is more than just a regulatory requirement; it’s a vital component of a sustainable and profitable modern farming operation. 
+                    {{-- Excerpt as Lead text --}}
+                    <p class="lead fw-bold">
+                        {{ $blog->excerpt }}
                     </p>
                     
-                    <p>In 2026, the focus on environmental impact and nutrient management has never been higher. Efficient storage ensures that valuable nutrients remain available for crops while preventing harmful runoff into local waterways.</p>
-
-                    <h2>The Role of Modern Lagoon Liners</h2>
-                    <p>One of the most significant advancements in storage technology is the high-density polyethylene (HDPE) liner. These liners provide an impermeable barrier that prevents seepage and protects groundwater. Unlike traditional clay bases, modern liners are resistant to UV rays and chemical breakdown.</p>
-                    
-                    <blockquote class="border-start border-4 ps-4 my-4 fs-5 italic" style="border-color: #00a651 !important; color: #555;">
-                        "Effective slurry management can reduce synthetic fertilizer costs by up to 30% by preserving organic nitrogen levels."
-                    </blockquote>
-
-                    <h3>Key Benefits of Maintenance</h3>
-                    <ul>
-                        <li>Reduction in maintenance labor costs.</li>
-                        <li>Compliance with the latest environmental regulations.</li>
-                        <li>Improved safety for farm staff and livestock.</li>
-                    </ul>
-
-                    <p>By investing in quality storage solutions now, farmers can ensure their operations remain resilient against future climate challenges and regulatory changes.</p>
+                    {{-- Full Content from Summernote (Raw HTML) --}}
+                    <div class="mt-4">
+                        {!! $blog->description !!}
+                    </div>
                 </article>
 
                 <div class="d-flex align-items-center gap-3 mt-5 py-4 border-top border-bottom">
                     <span class="fw-bold">Share this article:</span>
                     <div class="share-buttons">
-                        <a href="#" class="btn"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="btn"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="btn"><i class="fab fa-linkedin-in"></i></a>
+                        {{-- Social Sharing Links --}}
+                        <div class="share-buttons">
+                            {{-- Social Sharing Links --}}
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ url()->current() }}" target="_blank" class="btn">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ url()->current() }}&text={{ urlencode($blog->title) }}" target="_blank" class="btn">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ url()->current() }}" target="_blank" class="btn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -131,34 +132,33 @@
             <div class="col-lg-4 mt-5 mt-lg-0">
                 <aside class="blog-sidebar-card">
                     <h4 class="fw-bold mb-3" style="color: #00a651;">About the Author</h4>
-                    <p class="small text-muted mb-4">John Smith is a senior agricultural consultant with 15 years of experience in sustainable waste management and farm infrastructure.</p>
+                    <p class="small text-muted mb-4">{{ $blog->author_name }} is a contributor to the PFC Agri blog, sharing insights on modern farming and sustainable solutions.</p>
                     
                     <hr>
                     
-                    <h4 class="fw-bold mb-3" style="color: #00a651;">Related Topics</h4>
+                    <h4 class="fw-bold mb-3" style="color: #00a651;">Recent Posts</h4>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-dark hover-green">• Waste Management</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-dark">• Soil Health</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-dark">• Farm Tech 2026</a></li>
+                        @foreach($relatedPosts as $post)
+                            <li class="mb-3">
+                                <a href="{{ route('blog.show', $post->slug) }}" class="text-decoration-none text-dark hover-green">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ asset($post->image) }}" width="50" height="50" class="rounded me-2" style="object-fit: cover;">
+                                        <span class="small fw-bold">{{ Str::limit($post->title, 40) }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                        @endforeach
                     </ul>
 
                     <div class="mt-4 p-3 rounded" style="background-color: #00a651; color: #fff;">
                         <h5>Need Expert Advice?</h5>
                         <p class="small">Contact our team for a free consultation on your storage needs.</p>
-                        <a href="#" class="btn btn-light btn-sm fw-bold">Contact Us</a>
+                        <a href="{{ route('contact') }}" class="btn btn-light btn-sm fw-bold">Contact Us</a>
                     </div>
                 </aside>
             </div>
         </div>
     </div>
 </section>
-
-
-
-
-@endsection
-
-@section('script')
-
 
 @endsection
