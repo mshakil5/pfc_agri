@@ -214,6 +214,13 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('admin.awards') }}" class="nav-link {{ Route::is('admin.awards') ? 'active' : '' }}">
+                        <i class="ri-mail-open-line"></i>
+                        <span>Awards</span>
+                    </a>
+                </li>
+
 
 
                 <li class="nav-item">

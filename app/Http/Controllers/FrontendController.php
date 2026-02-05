@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Models\ContactEmail;
 use App\Mail\ContactMail;
 use App\Models\About;
+use App\Models\Award;
 use App\Models\Category;
 use App\Models\CompanyDetails;
 use App\Models\Master;
@@ -29,8 +30,10 @@ class FrontendController extends Controller
 
         $company = CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'linkedin', 'website', 'phone1', 'email1', 'address1','address2','company_logo','copyright','google_map')->first();
 
+        $awards = Award::with('translations')->latest('year')->get();
 
-        return view('frontend.index', compact('slider','categories','about','company'));
+
+        return view('frontend.index', compact('slider','categories','about','company','awards'));
     }
 
     public function aboutUs()

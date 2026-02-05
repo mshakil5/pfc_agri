@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AboutController;
+use App\Http\Controllers\Admin\AwardController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\FAQController;
@@ -138,6 +139,12 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
 
     
     Route::get('/blog', [BlogController::class, 'blog'])->name('blog.index');
+
+    Route::get('/awards', [AwardController::class, 'index'])->name('admin.awards');
+    Route::post('/awards', [AwardController::class, 'store']);
+    Route::get('/awards/{id}/edit', [AwardController::class, 'edit']);
+    Route::post('/awards-update', [AwardController::class, 'update']);
+    Route::delete('/awards/{id}', [AwardController::class, 'destroy'])->name('awards.destroy');
 
 
 

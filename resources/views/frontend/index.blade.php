@@ -564,36 +564,39 @@
         <div class="container text-center">
             <p class="section-tag mb-1">RECOGNITION</p>
             <h2 class="fw-bold mb-3" style="color: #00a651;">Awards & Achievements</h2>
-            <p class="text-muted mx-auto mb-5" style="max-width: 600px;">Our commitment to excellence has been recognized by industry leaders and organizations.</p>
+            <p class="text-muted mx-auto mb-5" style="max-width: 600px;">
+                Our commitment to excellence has been recognized by industry leaders and organizations.
+            </p>
             
             <div class="row g-4 text-start">
-                <div class="col-md-4">
-                    <div class="award-card">
-                        <div class="award-icon-circle"><i class="fas fa-trophy"></i></div>
-                        <h5 class="fw-bold">Agricultural Innovation Award</h5>
-                        <p class="small text-muted mb-2">UK Farming Association • 2025</p>
-                        <span class="tag-pill mb-3">Innovation</span>
-                        <p class="small text-muted mt-2">Recognized for outstanding innovation in slurry management technology.</p>
+                @foreach($awards as $award)
+                    <div class="col-md-4">
+                        <div class="award-card">
+                            {{-- Non-translatable data (icon) --}}
+                            <div class="award-icon-circle">
+                                <i class="{{ $award->icon }}"></i>
+                            </div>
+
+                            {{-- Translatable data (title) --}}
+                            <h5 class="fw-bold">{{ $award->title }}</h5>
+
+                            {{-- Combination of translatable (organization) and static (year) --}}
+                            <p class="small text-muted mb-2">
+                                {{ $award->organization }} • {{ $award->year }}
+                            </p>
+
+                            {{-- Translatable Tag --}}
+                            @if($award->tag)
+                                <span class="tag-pill mb-3">{{ $award->tag }}</span>
+                            @endif
+
+                            {{-- Translatable Description --}}
+                            <div class="small text-muted mt-2">
+                                {!! $award->description !!}
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="award-card">
-                        <div class="award-icon-circle"><i class="fas fa-leaf"></i></div>
-                        <h5 class="fw-bold">Sustainability Champion</h5>
-                        <p class="small text-muted mb-2">Green Agriculture Council • 2024</p>
-                        <span class="tag-pill mb-3">Sustainability</span>
-                        <p class="small text-muted mt-2">Awarded for commitment to environmentally sustainable farming solutions.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="award-card">
-                        <div class="award-icon-circle"><i class="fas fa-medal"></i></div>
-                        <h5 class="fw-bold">Best Agricultural Supplier</h5>
-                        <p class="small text-muted mb-2">Farmers Weekly • 2024</p>
-                        <span class="tag-pill mb-3">Service Excellence</span>
-                        <p class="small text-muted mt-2">Voted best supplier by UK farmers for product quality and customer service.</p>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
