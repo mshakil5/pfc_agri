@@ -35,7 +35,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
 
     // Slider
     Route::get('/slider', [SliderController::class, 'getSlider'])->name('allslider');
-    Route::post('/slider', [SliderController::class, 'sliderStore']);
+    Route::post('/slider', [SliderController::class, 'sliderStore'])->name('slider.store');
     Route::get('/slider/{id}/edit', [SliderController::class, 'sliderEdit']);
     Route::post('/slider-update', [SliderController::class, 'sliderUpdate']);
     Route::delete('/slider/{id}', [SliderController::class, 'sliderDelete'])->name('slider.delete');

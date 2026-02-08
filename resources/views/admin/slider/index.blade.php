@@ -272,7 +272,7 @@
                 let form_data = new FormData($('#createThisForm')[0]);
                 
                 $.ajax({
-                    url: "{{ route('dealer.store') }}", 
+                    url: "{{ route('slider.store') }}", 
                     type: "POST",
                     data: form_data,
                     contentType: false,

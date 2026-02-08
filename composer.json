@@ -21,6 +21,7 @@
         "yajra/laravel-datatables-oracle": "^12.4"
     },
     "require-dev": {
+        "druc/laravel-langscanner": "^2.3",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",

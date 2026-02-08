@@ -9,15 +9,17 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 
 Route::get('/lang/{locale}', function ($locale) {
-    if (! in_array($locale, ['en', 'it', 'es', 'de', 'fr'])) {
+
+    $allowed = ['en', 'it', 'es', 'de', 'fr'];
+
+    if (!in_array($locale, $allowed)) {
         abort(400);
     }
 
     Session::put('locale', $locale);
-    App::setLocale($locale);
 
     return redirect()->back();
-});
+})->name('lang.switch');
 
 // cache clear
 Route::get('/clear', function() {

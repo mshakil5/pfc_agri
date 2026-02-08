@@ -9,11 +9,6 @@
                 <a href="{{ $company->instagram }}" class="social-link"><i class="fab fa-instagram me-3"></i></a>
                 <a href="{{ $company->linkedin }}" class="social-link"><i class="fab fa-linkedin-in me-3"></i></a>
                 <a href="{{ $company->website }}" class="social-link"><i class="fas fa-globe me-2"></i></a>
-                
-                
-                
-                
-
 
                 @php
                     $locale = app()->getLocale();
@@ -37,47 +32,46 @@
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                            href="{{ url('lang/en') }}">
+                            <a class="dropdown-item d-flex align-items-center gap-2 {{ $locale === 'en' ? 'active' : '' }}"
+                            href="{{ route('lang.switch', 'en') }}">
                                 <img src="{{ asset('resources/flags/gb.svg') }}" width="18" height="14">
                                 English
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                            href="{{ url('lang/it') }}">
+                            <a class="dropdown-item d-flex align-items-center gap-2 {{ $locale === 'it' ? 'active' : '' }}"
+                            href="{{ route('lang.switch', 'it') }}">
                                 <img src="{{ asset('resources/flags/it.svg') }}" width="18" height="14">
                                 Italian
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                            href="{{ url('lang/es') }}">
+                            <a class="dropdown-item d-flex align-items-center gap-2 {{ $locale === 'es' ? 'active' : '' }}"
+                            href="{{ route('lang.switch', 'es') }}">
                                 <img src="{{ asset('resources/flags/es.svg') }}" width="18" height="14">
                                 Spanish
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                            href="{{ url('lang/de') }}">
+                            <a class="dropdown-item d-flex align-items-center gap-2 {{ $locale === 'de' ? 'active' : '' }}"
+                            href="{{ route('lang.switch', 'de') }}">
                                 <img src="{{ asset('resources/flags/de.svg') }}" width="18" height="14">
                                 German
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                            href="{{ url('lang/fr') }}">
+                            <a class="dropdown-item d-flex align-items-center gap-2 {{ $locale === 'fr' ? 'active' : '' }}"
+                            href="{{ route('lang.switch', 'fr') }}">
                                 <img src="{{ asset('resources/flags/fr.svg') }}" width="18" height="14">
                                 French
                             </a>
                         </li>
                     </ul>
                 </div>
-
 
             </div>
         </div>
