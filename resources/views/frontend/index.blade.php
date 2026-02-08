@@ -173,10 +173,10 @@
 
     <section class="py-5 mt-5">
         <div class="container text-center mb-5">
-            <p class="section-tag mb-1">What we offer</p>
-            <h2 class="fw-bold mb-3" style="color: #00a651;">Our Product Categories</h2>
+            <p class="section-tag mb-1">{{ __('index.what_we_offer') }}</p>
+            <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('index.our_product_categories') }}</h2>
             <p class="text-muted mx-auto" style="max-width: 600px;">
-                Comprehensive range of agricultural solutions designed to enhance your farming operations
+                {{ __('index.product_categories_description') }}
             </p>
         </div>
 
@@ -202,7 +202,7 @@
                                 </div>
                                 
                                 <a href="{{ route('category.show', $category->slug) }}" class="text-white text-decoration-none fw-bold">
-                                    View Products &rarr;
+                                    {{ __('index.view_products') }} &rarr;
                                 </a>
                             </div>
                         </div>
@@ -222,8 +222,8 @@
                         <div class="experience-badge">
                             <div class="badge-number">{{ $about->year }}+</div>
                             <div>
-                                <div class="fw-bold mb-0">Years</div>
-                                <small class="text-muted">In Business</small>
+                                <div class="fw-bold mb-0">{{ __('about.years') }}</div>
+                                <small class="text-muted">{{ __('about.in_business') }}</small>
                             </div>
                         </div>
                     </div>
@@ -258,7 +258,9 @@
                     </div>
 
                     <div class="mt-4">
-                        <a href="{{ route('aboutUs') }}" class="btn btn-learn-more">Learn More About Us &rarr;</a>
+                        <a href="{{ route('aboutUs') }}" class="btn btn-learn-more">
+                            {{ __('about.learn_more') }} &rarr;
+                        </a>
                     </div>
                 </div>
             </div>
@@ -269,9 +271,10 @@
     <section class="blog-section">
         <div class="container">
             <div class="text-center mb-5">
-                <p class="section-tag mb-1">Latest Insights</p>
-                <h2 class="fw-bold mb-3" style="color: #00a651;">From Our Blog</h2>
-                <p class="text-muted mx-auto" style="max-width: 600px;">Stay updated with the latest farming tips, product news, and industry insights.</p>
+                <p class="section-tag mb-1">{{ __('blog.from_our_blog') }}</p>
+                <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('blog.from_our_blog') }}
+                </h2>
+                <p class="text-muted mx-auto" style="max-width: 600px;">{{ __('Stay updated with the latest farming tips, product news, and industry insights.') }}</p>
             </div>
 
             <div class="row g-4">
@@ -299,7 +302,8 @@
                                     {{ Str::limit($blog->excerpt, 100) }}
                                 </p>
                                 
-                                <a href="{{ route('blog.show', $blog->slug) }}" class="read-more">Read More &rarr;</a>
+                                <a href="{{ route('blog.show', $blog->slug) }}" class="read-more">{{ __('Read More') }} &rarr;
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -312,11 +316,13 @@
 
     <section class="dealer-section">
         <div class="container">
-            <div class="text-center mb-5">
-                <p class="section-tag mb-1">Our Partners</p>
-                <h2 class="fw-bold mb-3" style="color: #00a651;">Authorized Dealer Network</h2>
-                <p class="text-muted mx-auto" style="max-width: 600px;">Find a trusted PFC Agri Solutions dealer near you for expert service and support.</p>
-            </div>
+        <div class="text-center mb-5">
+            <p class="section-tag mb-1">{{ __('partners.our_partners') }}</p>
+            <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('partners.authorized_dealer_network') }}</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                {{ __('partners.find_dealer_description') }}
+            </p>
+        </div>
 
             <div class="row g-4">
                 <div class="col-lg-7">
@@ -541,12 +547,12 @@
 
     <section class="awards-section">
         <div class="container text-center">
-            <p class="section-tag mb-1">RECOGNITION</p>
-            <h2 class="fw-bold mb-3" style="color: #00a651;">Awards & Achievements</h2>
+            <p class="section-tag mb-1">{{ __('RECOGNITION') }}</p>
+            <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('Awards & Achievements') }}</h2>
             <p class="text-muted mx-auto mb-5" style="max-width: 600px;">
-                Our commitment to excellence has been recognized by industry leaders and organizations.
+                {{ __('Our commitment to excellence has been recognized by industry leaders and organizations.') }}
             </p>
-            
+                        
             <div class="row g-4 text-start">
                 @foreach($awards as $award)
                     <div class="col-md-4">
@@ -584,11 +590,17 @@
         <div class="container">
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
-                    <h2 class="fw-bold mb-3" style="color: #00a651;">Ready to Transform Your Farming Operation?</h2>
-                    <p class="text-muted mb-4">Get in touch with our team to discuss your requirements. We're here to help you find the right solutions for your agricultural needs.</p>
+                    <h2 class="fw-bold mb-3" style="color: #00a651;">
+                        {{ __('Ready to Transform Your Farming Operation?') }}
+                    </h2>
+                    <p class="text-muted mb-4">
+                        {{ __('Get in touch with our team to discuss your requirements. We\'re here to help you find the right solutions for your agricultural needs.') }}
+                    </p>
+
                     <div class="d-flex gap-3">
-                        <a href="{{route('inquire')}}" class="btn btn-success btn-lg px-4 rounded-1" style="background-color: var(--pfc-green);">Inquire Now &rarr;</a>
-                        <a href="{{route('category.show')}}" class="btn btn-outline-success btn-lg px-4 rounded-1">Browse Products</a>
+                        <a href="{{route('inquire')}}" class="btn btn-success btn-lg px-4 rounded-1" style="background-color: var(--pfc-green);">{{ __('Inquire Now') }} &rarr;</a>
+                        <a href="{{route('category.show')}}" class="btn btn-outline-success btn-lg px-4 rounded-1">{{ __('Browse Products') }}
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-5">
@@ -597,7 +609,7 @@
                             <div class="contact-info-card">
                                 <div class="contact-icon-box"><i class="fas fa-phone"></i></div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold">Call Us</h6>
+                                    <h6 class="mb-0 fw-bold">{{ __('Call Us') }}</h6>
                                     <p class="mb-0 text-muted"> {{ $company->phone1 }}</p>
                                 </div>
                             </div>
@@ -606,7 +618,7 @@
                             <div class="contact-info-card">
                                 <div class="contact-icon-box"><i class="fas fa-envelope"></i></div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold">Email Us</h6>
+                                    <h6 class="mb-0 fw-bold">{{ __('Email Us') }}</h6>
                                     <p class="mb-0 text-muted"> {{ $company->email1 }} </p>
                                 </div>
                             </div>

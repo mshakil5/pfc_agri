@@ -7,8 +7,9 @@
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-3">
-                <h4 class="fw-bold mb-4">PFC Agri Solutions</h4>
+                <h4 class="fw-bold mb-4">{{ __('footer.company_name') }}</h4>
                 <p class="small opacity-75 mb-4">{{ $company->footer_content }}</p>
+
                 <div class="d-flex">
                     <a href="{{ $company->facebook }}" class="social-circle"><i class="fab fa-facebook-f"></i></a>
                     <a href="{{ $company->instagram }}" class="social-circle"><i class="fab fa-instagram"></i></a>
@@ -16,36 +17,57 @@
                     <a href="{{ $company->youtube }}" class="social-circle"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
+
             <div class="col-lg-3 col-6">
-                <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">Quick Links</h6>
-                <a href="{{ route('home') }}" class="footer-link">Home</a>
-                <a href="{{ route('aboutUs') }}" class="footer-link">About Us</a>
-                <a href="{{ route('category.show') }}" class="footer-link">Products</a>
-                <a href="{{ route('rAndD') }}" class="footer-link">R&D Projects</a>
-                <a href="{{ route('inquire') }}" class="footer-link">Inquire Now</a>
+                <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">
+                    {{ __('footer.quick_links') }}
+                </h6>
+
+                <a href="{{ route('home') }}" class="footer-link">{{ __('footer.home') }}</a>
+                <a href="{{ route('aboutUs') }}" class="footer-link">{{ __('footer.about_us') }}</a>
+                <a href="{{ route('category.show') }}" class="footer-link">{{ __('footer.products') }}</a>
+                <a href="{{ route('rAndD') }}" class="footer-link">{{ __('footer.r_and_d_projects') }}</a>
+                <a href="{{ route('inquire') }}" class="footer-link">{{ __('footer.inquire_now') }}</a>
             </div>
+
             <div class="col-lg-3 col-6">
-                <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">Our Products</h6>
+                <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">
+                    {{ __('footer.our_products') }}
+                </h6>
+
                 @foreach ($categories as $category)
-                    <a class="footer-link" href="{{ route('category.show', $category->slug) }}">{{$category->name}}</a>
+                    <a class="footer-link" href="{{ route('category.show', $category->slug) }}">
+                        {{ $category->name }}
+                    </a>
                 @endforeach
             </div>
+
             <div class="col-lg-3">
-                <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">Contact Us</h6>
+                <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">
+                    {{ __('footer.contact_us') }}
+                </h6>
+
                 <div class="d-flex gap-3 mb-3">
                     <i class="fas fa-map-marker-alt mt-1"></i>
-                    <p class="small opacity-75">PFC Agri Solutions<br>Farm Road, Rural County<br>United Kingdom</p>
+                    <p class="small opacity-75">
+                        {{ __('footer.address_line_1') }}<br>
+                        {{ __('footer.address_line_2') }}<br>
+                        {{ __('footer.address_line_3') }}
+                    </p>
                 </div>
+
                 <div class="d-flex gap-3 mb-3">
                     <i class="fas fa-phone"></i>
                     <p class="small opacity-75">{{ $company->phone1 }}</p>
                 </div>
+
                 <div class="d-flex gap-3">
                     <i class="fas fa-envelope"></i>
                     <p class="small opacity-75">{{ $company->email1 }}</p>
                 </div>
             </div>
         </div>
+
         <div class="footer-bottom text-center">
             <p class="mb-0">{{ $company->copyright }}</p>
         </div>

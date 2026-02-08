@@ -103,9 +103,15 @@
         <div class="container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Products</a></li>
-                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Wet Bale Management</a></li>
-                    <li class="breadcrumb-item active fw-bold text-success">Pro Acid Applicator</li>
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-decoration-none text-muted">{{ __('Products') }}</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-decoration-none text-muted">{{ __('Wet Bale Management') }}</a>
+                    </li>
+                    <li class="breadcrumb-item active fw-bold text-success">
+                        {{ __('Pro Acid Applicator') }}
+                    </li>
                 </ol>
             </nav>
         </div>
@@ -116,54 +122,84 @@
             <div class="row g-5">
                 <div class="col-lg-7">
                     <div class="main-product-img">
-                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80" class="img-fluid" id="mainImg" alt="Pro Acid Applicator">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80" class="img-fluid" id="mainImg" alt="{{ __('Pro Acid Applicator') }}">
                     </div>
                     <div class="thumb-grid">
-                        <div class="thumb-item active"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src"></div>
-                        <div class="thumb-item"><img src="https://images.unsplash.com/photo-1622383529357-37421312f48f?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src"></div>
-                        <div class="thumb-item"><img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src"></div>
-                        <div class="thumb-item"><img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src"></div>
+                        <div class="thumb-item active">
+                            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src">
+                        </div>
+                        <div class="thumb-item">
+                            <img src="https://images.unsplash.com/photo-1622383529357-37421312f48f?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src">
+                        </div>
+                        <div class="thumb-item">
+                            <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src">
+                        </div>
+                        <div class="thumb-item">
+                            <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=300" onclick="document.getElementById('mainImg').src=this.src">
+                        </div>
                     </div>
 
                     <div class="mt-5">
                         <ul class="nav nav-pills mb-4 nav-pills-custom" id="pills-tab" role="tablist">
-                            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#desc">Overview</button></li>
-                            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#specs">Technical Specs</button></li>
-                            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#docs">Downloads</button></li>
+                            <li class="nav-item">
+                                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#desc">{{ __('Overview') }}</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#specs">{{ __('Technical Specs') }}</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#docs">{{ __('Downloads') }}</button>
+                            </li>
                         </ul>
+
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="desc">
-                                <h4 class="fw-bold mb-3">Maximize Forage Quality</h4>
-                                <p>The Pro Acid Applicator is engineered for the modern farmer who refuses to compromise on silage quality. Utilizing high-precision sensors, the system automatically adjusts acid application rates based on real-time moisture data.</p>
+                                <h4 class="fw-bold mb-3">{{ __('Maximize Forage Quality') }}</h4>
+                                <p>{{ __('The Pro Acid Applicator is engineered for the modern farmer who refuses to compromise on silage quality. Utilizing high-precision sensors, the system automatically adjusts acid application rates based on real-time moisture data.') }}</p>
+                                
                                 <div class="row mt-4 g-4">
                                     <div class="col-md-6">
                                         <div class="feature-icon-box"><i class="fas fa-microchip"></i></div>
-                                        <h6>Smart Flow Control</h6>
-                                        <p class="small text-muted">Adjusts dosage dynamically between 0.5L to 10L per ton.</p>
+                                        <h6>{{ __('Smart Flow Control') }}</h6>
+                                        <p class="small text-muted">{{ __('Adjusts dosage dynamically between 0.5L to 10L per ton.') }}</p>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="feature-icon-box"><i class="fas fa-shield-alt"></i></div>
-                                        <h6>Corrosion Resistant</h6>
-                                        <p class="small text-muted">Built with high-grade stainless steel and acid-proof seals.</p>
+                                        <h6>{{ __('Corrosion Resistant') }}</h6>
+                                        <p class="small text-muted">{{ __('Built with high-grade stainless steel and acid-proof seals.') }}</p>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="tab-pane fade" id="specs">
                                 <table class="table table-bordered tech-table">
-                                    <tr><td>Compatible Balers</td><td>Most Round & Square Models</td></tr>
-                                    <tr><td>Tank Capacity</td><td>100L / 200L / 400L Options</td></tr>
-                                    <tr><td>Pump Type</td><td>12V High-Pressure Diaphragm</td></tr>
-                                    <tr><td>Control System</td><td>Cab-mounted LCD Interface</td></tr>
+                                    <tr>
+                                        <td>{{ __('Compatible Balers') }}</td>
+                                        <td>{{ __('Most Round & Square Models') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ __('Tank Capacity') }}</td>
+                                        <td>{{ __('100L / 200L / 400L Options') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ __('Pump Type') }}</td>
+                                        <td>{{ __('12V High-Pressure Diaphragm') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ __('Control System') }}</td>
+                                        <td>{{ __('Cab-mounted LCD Interface') }}</td>
+                                    </tr>
                                 </table>
                             </div>
+
                             <div class="tab-pane fade" id="docs">
                                 <div class="list-group">
                                     <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between">
-                                        <span><i class="far fa-file-pdf me-2 text-danger"></i> Installation Manual.pdf</span>
+                                        <span><i class="far fa-file-pdf me-2 text-danger"></i> {{ __('Installation Manual.pdf') }}</span>
                                         <i class="fas fa-download"></i>
                                     </a>
                                     <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between">
-                                        <span><i class="far fa-file-pdf me-2 text-danger"></i> Product Brochure 2026.pdf</span>
+                                        <span><i class="far fa-file-pdf me-2 text-danger"></i> {{ __('Product Brochure 2026.pdf') }}</span>
                                         <i class="fas fa-download"></i>
                                     </a>
                                 </div>
@@ -174,44 +210,44 @@
 
                 <div class="col-lg-5">
                     <div class="ps-lg-4">
-                        <span class="badge-category">Applicators</span>
-                        <h1 class="product-title">Pro Acid Applicator System</h1>
-                        <div class="price-tag">Price on Request</div>
-                        
-                        <p class="text-muted mb-4">A complete precision treatment system designed to apply preservatives accurately to baled crops, ensuring minimal spoilage and maximum nutrient retention.</p>
+                        <span class="badge-category">{{ __('Applicators') }}</span>
+                        <h1 class="product-title">{{ __('Pro Acid Applicator System') }}</h1>
+                        <div class="price-tag">{{ __('Price on Request') }}</div>
+
+                        <p class="text-muted mb-4">{{ __('A complete precision treatment system designed to apply preservatives accurately to baled crops, ensuring minimal spoilage and maximum nutrient retention.') }}</p>
 
                         <div class="spec-shortcut">
-                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>Plug & Play</span></div>
-                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>Universal Fit</span></div>
-                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>GPS Ready</span></div>
-                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>2 Year Warranty</span></div>
+                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>{{ __('Plug & Play') }}</span></div>
+                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>{{ __('Universal Fit') }}</span></div>
+                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>{{ __('GPS Ready') }}</span></div>
+                            <div class="shortcut-item"><i class="fas fa-check-circle"></i><span>{{ __('2 Year Warranty') }}</span></div>
                         </div>
 
                         <div class="inquiry-card shadow-lg">
-                            <h5 class="fw-bold mb-3">Request a Quote</h5>
-                            <p class="small opacity-75 mb-4">Our specialists will contact you within 24 hours with a custom quote and configuration advice.</p>
+                            <h5 class="fw-bold mb-3">{{ __('Request a Quote') }}</h5>
+                            <p class="small opacity-75 mb-4">{{ __('Our specialists will contact you within 24 hours with a custom quote and configuration advice.') }}</p>
                             
                             <form>
                                 <div class="mb-3">
-                                    <input type="text" class="form-control bg-dark text-white border-secondary" placeholder="Full Name">
+                                    <input type="text" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('Full Name') }}">
                                 </div>
                                 <div class="mb-3">
-                                    <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="Email Address">
+                                    <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('Email Address') }}">
                                 </div>
                                 <div class="mb-4">
                                     <select class="form-select bg-dark text-white border-secondary">
-                                        <option selected>Select Baler Model</option>
-                                        <option>John Deere</option>
-                                        <option>New Holland</option>
-                                        <option>Other</option>
+                                        <option selected>{{ __('Select Baler Model') }}</option>
+                                        <option>{{ __('John Deere') }}</option>
+                                        <option>{{ __('New Holland') }}</option>
+                                        <option>{{ __('Other') }}</option>
                                     </select>
                                 </div>
-                                <button class="btn-pfc-lg">Submit Inquiry <i class="fas fa-paper-plane ms-2"></i></button>
+                                <button class="btn-pfc-lg">{{ __('Submit Inquiry') }} <i class="fas fa-paper-plane ms-2"></i></button>
                             </form>
-                            
+
                             <div class="mt-4 pt-4 border-top border-secondary text-center">
-                                <p class="small mb-0 opacity-50">Need immediate help?</p>
-                                <p class="fw-bold">+44 (0) 1234 567890</p>
+                                <p class="small mb-0 opacity-50">{{ __('Need immediate help?') }}</p>
+                                <p class="fw-bold">{{ __('+44 (0) 1234 567890') }}</p>
                             </div>
                         </div>
                     </div>

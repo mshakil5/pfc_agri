@@ -85,16 +85,25 @@
             <div class="col-lg-8 mb-3 mb-lg-0">
                 <div class="cookie-title">
                     <i class="fas fa-cookie-bite text-success"></i>
-                    Cookie Settings
+                    {{ __('cookie.title') }}
                 </div>
+
                 <p class="cookie-text">
-                    We use cookies to enhance your experience and analyze our traffic. By clicking "Accept", you consent to our use of cookies in accordance with our <a href="/privacy-policy" class="text-success text-decoration-none fw-bold">Privacy Policy</a>.
+                    {{ __('cookie.text') }}
+                    <a href="/privacy-policy" class="text-success text-decoration-none fw-bold">
+                        {{ __('cookie.privacy_policy') }}
+                    </a>.
                 </p>
             </div>
+
             <div class="col-lg-4 text-lg-end">
                 <div class="cookie-buttons d-flex justify-content-lg-end gap-2">
-                    <button class="btn-cookie-reject" onclick="rejectCookies()">Decline</button>
-                    <button class="btn-cookie-accept" onclick="acceptCookies()">Accept All</button>
+                    <button class="btn-cookie-reject" onclick="rejectCookies()">
+                        {{ __('cookie.decline') }}
+                    </button>
+                    <button class="btn-cookie-accept" onclick="acceptCookies()">
+                        {{ __('cookie.accept_all') }}
+                    </button>
                 </div>
             </div>
         </div>

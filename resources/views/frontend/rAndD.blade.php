@@ -135,7 +135,7 @@
                 @endforeach
             @else
                 {{-- Fallback if JSON is empty --}}
-                <div class="col-12"><p class="text-muted">No stats available.</p></div>
+                <div class="col-12"><p class="text-muted">{{ __('No stats available.') }}</p></div>
             @endif
         </div>
     </div>
@@ -145,9 +145,9 @@
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <p class="text-success fw-bold small mb-1">OUR PROJECTS</p>
-            <h2 class="fw-bold">Current R&D Initiatives</h2>
-            <p class="text-muted">Explore the projects we're actively developing to bring new solutions to market.</p>
+            <p class="text-success fw-bold small mb-1">{{ __('OUR PROJECTS') }}</p>
+            <h2 class="fw-bold">{{ __('Current R&D Initiatives') }}</h2>
+            <p class="text-muted">{{ __('Explore the projects we\'re actively developing to bring new solutions to market.') }}</p>
         </div>
 
         @forelse($data as $project)
@@ -167,7 +167,7 @@
                         </span>
                         <span class="ms-3 text-muted small">
                             <i class="far fa-calendar"></i> 
-                            Started {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
+                            {{ __('Started') }} {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
                         </span>
                     </div>
                     
@@ -177,14 +177,14 @@
                     </p>
                     
                     {{-- Timeline Section --}}
-                    <h6 class="fw-bold small mt-4">Project Details</h6>
+                    <h6 class="fw-bold small mt-4">{{ __('Project Details') }}</h6>
                     <div class="project-long-desc mb-3">
                         {{-- Rendering the HTML content from the long_description --}}
                         {!! Str::limit($project->long_description, 200) !!}
                     </div>
 
                     <div class="mt-4 pt-3 border-top">
-                        <span class="text-muted small">Target Completion: </span>
+                        <span class="text-muted small">{{ __('Target Completion:') }} </span>
                         <span class="text-success fw-bold">
                             {{ \Carbon\Carbon::parse($project->deadline)->format('F Y') }}
                         </span>
@@ -194,14 +194,14 @@
         </div>
         @empty
             <div class="text-center p-5">
-                <p class="text-muted">No R&D projects found at the moment.</p>
+                <p class="text-muted">{{ __('No R&D projects found at the moment.') }}</p>
             </div>
         @endforelse
 
         <div class="text-center mt-5 pt-5">
-            <h2 class="fw-bold mb-3 text-success">Have an Idea for Innovation?</h2>
-            <p class="text-muted mx-auto mb-4" style="max-width: 600px;">We're always looking for new challenges. If you have a problem that needs solving, we'd love to hear from you.</p>
-            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">Share Your Ideas</a>
+            <h2 class="fw-bold mb-3 text-success">{{ __('Have an Idea for Innovation?') }}</h2>
+            <p class="text-muted mx-auto mb-4" style="max-width: 600px;">{{ __("We're always looking for new challenges. If you have a problem that needs solving, we'd love to hear from you.") }}</p>
+            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">{{ __('Share Your Ideas') }}</a>
         </div>
     </div>
 </section>

@@ -108,7 +108,7 @@
                     <img src="{{ asset('images/about/' . $data->image) }}" alt="{{ $data->title }}">
                     <div class="years-badge">
                         <h3 class="fw-bold mb-0">{{ $data->year }}+</h3>
-                        <p class="small mb-0">Years of Excellence</p>
+                        <p class="small mb-0">{{ __('Years of Excellence') }}</p>
                     </div>
                 </div>
             </div>
@@ -118,8 +118,8 @@
 
 <section class="values-section text-center">
     <div class="container">
-        <p class="section-tag mb-1">WHAT DRIVES US</p>
-        <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">Our Core Values</h2>
+        <p class="section-tag mb-1">{{ __('WHAT DRIVES US') }}</p>
+        <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">{{ __('Our Core Values') }}</h2>
         
         <div class="row g-4">
             @if(!empty($data->amenities))
@@ -235,9 +235,9 @@
 
 <section class="team-section">
     <div class="container text-center">
-        <p class="section-tag mb-1">THE PEOPLE BEHIND PFC</p>
-        <h2 class="fw-bold mb-3" style="color: var(--pfc-green);">Meet Our Team</h2>
-        <p class="text-muted mx-auto mb-5" style="max-width: 600px;">Our dedicated team combines farming experience with technical expertise to serve you better.</p>
+        <p class="section-tag mb-1">{{ __('THE PEOPLE BEHIND PFC') }}</p>
+        <h2 class="fw-bold mb-3" style="color: var(--pfc-green);">{{ __('Meet Our Team') }}</h2>
+        <p class="text-muted mx-auto mb-5" style="max-width: 600px;">{{ __('Our dedicated team combines farming experience with technical expertise to serve you better.') }}</p>
         
         <div class="row g-4">
             <div class="col-lg-4">
@@ -282,28 +282,28 @@
 
 <section class="get-in-touch-section">
     <div class="container text-center">
-        <h2 class="fw-bold mb-3">Get In Touch</h2>
-        <p class="opacity-75 mx-auto mb-5" style="max-width: 600px;">We'd love to hear from you. Reach out to discuss your agricultural needs.</p>
+        <h2 class="fw-bold mb-3">{{ __('Get In Touch') }}</h2>
+        <p class="opacity-75 mx-auto mb-5" style="max-width: 600px;">{{ __("We'd love to hear from you. Reach out to discuss your agricultural needs.") }}</p>
         
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-phone"></i></div>
-                    <h5 class="fw-bold mb-2">Call Us</h5>
+                    <h5 class="fw-bold mb-2">{{ __('Call Us') }}</h5>
                     <p class="mb-0 opacity-90">{{ $company->phone1 }}</p>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-envelope"></i></div>
-                    <h5 class="fw-bold mb-2">Email Us</h5>
+                    <h5 class="fw-bold mb-2">{{ __('Email Us') }}</h5>
                     <p class="mb-0 opacity-90">{{ $company->email1 }}</p>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-map-marker-alt"></i></div>
-                    <h5 class="fw-bold mb-2">Visit Us</h5>
+                    <h5 class="fw-bold mb-2">{{ __('Visit Us') }}</h5>
                     <p class="small mb-0 opacity-90 text-light">{!! $company->address1 !!}</p>
                 </div>
             </div>

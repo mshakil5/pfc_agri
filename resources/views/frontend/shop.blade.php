@@ -78,8 +78,10 @@
         </h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 justify-content-center justify-content-md-start">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-white opacity-75 text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">Shop</li>
+                <li class="breadcrumb-item">
+                    <a href="{{ url('/') }}" class="text-white opacity-75 text-decoration-none">{{ __('Home') }}</a>
+                </li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ __('Shop') }}</li>
             </ol>
         </nav>
     </div>
@@ -90,10 +92,10 @@
         <div class="row g-4">
             <aside class="col-lg-3">
                 <div class="category-sidebar">
-                    <h6 class="sidebar-title text-uppercase small">Categories</h6>
+                    <h6 class="sidebar-title text-uppercase small">{{ __('Categories') }}</h6>
                     
                     <a href="{{ route('category.show') }}" class="main-cat {{ !$currentCategory ? 'active' : '' }}">
-                        <span>All Products</span>
+                        <span>{{ __('All Products') }}</span>
                         <i class="fas fa-chevron-right small opacity-50"></i>
                     </a>
                     
@@ -118,10 +120,10 @@
                                 <a href="{{ route('category.show') }}" class="ms-2 text-success"><i class="fas fa-times-circle"></i></a>
                             </div>
                         @else
-                            <span class="text-muted fw-medium">All Categories</span>
+                            <span class="text-muted fw-medium">{{ __('All Categories') }}</span>
                         @endif
                     </div>
-                    <span class="text-muted small">Showing <strong>{{ $products->count() }}</strong> of {{ $products->total() }} results</span>
+                    <span class="text-muted small">Showing <strong>{{ $products->count() }}</strong> of {{ $products->total() }} {{ __('Results') }}</span>
                 </div>
 
                 <div class="row g-4">
@@ -145,7 +147,7 @@
                                     <span class="fw-bold text-success">
                                         {{ $product->price > 0 ? '£' . number_format($product->price, 2) : 'Price on Request' }}
                                     </span>
-                                    <a href="{{ route('product.detail') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">View Details</a>
+                                    <a href="{{ route('product.detail') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">{{ __('View Details') }}</a>
                                 </div>
                             </div>
                         </div>
@@ -154,8 +156,8 @@
                     <div class="col-12">
                         <div class="text-center py-5 bg-white rounded-3 shadow-sm">
                             <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No products found in this category.</h5>
-                            <a href="{{ route('category.show') }}" class="btn btn-success mt-3">Back to All Products</a>
+                            <h5 class="text-muted">{{ __('No products found in this category.') }}</h5>
+                            <a href="{{ route('category.show') }}" class="btn btn-success mt-3">{{ __('Back to All Products') }}</a>
                         </div>
                     </div>
                     @endforelse

@@ -92,9 +92,9 @@
 
 <section class="contact-hero">
     <div class="container">
-        <h1 class="fw-bold display-5 mb-3">Get In Touch</h1>
+        <h1 class="fw-bold display-5 mb-3">{{ __('Get In Touch') }}</h1>
         <p class="opacity-90 mx-auto" style="max-width: 600px;">
-            Have a question or need a quote? We'd love to hear from you. Fill out the form below and our team will respond promptly.
+            {{ __("Have a question or need a quote? We'd love to hear from you. Fill out the form below and our team will respond promptly.") }}
         </p>
     </div>
 </section>
@@ -105,12 +105,12 @@
             
             <div class="col-lg-4">
                 <div class="contact-info-card h-100">
-                    <h4 class="fw-bold mb-4" style="color: #00a651;">Contact Information</h4>
+                    <h4 class="fw-bold mb-4" style="color: #00a651;">{{ __('Contact Information') }}</h4>
                     
                     <div class="info-item">
                         <div class="info-icon-box"><i class="fas fa-phone"></i></div>
                         <div>
-                            <p class="fw-bold mb-0">Phone</p>
+                            <p class="fw-bold mb-0">{{ __('Phone') }}</p>
                             <p class="text-muted small mb-0">{{ $company->phone1 }}</p>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                     <div class="info-item">
                         <div class="info-icon-box"><i class="fas fa-envelope"></i></div>
                         <div>
-                            <p class="fw-bold mb-0">Email</p>
+                            <p class="fw-bold mb-0">{{ __('Email') }}</p>
                             <p class="text-muted small mb-0">{{ $company->email1 }}</p>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                     <div class="info-item">
                         <div class="info-icon-box"><i class="fas fa-map-marker-alt"></i></div>
                         <div>
-                            <p class="fw-bold mb-0">Address</p>
+                            <p class="fw-bold mb-0">{{ __('Address') }}</p>
                             <p class="text-muted small mb-0">
                                 {!! $company->address1 !!}
                                 
@@ -138,7 +138,7 @@
                     <div class="info-item">
                         <div class="info-icon-box"><i class="fas fa-clock"></i></div>
                         <div>
-                            <p class="fw-bold mb-0">Business Hours</p>
+                            <p class="fw-bold mb-0">{{ __('Business Hours') }}</p>
                             <p class="text-muted small mb-0">
                                 {!! $company->address2 !!}
                             </p>
@@ -146,14 +146,14 @@
                     </div>
 
                     <hr class="my-4 opacity-50">
-                    <p class="small text-muted mb-0">For urgent inquiries outside business hours, please call our emergency line.</p>
+                    <p class="small text-muted mb-0">{{ __('For urgent inquiries outside business hours, please call our emergency line.') }}</p>
                 </div>
             </div>
 
             <div class="col-lg-8">
                 <div class="contact-form-card">
-                    <h4 class="fw-bold mb-2" style="color: #00a651;">Send us a Message</h4>
-                    <p class="text-muted small mb-4">Fill out the form below and we'll get back to you as soon as possible.</p>
+                    <h4 class="fw-bold mb-2" style="color: #00a651;">{{ __('Send us a Message') }}</h4>
+                    <p class="text-muted small mb-4">{{ __("Fill out the form below and we'll get back to you as soon as possible.") }}</p>
 
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert" id="callback">
@@ -178,43 +178,43 @@
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Full Name <span>*</span></label>
-                                <input type="text" name="full_name" class="form-control" placeholder="John Smith" required value="{{ old('full_name') }}">
+                                <label class="form-label">{{ __('Full Name') }} <span>*</span></label>
+                                <input type="text" name="full_name" class="form-control" placeholder="{{ __('John Smith') }}" required value="{{ old('full_name') }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Email Address <span>*</span></label>
-                                <input type="email" name="email" class="form-control" placeholder="john@example.com" required value="{{ old('email') }}">
+                                <label class="form-label">{{ __('Email Address') }} <span>*</span></label>
+                                <input type="email" name="email" class="form-control" placeholder="{{ __('john@example.com') }}" required value="{{ old('email') }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Phone Number</label>
-                                <input type="tel" name="phone" class="form-control" placeholder="+44 1234 567890" value="{{ old('phone') }}">
+                                <label class="form-label">{{ __('Phone Number') }}</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="{{ __('+44 1234 567890') }}" value="{{ old('phone') }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Subject</label>
+                                <label class="form-label">{{ __('Subject') }}</label>
                                 <select name="subject" class="form-select">
-                                    <option selected disabled>Select a subject</option>
-                                    <option value="Product Inquiry">Product Inquiry</option>
-                                    <option value="Technical Support">Technical Support</option>
-                                    <option value="Partnership">Partnership</option>
-                                    <option value="Other">Other</option>
+                                    <option selected disabled>{{ __('Select a subject') }}</option>
+                                    <option value="Product Inquiry">{{ __('Product Inquiry') }}</option>
+                                    <option value="Technical Support">{{ __('Technical Support') }}</option>
+                                    <option value="Partnership">{{ __('Partnership') }}</option>
+                                    <option value="Other">{{ __('Other') }}</option>
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Product Interest</label>
+                                <label class="form-label">{{ __('Product Interest') }}</label>
                                 <select name="category_id" class="form-select">
-                                    <option selected disabled>Select a product category (optional)</option>
+                                    <option selected disabled>{{ __('Select a product category (optional)') }}</option>
                                     @foreach ($categories as $cat)
-                                        <option value="{{$cat->id}}"> {{ $cat->name }}</option>
+                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Your Message <span>*</span></label>
-                                <textarea name="message" class="form-control" rows="5" placeholder="Please describe your inquiry in detail..." required>{{ old('message') }}</textarea>
+                                <label class="form-label">{{ __('Your Message') }} <span>*</span></label>
+                                <textarea name="message" class="form-control" rows="5" placeholder="{{ __('Please describe your inquiry in detail...') }}" required>{{ old('message') }}</textarea>
                             </div>
                             <div class="col-12 mt-4">
-                                <button type="submit" class="btn-send"><i class="fas fa-paper-plane me-2"></i> Send Message</button>
-                                <span class="ms-3 text-muted small">* Required fields</span>
+                                <button type="submit" class="btn-send"><i class="fas fa-paper-plane me-2"></i> {{ __('Send Message') }}</button>
+                                <span class="ms-3 text-muted small">{{ __('* Required fields') }}</span>
                             </div>
                         </div>
                     </form>

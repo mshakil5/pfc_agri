@@ -82,7 +82,7 @@
             <span><i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($blog->published_at)->format('M d, Y') }}</span>
             <span><i class="far fa-user"></i> {{ $blog->author_name }}</span>
             {{-- Using 'tag' if you added it to your table, otherwise using a generic label --}}
-            <span class="badge bg-success" style="background-color: #00a651 !important;">Article</span>
+            <span class="badge bg-success" style="background-color: #00a651 !important;">{{ __('Article') }}</span>
         </div>
         <h1 class="display-4 fw-bold mb-4" style="color: #00a651;">{{ $blog->title }}</h1>
     </div>
@@ -131,12 +131,12 @@
 
             <div class="col-lg-4 mt-5 mt-lg-0">
                 <aside class="blog-sidebar-card">
-                    <h4 class="fw-bold mb-3" style="color: #00a651;">About the Author</h4>
-                    <p class="small text-muted mb-4">{{ $blog->author_name }} is a contributor to the PFC Agri blog, sharing insights on modern farming and sustainable solutions.</p>
+                    <h4 class="fw-bold mb-3" style="color: #00a651;">{{ __('About the Author') }}</h4>
+                    <p class="small text-muted mb-4">{{ $blog->author_name }} {{ __('is a contributor to the PFC Agri blog, sharing insights on modern farming and sustainable solutions.') }}</p>
                     
                     <hr>
                     
-                    <h4 class="fw-bold mb-3" style="color: #00a651;">Recent Posts</h4>
+                    <h4 class="fw-bold mb-3" style="color: #00a651;">{{ __('Recent Posts') }}</h4>
                     <ul class="list-unstyled">
                         @foreach($relatedPosts as $post)
                             <li class="mb-3">
@@ -151,9 +151,9 @@
                     </ul>
 
                     <div class="mt-4 p-3 rounded" style="background-color: #00a651; color: #fff;">
-                        <h5>Need Expert Advice?</h5>
-                        <p class="small">Contact our team for a free consultation on your storage needs.</p>
-                        <a href="{{ route('contact') }}" class="btn btn-light btn-sm fw-bold">Contact Us</a>
+                        <h5>{{ __('Need Expert Advice?') }}</h5>
+                        <p class="small">{{ __('Contact our team for a free consultation on your storage needs.') }}</p>
+                        <a href="{{ route('contact') }}" class="btn btn-light btn-sm fw-bold">{{ __('Contact Us') }}</a>
                     </div>
                 </aside>
             </div>
