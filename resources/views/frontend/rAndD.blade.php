@@ -111,10 +111,10 @@
 @if($research)
 <section class="rd-hero" style="background-image: url('{{ asset('uploads/master/' . $research->feature_image) }}');">
     <div class="container">
-        <span class="innovation-badge">{{ $research->name }}</span>
-        <h1 class="fw-bold display-4">{{ $research->short_title }}</h1>
+        <span class="innovation-badge">{{ $research->getTranslation(app()->getLocale(), 'name') }}</span>
+        <h1 class="fw-bold display-4">{{ $research->getTranslation(app()->getLocale(), 'short_title') }}</h1>
         <p class="opacity-75 mx-auto" style="max-width: 700px;">
-            {{ $research->long_title }}
+            {{ $research->getTranslation(app()->getLocale(), 'long_title') }}
         </p>
     </div>
 </section>
@@ -123,20 +123,21 @@
     <div class="container">
         <div class="row text-center">
             @php
-                $counters = json_decode($research->extra1, true);
+                $locale   = app()->getLocale();
+                $trans    = $research->translations[$locale] ?? [];
+                $counters = !empty($trans['counters'])
+                    ? $trans['counters']
+                    : (json_decode($research->extra1, true) ?? []);
             @endphp
 
-            @if(!empty($counters))
-                @foreach($counters as $counter)
-                    <div class="col-md-3 col-6 counter-item mb-3">
-                        <h2>{{ $counter['count'] }}</h2>
-                        <p class="small text-muted mb-0">{{ $counter['subtitle'] }}</p>
-                    </div>
-                @endforeach
-            @else
-                {{-- Fallback if JSON is empty --}}
-                <div class="col-12"><p class="text-muted">{{ __('No stats available.') }}</p></div>
-            @endif
+            @forelse($counters as $counter)
+                <div class="col-md-3 col-6 counter-item mb-3">
+                    <h2>{{ $counter['count'] }}</h2>
+                    <p class="small text-muted mb-0">{{ $counter['subtitle'] }}</p>
+                </div>
+            @empty
+                <div class="col-12"><p class="text-muted">{{ __('rnd.no_stats') }}</p></div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -145,46 +146,40 @@
 <section class="py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
-            <p class="text-success fw-bold small mb-1">{{ __('OUR PROJECTS') }}</p>
-            <h2 class="fw-bold">{{ __('Current R&D Initiatives') }}</h2>
-            <p class="text-muted">{{ __('Explore the projects we\'re actively developing to bring new solutions to market.') }}</p>
+            <p class="text-success fw-bold small mb-1">{{ __('rnd.our_projects') }}</p>
+            <h2 class="fw-bold">{{ __('rnd.current_initiatives') }}</h2>
+            <p class="text-muted">{{ __('rnd.initiatives_description') }}</p>
         </div>
 
         @forelse($data as $project)
-        <div class="project-card mb-4"> {{-- Added mb-4 for spacing between cards --}}
+        <div class="project-card mb-4">
             <div class="row g-0">
                 <div class="col-lg-5">
-                    {{-- Check if image exists, otherwise show placeholder --}}
-                    <img src="{{ $project->feature_image ? asset($project->feature_image) : asset('images/placeholder.webp') }}" 
-                         class="project-img w-100 h-100" 
-                         style="object-fit: cover;"
-                         alt="{{ $project->title }}">
+                    <img src="{{ $project->feature_image ? asset($project->feature_image) : asset('images/placeholder.webp') }}"
+                         class="project-img w-100 h-100" style="object-fit: cover;"
+                         alt="{{ $project->getTranslation(app()->getLocale(), 'title') }}">
                 </div>
                 <div class="col-lg-7 p-4 p-md-5">
                     <div class="mb-3">
                         <span class="status-label status-in-progress">
-                            {{ $project->status == 1 ? 'In Progress' : 'Completed' }}
+                            {{ $project->status == 1 ? __('rnd.in_progress') : __('rnd.completed') }}
                         </span>
                         <span class="ms-3 text-muted small">
-                            <i class="far fa-calendar"></i> 
-                            {{ __('Started') }} {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
+                            <i class="far fa-calendar"></i>
+                            {{ __('rnd.started') }} {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
                         </span>
                     </div>
-                    
-                    <h3 class="fw-bold text-success mb-3">{{ $project->title }}</h3>
-                    <p class="text-muted small">
-                        {{ $project->short_description }}
-                    </p>
-                    
-                    {{-- Timeline Section --}}
-                    <h6 class="fw-bold small mt-4">{{ __('Project Details') }}</h6>
+
+                    <h3 class="fw-bold text-success mb-3">{{ $project->getTranslation(app()->getLocale(), 'title') }}</h3>
+                    <p class="text-muted small">{{ $project->getTranslation(app()->getLocale(), 'short_description') }}</p>
+
+                    <h6 class="fw-bold small mt-4">{{ __('rnd.project_details') }}</h6>
                     <div class="project-long-desc mb-3">
-                        {{-- Rendering the HTML content from the long_description --}}
-                        {!! Str::limit($project->long_description, 200) !!}
+                        {!! Str::limit($project->getTranslation(app()->getLocale(), 'long_description'), 200) !!}
                     </div>
 
                     <div class="mt-4 pt-3 border-top">
-                        <span class="text-muted small">{{ __('Target Completion:') }} </span>
+                        <span class="text-muted small">{{ __('rnd.target_completion') }} </span>
                         <span class="text-success fw-bold">
                             {{ \Carbon\Carbon::parse($project->deadline)->format('F Y') }}
                         </span>
@@ -194,14 +189,14 @@
         </div>
         @empty
             <div class="text-center p-5">
-                <p class="text-muted">{{ __('No R&D projects found at the moment.') }}</p>
+                <p class="text-muted">{{ __('rnd.no_projects') }}</p>
             </div>
         @endforelse
 
         <div class="text-center mt-5 pt-5">
-            <h2 class="fw-bold mb-3 text-success">{{ __('Have an Idea for Innovation?') }}</h2>
-            <p class="text-muted mx-auto mb-4" style="max-width: 600px;">{{ __("We're always looking for new challenges. If you have a problem that needs solving, we'd love to hear from you.") }}</p>
-            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">{{ __('Share Your Ideas') }}</a>
+            <h2 class="fw-bold mb-3 text-success">{{ __('rnd.have_idea') }}</h2>
+            <p class="text-muted mx-auto mb-4" style="max-width: 600px;">{{ __('rnd.idea_description') }}</p>
+            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">{{ __('rnd.share_ideas') }}</a>
         </div>
     </div>
 </section>

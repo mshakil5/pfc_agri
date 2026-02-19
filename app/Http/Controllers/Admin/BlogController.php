@@ -81,6 +81,12 @@ public function store(Request $request)
     return response()->json(['message' => 'Blog created successfully!']);
 }
 
+public function edit($id)
+{
+    $blog = Blog::with('translations')->findOrFail($id);
+    return response()->json($blog);
+}
+
 public function update(Request $request)
 {
     $blog = Blog::findOrFail($request->codeid);

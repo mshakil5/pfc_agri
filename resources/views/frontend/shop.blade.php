@@ -74,14 +74,14 @@
 <header class="product-hero">
     <div class="container text-center text-md-start">
         <h1 class="fw-bold display-5">
-            {{ $currentCategory ? $currentCategory->name : 'Our Product Range' }}
+            {{ $currentCategory ? ($currentCategory->translateOrNew(app()->getLocale())->name ?? $currentCategory->name) : __('shop.our_product_range') }}
         </h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 justify-content-center justify-content-md-start">
                 <li class="breadcrumb-item">
-                    <a href="{{ url('/') }}" class="text-white opacity-75 text-decoration-none">{{ __('Home') }}</a>
+                    <a href="{{ url('/') }}" class="text-white opacity-75 text-decoration-none">{{ __('shop.home') }}</a>
                 </li>
-                <li class="breadcrumb-item active text-white" aria-current="page">{{ __('Shop') }}</li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ __('shop.shop') }}</li>
             </ol>
         </nav>
     </div>
@@ -92,21 +92,21 @@
         <div class="row g-4">
             <aside class="col-lg-3">
                 <div class="category-sidebar">
-                    <h6 class="sidebar-title text-uppercase small">{{ __('Categories') }}</h6>
-                    
+                    <h6 class="sidebar-title text-uppercase small">{{ __('shop.categories') }}</h6>
+
                     <a href="{{ route('category.show') }}" class="main-cat {{ !$currentCategory ? 'active' : '' }}">
-                        <span>{{ __('All Products') }}</span>
+                        <span>{{ __('shop.all_products') }}</span>
                         <i class="fas fa-chevron-right small opacity-50"></i>
                     </a>
-                    
+
                     @foreach($categories as $cat)
-                    <a href="{{ route('category.show', $cat->slug) }}" 
-                       class="main-cat {{ ($currentCategory && $currentCategory->id == $cat->id) ? 'active' : '' }}">
-                        <span>{{ $cat->name }}</span>
-                        <span class="badge rounded-pill {{ ($currentCategory && $currentCategory->id == $cat->id) ? 'bg-white text-success' : 'bg-light text-dark' }}">
-                            {{ $cat->products_count }}
-                        </span>
-                    </a>
+                        <a href="{{ route('category.show', $cat->slug) }}"
+                           class="main-cat {{ ($currentCategory && $currentCategory->id == $cat->id) ? 'active' : '' }}">
+                            <span>{{ $cat->translateOrNew(app()->getLocale())->name ?? $cat->name }}</span>
+                            <span class="badge rounded-pill {{ ($currentCategory && $currentCategory->id == $cat->id) ? 'bg-white text-success' : 'bg-light text-dark' }}">
+                                {{ $cat->products_count }}
+                            </span>
+                        </a>
                     @endforeach
                 </div>
             </aside>
@@ -116,50 +116,56 @@
                     <div>
                         @if($currentCategory)
                             <div class="active-filter-pill">
-                                Category: {{ $currentCategory->name }} 
+                                {{ __('shop.category') }}: {{ $currentCategory->translateOrNew(app()->getLocale())->name ?? $currentCategory->name }}
                                 <a href="{{ route('category.show') }}" class="ms-2 text-success"><i class="fas fa-times-circle"></i></a>
                             </div>
                         @else
-                            <span class="text-muted fw-medium">{{ __('All Categories') }}</span>
+                            <span class="text-muted fw-medium">{{ __('shop.all_categories') }}</span>
                         @endif
                     </div>
-                    <span class="text-muted small">Showing <strong>{{ $products->count() }}</strong> of {{ $products->total() }} {{ __('Results') }}</span>
+                    <span class="text-muted small">
+                        {{ __('shop.showing') }} <strong>{{ $products->count() }}</strong> {{ __('shop.of') }} {{ $products->total() }} {{ __('shop.results') }}
+                    </span>
                 </div>
 
                 <div class="row g-4">
                     @forelse($products as $product)
-                    <div class="col-md-6 col-xl-4">
-                        <div class="p-card">
-                            <div class="p-img-box">
-                                <img src="{{ asset($product->image) }}" alt="{{ $product->title }}" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
-                            </div>
-                            <div class="p-4 d-flex flex-column flex-grow-1">
-                                <div class="mb-2">
-                                    <span class="badge bg-success bg-opacity-10 text-success uppercase" style="font-size: 10px;">
-                                        {{ $product->category->name ?? 'Agriculture' }}
-                                    </span>
+                        <div class="col-md-6 col-xl-4">
+                            <div class="p-card">
+                                <div class="p-img-box">
+                                    <img src="{{ asset($product->image) }}"
+                                         alt="{{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}"
+                                         onerror="this.src='https://placehold.co/600x400?text=No+Image'">
                                 </div>
-                                <h6 class="fw-bold mb-2">{{ $product->title }}</h6>
-                                <p class="text-muted small mb-3">
-                                    {{ Str::limit(strip_tags($product->long_description), 70) }}
-                                </p>
-                                <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-success">
-                                        {{ $product->price > 0 ? '£' . number_format($product->price, 2) : 'Price on Request' }}
-                                    </span>
-                                    <a href="{{ route('product.detail') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">{{ __('View Details') }}</a>
+                                <div class="p-4 d-flex flex-column flex-grow-1">
+                                    <div class="mb-2">
+                                        <span class="badge bg-success bg-opacity-10 text-success uppercase" style="font-size: 10px;">
+                                            {{ $product->category ? ($product->category->translateOrNew(app()->getLocale())->name ?? $product->category->name) : __('shop.agriculture') }}
+                                        </span>
+                                    </div>
+                                    <h6 class="fw-bold mb-2">{{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}</h6>
+                                    <p class="text-muted small mb-3">
+                                        {{ Str::limit(strip_tags($product->translateOrNew(app()->getLocale())->long_description ?? $product->long_description), 70) }}
+                                    </p>
+                                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-success">
+                                            {{ $product->price > 0 ? '£' . number_format($product->price, 2) : __('shop.price_on_request') }}
+                                        </span>
+                                        <a href="{{ route('product.detail', $product->slug) }}" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                                            {{ __('shop.view_details') }}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @empty
-                    <div class="col-12">
-                        <div class="text-center py-5 bg-white rounded-3 shadow-sm">
-                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">{{ __('No products found in this category.') }}</h5>
-                            <a href="{{ route('category.show') }}" class="btn btn-success mt-3">{{ __('Back to All Products') }}</a>
+                        <div class="col-12">
+                            <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">{{ __('shop.no_products_found') }}</h5>
+                                <a href="{{ route('category.show') }}" class="btn btn-success mt-3">{{ __('shop.back_to_all') }}</a>
+                            </div>
                         </div>
-                    </div>
                     @endforelse
                 </div>
 

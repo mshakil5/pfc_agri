@@ -31,11 +31,15 @@ class ProductController extends Controller
         return view('frontend.shop', compact('categories', 'products', 'currentCategory'));
     }
 
-    public function productDetail()
+    public function productDetail($slug)
     {
-        return view('frontend.product-detail');
-    }
+        $product = Product::with(['translations', 'category.translations'])
+            ->where('slug', $slug)
+            ->where('status', 1)
+            ->firstOrFail();
 
+        return view('frontend.product-detail', compact('product'));
+    }
 
 
 }

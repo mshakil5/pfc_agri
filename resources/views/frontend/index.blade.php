@@ -218,7 +218,9 @@
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <div class="about-image-wrapper">
-                        <img src="{{ asset('images/about/' . $about->image) }}" alt="{{ $about->title }}" class="main-about-img">
+                        <img src="{{ asset('images/about/' . $about->image) }}"
+                            alt="{{ $about->getTranslation(app()->getLocale(), 'title') }}"
+                            class="main-about-img">
                         <div class="experience-badge">
                             <div class="badge-number">{{ $about->year }}+</div>
                             <div>
@@ -230,31 +232,32 @@
                 </div>
 
                 <div class="col-lg-6">
-                    <p class="section-tag mb-2">{{ $about->title }}</p>
-                    <h2 class="about-title mb-4">{{ $about->sub_title }}</h2>
+                    <p class="section-tag mb-2">{{ $about->getTranslation(app()->getLocale(), 'title') }}</p>
+                    <h2 class="about-title mb-4">{{ $about->getTranslation(app()->getLocale(), 'sub_title') }}</h2>
                     <div class="text-muted mb-5">
-                        {{-- Use {!! !!} if the long_description contains HTML from a text editor --}}
-                        {!! $about->long_description !!}
+                        {!! $about->getTranslation(app()->getLocale(), 'long_description') !!}
                     </div>
 
                     <div class="row">
                         @php
-                            $amenities = json_decode($about->amenities, true);
+                            $locale    = app()->getLocale();
+                            $trans     = $about->translations[$locale] ?? [];
+                            $amenities = !empty($trans['amenities'])
+                                ? $trans['amenities']
+                                : (json_decode($about->amenities, true) ?? []);
                         @endphp
 
-                        @if(!empty($amenities))
-                            @foreach($amenities as $item)
+                        @foreach($amenities as $item)
                             <div class="col-sm-6">
                                 <div class="feature-box">
-                                    <div class="feature-icon"><i class="{{ $item['icon'] }}"></i></div>
+                                    <div class="feature-icon"><i class="{{ $item['icon'] ?? '' }}"></i></div>
                                     <div class="feature-content">
-                                        <h6>{{ $item['title'] }}</h6>
-                                        <p>{{ $item['subtitle'] }}</p>
+                                        <h6>{{ $item['title'] ?? '' }}</h6>
+                                        <p>{{ $item['subtitle'] ?? '' }}</p>
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
-                        @endif
+                        @endforeach
                     </div>
 
                     <div class="mt-4">

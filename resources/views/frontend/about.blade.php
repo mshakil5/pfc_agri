@@ -85,9 +85,9 @@
 @if($data)
 <section class="pfc-about-header">
     <div class="container">
-        <h1 class="fw-bold mb-3">{{ $data->header_title }}</h1>
+        <h1 class="fw-bold mb-3">{{ $data->getTranslation(app()->getLocale(), 'header_title') }}</h1>
         <p class="lead opacity-90 mx-auto" style="max-width: 750px;">
-            {{ $data->header_subtitle }}
+            {{ $data->getTranslation(app()->getLocale(), 'header_subtitle') }}
         </p>
     </div>
 </section>
@@ -96,19 +96,18 @@
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <p class="section-tag mb-1">{{ $data->sub_title }}</p>
-                <h2 class="fw-bold mb-4" style="color: var(--pfc-green);">{{ $data->title }}</h2>
-                
+                <p class="section-tag mb-1">{{ $data->getTranslation(app()->getLocale(), 'sub_title') }}</p>
+                <h2 class="fw-bold mb-4" style="color: var(--pfc-green);">{{ $data->getTranslation(app()->getLocale(), 'title') }}</h2>
                 <p class="text-muted">
-                   {!! $data->long_description !!}
+                    {!! $data->getTranslation(app()->getLocale(), 'long_description') !!}
                 </p>
             </div>
             <div class="col-lg-6">
                 <div class="story-image-wrapper">
-                    <img src="{{ asset('images/about/' . $data->image) }}" alt="{{ $data->title }}">
+                    <img src="{{ asset('images/about/' . $data->image) }}" alt="{{ $data->getTranslation(app()->getLocale(), 'title') }}">
                     <div class="years-badge">
                         <h3 class="fw-bold mb-0">{{ $data->year }}+</h3>
-                        <p class="small mb-0">{{ __('Years of Excellence') }}</p>
+                        <p class="small mb-0">{{ __('about.years_of_excellence') }}</p>
                     </div>
                 </div>
             </div>
@@ -118,21 +117,27 @@
 
 <section class="values-section text-center">
     <div class="container">
-        <p class="section-tag mb-1">{{ __('WHAT DRIVES US') }}</p>
-        <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">{{ __('Our Core Values') }}</h2>
-        
+        <p class="section-tag mb-1">{{ __('about.what_drives_us') }}</p>
+        <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">{{ __('about.our_core_values') }}</h2>
+
         <div class="row g-4">
-            @if(!empty($data->amenities))
-                @foreach($data->amenities as $item)
+            @php
+                $locale    = app()->getLocale();
+                $trans     = $data->translations[$locale] ?? [];
+                $amenities = !empty($trans['amenities'])
+                    ? $trans['amenities']
+                    : (is_array($data->amenities) ? $data->amenities : (json_decode($data->amenities, true) ?? []));
+            @endphp
+
+            @foreach($amenities as $item)
                 <div class="col-lg-3 col-md-6">
                     <div class="value-card">
-                        <div class="value-icon-box"><i class="{{ $item['icon'] }}"></i></div>
-                        <h5 class="fw-bold">{{ $item['title'] }}</h5>
-                        <p class="small text-muted mb-0">{{ $item['subtitle'] }}</p>
+                        <div class="value-icon-box"><i class="{{ $item['icon'] ?? '' }}"></i></div>
+                        <h5 class="fw-bold">{{ $item['title'] ?? '' }}</h5>
+                        <p class="small text-muted mb-0">{{ $item['subtitle'] ?? '' }}</p>
                     </div>
                 </div>
-                @endforeach
-            @endif
+            @endforeach
         </div>
     </div>
 </section>
