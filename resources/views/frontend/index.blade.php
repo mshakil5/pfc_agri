@@ -185,22 +185,22 @@
                 @foreach($categories as $category)
                     <div class="col-md-6">
                         <div class="card category-card">
-                            <img src="{{ asset($category->image) }}" 
-                                class="card-img h-100" 
-                                style="object-fit: cover;" 
-                                alt="{{ $category->name }}">
-                            
+                            <img src="{{ asset($category->image) }}"
+                                class="card-img h-100"
+                                style="object-fit: cover;"
+                                alt="{{ $category->translateOrNew(app()->getLocale())->name ?? $category->name }}">
+
                             <div class="card-img-overlay">
-                                <h3>{{ $category->name }}</h3>
-                                
-                                <p class="small opacity-75">{{ $category->description }}</p>
-                                
+                                <h3>{{ $category->translateOrNew(app()->getLocale())->name ?? $category->name }}</h3>
+
+                                <p class="small opacity-75">{{ $category->translateOrNew(app()->getLocale())->description ?? $category->description }}</p>
+
                                 <div class="mb-3">
                                     @foreach($category->products->take(4) as $product)
                                         <span class="tag-pill">{{ $product->title }}</span>
                                     @endforeach
                                 </div>
-                                
+
                                 <a href="{{ route('category.show', $category->slug) }}" class="text-white text-decoration-none fw-bold">
                                     {{ __('index.view_products') }} &rarr;
                                 </a>
