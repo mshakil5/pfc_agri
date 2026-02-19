@@ -5,65 +5,79 @@
     <div class="container-fluid" id="newBtnSection">
         <div class="row mb-3">
             <div class="col-auto">
-                <button type="button" class="btn btn-primary" id="newBtn">
-                    Add New Category
-                </button>
+                <button type="button" class="btn btn-primary" id="newBtn">Add New Category</button>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid" id="addThisFormContainer">
-        <div class="row justify-content-center">
-            <div class="col-xl-8">
-                <div class="card">
-                    <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0 flex-grow-1" id="cardTitle">Add New Category</h4>
-                    </div>
-                    <div class="card-body">
-                        <form id="createThisForm">
-                            @csrf
-                            <input type="hidden" id="codeid" name="codeid">
+    <div class="container-fluid" id="addThisFormContainer" style="display:none;">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1" id="cardTitle">Add New Category</h4>
+            </div>
+            <div class="card-body">
+                <form id="createThisForm">
+                    @csrf
+                    <input type="hidden" id="codeid" name="codeid">
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="">
-                                </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Parent Category</label>
+                            <select class="form-control select2" id="parent_id" name="parent_id">
+                                <option value="">Select Parent Category</option>
+                                @foreach ($parentCategories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->translateOrNew(app()->getLocale())->name ?? $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label">Parent Category</label>
-                                    <select class="form-control select2" id="parent_id" name="parent_id">
-                                        <option value="">Select Parent Category</option>
-                                        @foreach ($parentCategories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category Image</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*"
+                                onchange="previewImage(event, '#preview-image')">
+                            <img id="preview-image" src="#" alt="" class="img-thumbnail rounded mt-3"
+                                style="max-width:300px; display:none;">
+                        </div>
 
-                                <div class="col-md-12">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" id="description" name="description" rows="3" placeholder=""></textarea>
-                                </div>
+                        {{-- Language Tabs --}}
+                        <div class="col-md-12">
+                            <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
+                                @foreach(config('translatable.locales') as $index => $locale)
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
+                                           data-bs-toggle="tab" href="#category-tab-{{ $locale }}" role="tab">
+                                            {{ strtoupper($locale) }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
 
-                                <div class="col-md-12">
-                                    <label class="form-label">Category Image</label>
-                                    <input type="file" class="form-control" id="image" accept="image/*"
-                                        onchange="previewImage(event, '#preview-image')">
-                                    <img id="preview-image" src="#" alt="" class="img-thumbnail rounded mt-3"
-                                        style="max-width: 300px; display: none;">
-                                </div>
+                            <div class="tab-content">
+                                @foreach(config('translatable.locales') as $index => $locale)
+                                    <div class="tab-pane {{ $index == 0 ? 'active' : '' }}"
+                                         id="category-tab-{{ $locale }}" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label class="form-label">Name ({{ strtoupper($locale) }}) @if($locale === 'en') <span class="text-danger">*</span> @endif</label>
+                                                <input type="text" class="form-control"
+                                                       name="{{ $locale }}[name]" id="{{ $locale }}_name">
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label">Description ({{ strtoupper($locale) }})</label>
+                                                <textarea class="form-control" name="{{ $locale }}[description]"
+                                                          id="{{ $locale }}_description" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
-                        </form>
+                        </div>
                     </div>
-                    <div class="card-footer text-end">
-                        <button type="submit" id="addBtn" class="btn btn-primary">
-                            Create
-                        </button>
-                        <button type="button" id="FormCloseBtn" class="btn btn-light">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+                </form>
+            </div>
+            <div class="card-footer text-end">
+                <button type="button" id="addBtn" class="btn btn-primary">Create</button>
+                <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
             </div>
         </div>
     </div>
@@ -93,287 +107,126 @@
 @endsection
 
 @section('script')
-    <script>
-        // Function to load parent categories via AJAX
-        function loadParentCategories() {
+<script>
+    function loadParentCategories() {
+        $.get("{{ route('parent.categories') }}", function (response) {
+            $('#parent_id').empty().append('<option value="">Select Parent Category</option>');
+            response.forEach(function (cat) {
+                var name = (cat.translations && cat.translations.length > 0) ? cat.translations[0].name : cat.name;
+                $('#parent_id').append('<option value="' + cat.id + '">' + name + '</option>');
+            });
+            $('#parent_id').trigger('change');
+        });
+    }
+
+    $(document).ready(function () {
+
+        $('.select2').select2({ placeholder: "Select Parent Category", allowClear: true, width: '100%' });
+
+        $('#categoryTable').DataTable({
+            processing: true, serverSide: true, pageLength: 25,
+            ajax: "{{ route('allcategory') }}",
+            columns: [
+                { data: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'name', name: 'name' },
+                { data: 'parent_category', orderable: false, searchable: false },
+                { data: 'image', orderable: false, searchable: false },
+                { data: 'status', orderable: false, searchable: false },
+                { data: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $(document).on('change', '.toggle-status', function () {
+            $.post('/admin/category-status', {
+                _token: '{{ csrf_token() }}',
+                category_id: $(this).data('id'),
+                status: $(this).prop('checked') ? 1 : 0
+            }, function (d) {
+                reloadTable('#categoryTable');
+                showSuccess(d.message);
+            }).fail(() => showError('Failed to update status'));
+        });
+
+        $("#newBtn").click(function () {
+            clearForm();
+            $(this).hide();
+            $("#addThisFormContainer").slideDown(300);
+            loadParentCategories();
+        });
+
+        $("#FormCloseBtn").click(function () {
+            $("#addThisFormContainer").slideUp(300);
+            setTimeout(() => $("#newBtn").show(), 300);
+        });
+
+        $("#addBtn").click(function (e) {
+            e.preventDefault();
+            var isUpdate = $("#codeid").val() !== '';
+            var url = isUpdate ? "{{ URL::to('/admin/category-update') }}" : "{{ URL::to('/admin/category') }}";
+
             $.ajax({
-                url: "{{ route('parent.categories') }}",
-                method: "GET",
-                success: function(response) {
-                    // Clear existing options except the first one
-                    $('#parent_id').empty().append('<option value="">Select Parent Category</option>');
-
-                    // Add new options
-                    response.forEach(function(category) {
-                        $('#parent_id').append('<option value="' + category.id + '">' + category.name +
-                            '</option>');
-                    });
-
-                    // Trigger change to refresh Select2
-                    $('#parent_id').trigger('change');
+                url: url,
+                type: "POST",
+                data: new FormData($('#createThisForm')[0]),
+                contentType: false,
+                processData: false,
+                success: function (d) {
+                    showSuccess(d.message);
+                    $("#FormCloseBtn").click();
+                    reloadTable('#categoryTable');
+                    loadParentCategories();
                 },
-                error: function(xhr) {
-                    console.error('Failed to load parent categories');
+                error: function (xhr) {
+                    if (xhr.status === 422) {
+                        let msgs = [];
+                        Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0]));
+                        showError(msgs.join("<br>"));
+                    } else {
+                        showError(xhr.responseJSON?.message ?? "Something went wrong!");
+                    }
                 }
             });
+        });
+
+        $("#contentContainer").on('click', '#EditBtn', function () {
+            let id = $(this).attr('rid');
+            $.get("/admin/category/" + id + "/edit", function (data) {
+                populateForm(data);
+            });
+        });
+
+        function populateForm(data) {
+            $("#codeid").val(data.id);
+            $("#cardTitle").text('Update Category');
+            $("#addBtn").html('Update');
+            $("#addThisFormContainer").slideDown(300);
+            $("#newBtn").hide();
+
+            loadParentCategories();
+            setTimeout(function () {
+                $('#parent_id').val(data.parent_id || null).trigger('change');
+            }, 300);
+
+            if (data.image) {
+                $('#preview-image').attr('src', data.image).show();
+            }
+
+            if (data.translations && data.translations.length > 0) {
+                data.translations.forEach(function (t) {
+                    $('#' + t.locale + '_name').val(t.name);
+                    $('#' + t.locale + '_description').val(t.description);
+                });
+            }
         }
 
-        // Initialize Select2 when document is ready
-        $(document).ready(function() {
-            // Initialize Select2 for parent category dropdown
-            $('.select2').select2({
-                placeholder: "Select Parent Category",
-                allowClear: true,
-                width: '100%'
-            });
-
-            $('#categoryTable').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: 25,
-                ajax: "{{ route('allcategory') }}",
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'parent_category',
-                        name: 'parent_category',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'image',
-                        name: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-
-            $(document).on('change', '.toggle-status', function() {
-                var category_id = $(this).data('id');
-                var status = $(this).prop('checked') ? 1 : 0;
-
-                $.ajax({
-                    url: '/admin/category-status',
-                    method: "POST",
-                    data: {
-                        category_id: category_id,
-                        status: status,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(d) {
-                        reloadTable('#categoryTable');
-                        showSuccess(d.message);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        showError('Failed to update status');
-                    }
-                });
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            $("#addThisFormContainer").hide();
-            $("#newBtn").click(function() {
-                clearform();
-                $("#newBtn").hide(100);
-                $("#addThisFormContainer").show(300);
-
-                // Load fresh parent categories when opening the form
-                loadParentCategories();
-
-                // Re-initialize Select2 when form is shown
-                $('#parent_id').select2({
-                    placeholder: "Select Parent Category",
-                    allowClear: true,
-                    width: '100%'
-                });
-            });
-
-            $("#FormCloseBtn").click(function() {
-                $("#addThisFormContainer").hide(200);
-                $("#newBtn").show(100);
-                clearform();
-            });
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            var url = "{{ URL::to('/admin/category') }}";
-            var upurl = "{{ URL::to('/admin/category-update') }}";
-
-            $("#addBtn").click(function() {
-                //create
-                if ($(this).val() == 'Create') {
-                    var form_data = new FormData();
-                    form_data.append("name", $("#name").val());
-                    form_data.append("parent_id", $("#parent_id").val());
-                    form_data.append("description", $("#description").val());
-
-                    var featureImgInput = document.getElementById('image');
-                    if (featureImgInput.files && featureImgInput.files[0]) {
-                        form_data.append("image", featureImgInput.files[0]);
-                    }
-
-                    $.ajax({
-                        url: url,
-                        method: "POST",
-                        contentType: false,
-                        processData: false,
-                        data: form_data,
-                        success: function(d) {
-                            showSuccess(d.message);
-                            $("#addThisFormContainer").slideUp(300);
-                            setTimeout(() => {
-                                $("#newBtn").show(200);
-                            }, 300);
-                            reloadTable('#categoryTable');
-                            clearform();
-
-                            // Reload parent categories after successful creation
-                            loadParentCategories();
-                        },
-                        error: function(xhr, status, error) {
-                            if (xhr.status === 422) {
-                                let firstError = Object.values(xhr.responseJSON.errors)[0][0];
-                                showError(firstError);
-                            } else {
-                                showError(xhr.responseJSON?.message ?? "Something went wrong!");
-                            }
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-                //create  end
-
-                //Update
-                if ($(this).val() == 'Update') {
-                    var form_data = new FormData();
-                    form_data.append("name", $("#name").val());
-                    form_data.append("parent_id", $("#parent_id").val());
-                    form_data.append("description", $("#description").val());
-
-                    var featureImgInput = document.getElementById('image');
-                    if (featureImgInput.files && featureImgInput.files[0]) {
-                        form_data.append("image", featureImgInput.files[0]);
-                    }
-
-                    form_data.append("codeid", $("#codeid").val());
-
-                    $.ajax({
-                        url: upurl,
-                        type: "POST",
-                        dataType: 'json',
-                        contentType: false,
-                        processData: false,
-                        data: form_data,
-                        success: function(d) {
-                            showSuccess(d.message);
-                            $("#addThisFormContainer").hide();
-                            $("#addThisFormContainer").slideUp(300);
-                            setTimeout(() => {
-                                $("#newBtn").show(200);
-                            }, 300);
-                            reloadTable('#categoryTable');
-                            clearform();
-
-                            // Reload parent categories after successful update
-                            loadParentCategories();
-                        },
-                        error: function(xhr, status, error) {
-                            if (xhr.status === 422) {
-                                let firstError = Object.values(xhr.responseJSON.errors)[0][0];
-                                showError(firstError);
-                            } else {
-                                showError(xhr.responseJSON?.message ?? "Something went wrong!");
-                            }
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-                //Update  end
-            });
-
-            //Edit
-            $("#contentContainer").on('click', '#EditBtn', function() {
-                $("#cardTitle").text('Update this data');
-                codeid = $(this).attr('rid');
-                info_url = url + '/' + codeid + '/edit';
-                $.get(info_url, {}, function(d) {
-                    populateForm(d);
-                    pagetop();
-                });
-            });
-            //Edit  end 
-
-            function populateForm(data) {
-                $("#name").val(data.name);
-                $("#description").val(data.description);
-                $("#codeid").val(data.id);
-                $("#addBtn").val('Update');
-                $("#addBtn").html('Update');
-                $("#addThisFormContainer").show(300);
-                $("#newBtn").hide(100);
-
-                // Load fresh parent categories when editing
-                loadParentCategories();
-
-                // Set Select2 value for parent_id after a slight delay to ensure options are loaded
-                setTimeout(function() {
-                    if (data.parent_id) {
-                        $('#parent_id').val(data.parent_id).trigger('change');
-                    } else {
-                        $('#parent_id').val(null).trigger('change');
-                    }
-                }, 300);
-
-                var featureImagePreview = document.getElementById('preview-image');
-                if (data.image) {
-                    featureImagePreview.src = data.image;
-                    featureImagePreview.style.display = 'block';
-                } else {
-                    featureImagePreview.src = "#";
-                    featureImagePreview.style.display = 'none';
-                }
-            }
-
-            function clearform() {
-                $('#createThisForm')[0].reset();
-                $("#addBtn").val('Create');
-                $("#addBtn").html('Create');
-                $('#preview-image').attr('src', '#');
-                $('#preview-image').hide();
-                $("#cardTitle").text('Add new Category');
-
-                // Clear Select2
-                $('#parent_id').val(null).trigger('change');
-            }
-        });
-    </script>
+        function clearForm() {
+            $('#createThisForm')[0].reset();
+            $("#codeid").val('');
+            $("#cardTitle").text('Add New Category');
+            $("#addBtn").html('Create');
+            $('#preview-image').attr('src', '#').hide();
+            $('#parent_id').val(null).trigger('change');
+        }
+    });
+</script>
 @endsection

@@ -137,7 +137,7 @@
                                 <a href="{{ route('allproducts') }}" 
                                   class="nav-link {{ Route::is('allproducts') ? 'active' : '' }}">Product</a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item d-none">
                                 <a href="{{ route('alltags') }}" 
                                   class="nav-link {{ Route::is('alltags') ? 'active' : '' }}">Tag</a>
                             </li>
