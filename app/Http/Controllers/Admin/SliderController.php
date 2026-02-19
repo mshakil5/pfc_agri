@@ -5,37 +5,38 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Slider;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-use DataTables;
-use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Cache;
+use DataTables;
 
 class SliderController extends Controller
 {
     public function getSlider(Request $request)
     {
         if ($request->ajax()) {
-            $sliders = Slider::select(['id','title','image','serial','status'])->orderBy('serial');
+            $sliders = Slider::with('translations')->orderBy('serial');
+
             return DataTables::of($sliders)
                 ->addIndexColumn()
-                ->addColumn('image', function($row){
-                    return $row->image 
-                        ? '<img src="'.asset('images/slider/'.$row->image).'" class="img-thumbnail" style="width:50px;height:50px;">'
+                ->addColumn('title', function ($row) {
+                    return $row->translateOrNew(app()->getLocale())->title;
+                })
+                ->addColumn('image', function ($row) {
+                    return $row->image
+                        ? '<img src="' . asset('images/slider/' . $row->image) . '" class="img-thumbnail" style="width:50px;height:50px;">'
                         : '';
                 })
-                ->addColumn('status', function($row){
+                ->addColumn('status', function ($row) {
                     $checked = $row->status == 1 ? 'checked' : '';
                     return '<div class="form-check form-switch" dir="ltr">
-                                <input type="checkbox" class="form-check-input toggle-status" 
-                                       id="customSwitchStatus'.$row->id.'" data-id="'.$row->id.'" '.$checked.'>
-                                <label class="form-check-label" for="customSwitchStatus'.$row->id.'"></label>
+                                <input type="checkbox" class="form-check-input toggle-status"
+                                       id="customSwitchStatus' . $row->id . '" data-id="' . $row->id . '" ' . $checked . '>
+                                <label class="form-check-label" for="customSwitchStatus' . $row->id . '"></label>
                             </div>';
                 })
-                ->addColumn('serial', function($row){
-                    return '<span class="serial-text">'.$row->serial.'</span>';
+                ->addColumn('serial', function ($row) {
+                    return '<span class="serial-text">' . $row->serial . '</span>';
                 })
-                ->addColumn('action', function($row){
+                ->addColumn('action', function ($row) {
                     return '
                         <div class="dropdown">
                             <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
@@ -44,62 +45,59 @@ class SliderController extends Controller
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <button class="dropdown-item" id="EditBtn" rid="'.$row->id.'">
+                                    <button class="dropdown-item" id="EditBtn" rid="' . $row->id . '">
                                         <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit
                                     </button>
                                 </li>
                                 <li class="dropdown-divider"></li>
                                 <li>
-                                    <button class="dropdown-item deleteBtn" 
-                                        data-delete-url="'.route('slider.delete',$row->id).'" 
-                                        data-method="DELETE" 
+                                    <button class="dropdown-item deleteBtn"
+                                        data-delete-url="' . route('slider.delete', $row->id) . '"
+                                        data-method="DELETE"
                                         data-table="#sliderTable">
                                         <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete
                                     </button>
                                 </li>
                             </ul>
-                        </div>
-                    ';
+                        </div>';
                 })
-                ->rawColumns(['image','status','serial','action'])
+                ->rawColumns(['image', 'status', 'serial', 'action'])
                 ->make(true);
         }
 
-        $sliders = Slider::orderBy('serial')->get();
+        $sliders = Slider::with('translations')->orderBy('serial')->get();
         return view('admin.slider.index', compact('sliders'));
     }
 
     public function sliderStore(Request $request)
     {
-        // Validation: Ignore unique check if updating the same record
         $id = $request->codeid;
-        $request->validate([
-            'title' => 'required|unique:sliders,title,' . $id,
-            'image' => $id ? 'nullable|image' : 'required|image', // image required only on create
-        ]);
 
-        // Find existing or create new instance
-        $data = Slider::findOrNew($id);
+        $rules = [
+            'image' => $id ? 'nullable|image' : 'required|image',
+            'link'  => 'nullable|string',
+        ];
 
-        $data->title = $request->title;
-        $data->sub_title = $request->sub_title;
-        $data->hero_badge = $request->hero_badge;
-        $data->link = $request->link;
-        
-        // Handle JSON Arrays (Buttons and Features)
-        $data->buttons = $request->buttons; 
-        $data->stat_card = $request->features;
-
-        // Set Serial only for new records
-        if (!$data->exists) {
-            $lastSerial = Slider::max('serial');
-            $data->serial = $lastSerial ? $lastSerial + 1 : 1;
-            $data->created_by = auth()->id();
+        foreach (config('translatable.locales') as $locale) {
+            $rules["$locale.title"]     = 'required|string';
+            $rules["$locale.sub_title"] = 'nullable|string';
+            $rules["$locale.hero_badge"] = 'nullable|string';
         }
 
-        // Image Upload Logic
+        $request->validate($rules);
+
+        $data = Slider::findOrNew($id);
+        $data->link = $request->link;
+
+        if (!$data->exists) {
+            $lastSerial   = Slider::max('serial');
+            $data->serial = $lastSerial ? $lastSerial + 1 : 1;
+            $data->created_by = auth()->id();
+        } else {
+            $data->updated_by = auth()->id();
+        }
+
         if ($request->hasFile('image')) {
-            // Delete old image if updating
             if ($data->image && file_exists(public_path('images/slider/' . $data->image))) {
                 unlink(public_path('images/slider/' . $data->image));
             }
@@ -118,61 +116,39 @@ class SliderController extends Controller
         }
 
         $data->save();
-        
+
+        // Save translations including per-locale buttons and stat_card
+        foreach (config('translatable.locales') as $locale) {
+            $translation = $data->translateOrNew($locale);
+            $translation->title      = $request->input("$locale.title");
+            $translation->sub_title  = $request->input("$locale.sub_title");
+            $translation->hero_badge = $request->input("$locale.hero_badge");
+            $translation->buttons    = $request->input("$locale.buttons") ?? [];
+            $translation->stat_card  = $request->input("$locale.stat_card") ?? [];
+            $translation->save();
+        }
+
         Cache::forget('active_sliders');
-        
+
         $message = $id ? 'Slider updated successfully!' : 'Slider created successfully!';
         return response()->json(['message' => $message], 200);
     }
 
     public function sliderEdit($id)
     {
-        $slider = Slider::findOrFail($id);
+        $slider = Slider::with('translations')->findOrFail($id);
         return response()->json($slider);
-    }
-
-    public function sliderUpdate(Request $request)
-    {
-        $request->validate([
-            'title'=>'required|unique:sliders,title,'.$request->codeid,
-        ]);
-
-        $slider = Slider::findOrFail($request->codeid);
-        $slider->title = $request->title;
-        $slider->link = $request->link;
-        $slider->updated_by = auth()->id();
-
-        if ($request->hasFile('image')) {
-            if($slider->image && file_exists(public_path('images/slider/'.$slider->image))){
-                @unlink(public_path('images/slider/'.$slider->image));
-            }
-            $file = $request->file('image');
-            $name = mt_rand(10000000,99999999).'.webp';
-            $path = public_path('images/slider/');
-            if(!file_exists($path)) mkdir($path,0755,true);
-
-            Image::make($file)
-                ->resize(1200,null,fn($c)=>$c->aspectRatio())
-                ->encode('webp',50)
-                ->save($path.$name);
-
-            $slider->image = $name;
-        }
-
-        $slider->save();
-        Cache::forget('active_sliders');
-        return response()->json(['message'=>'Slider updated successfully!'],200);
     }
 
     public function sliderDelete($id)
     {
         $slider = Slider::findOrFail($id);
-        if($slider->image && file_exists(public_path('images/slider/'.$slider->image))){
-            @unlink(public_path('images/slider/'.$slider->image));
+        if ($slider->image && file_exists(public_path('images/slider/' . $slider->image))) {
+            @unlink(public_path('images/slider/' . $slider->image));
         }
         $slider->delete();
         Cache::forget('active_sliders');
-        return response()->json(['message'=>'Slider deleted successfully.'],200);
+        return response()->json(['message' => 'Slider deleted successfully.'], 200);
     }
 
     public function toggleStatus(Request $request)
@@ -181,16 +157,15 @@ class SliderController extends Controller
         $slider->status = $request->status;
         $slider->save();
         Cache::forget('active_sliders');
-        return response()->json(['message'=>'Slider status updated successfully.'],200);
+        return response()->json(['message' => 'Slider status updated successfully.'], 200);
     }
 
     public function updateOrder(Request $request)
     {
-        $order = $request->order;
-        foreach($order as $index=>$id){
-            Slider::where('id',$id)->update(['serial'=>$index+1]);
+        foreach ($request->order as $index => $id) {
+            Slider::where('id', $id)->update(['serial' => $index + 1]);
         }
         Cache::forget('active_sliders');
-        return response()->json(['success'=>true,'message'=>'Slider order updated successfully!']);
+        return response()->json(['success' => true, 'message' => 'Slider order updated successfully!']);
     }
 }
