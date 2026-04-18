@@ -13,19 +13,15 @@
             display: flex;
             align-items: center;
             color: white;
-            padding: 100px 0; /* More balanced padding */
+            padding: 100px 0;
             overflow: hidden;
         }
 
-        /* The Gradient Overlay */
         .hero-section::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Adjust the '0.9' for darkness and '60%' for where the fade starts */
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: linear-gradient(to right, 
                 rgba(0, 50, 0, 0.9) 0%, 
                 rgba(0, 50, 0, 0.6) 40%, 
@@ -33,14 +29,52 @@
             z-index: 1;
         }
 
-        /* Ensure content sits above the gradient */
-        .hero-section .container {
+        .hero-section .container { position: relative; z-index: 2; }
+
+        /* Carousel overrides */
+        .carousel, .carousel-inner, .carousel-item { height: 100%; }
+
+        .carousel-item .hero-section {
+            background-attachment: scroll;
+        }
+
+        /* Fade transition instead of slide (looks better for full-screen heroes) */
+        #heroCarousel .carousel-item {
+            transition: opacity 0.8s ease-in-out;
+            opacity: 0;
+            /* Remove default transform-based slide */
+            transform: none !important;
+            position: absolute;
+            width: 100%;
+        }
+
+        #heroCarousel .carousel-item.active {
+            opacity: 1;
             position: relative;
-            z-index: 2;
+        }
+
+        /* Carousel control buttons */
+        #heroCarousel .carousel-control-prev,
+        #heroCarousel .carousel-control-next {
+            z-index: 10;
+            width: 5%;
+        }
+
+        /* Carousel indicators */
+        #heroCarousel .carousel-indicators [data-bs-target] {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(118, 255, 3, 0.5);
+            border: 1px solid #76ff03;
+        }
+
+        #heroCarousel .carousel-indicators .active {
+            background-color: #76ff03;
         }
 
         .hero-badge { 
-            background: rgba(118, 255, 3, 0.2); /* Tinted with your highlight color */
+            background: rgba(118, 255, 3, 0.2);
             border: 1px solid rgba(118, 255, 3, 0.4);
             color: #76ff03;
             padding: 6px 18px; 
@@ -53,24 +87,17 @@
         }
 
         .hero-title {
-            font-size: clamp(2.5rem, 5vw, 4rem); /* Responsive font sizing */
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 1.5rem;
         }
 
-        /* This is the green color for the second part of the title */
         .text-highlight {
-            color: #7FD13B; /* A vibrant agricultural green */
-            display: inline-block; /* Helps with spacing on some browsers */
+            color: #7FD13B;
+            display: inline-block;
         }
 
-        /* Optional: Add a text shadow if the image is very busy */
-        .hero-title span {
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* Professional Stat Cards */
         .stat-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(8px);
@@ -82,93 +109,99 @@
             transition: transform 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
-        }
+        .stat-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); }
+        .stat-card h3 { font-size: 1.8rem; font-weight: 700; color: #76ff03; margin-bottom: 5px; }
 
-        .stat-card h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #76ff03;
-            margin-bottom: 5px;
-        }
-
-        /* --- Mobile Responsiveness --- */
         @media (max-width: 991px) {
-            .hero-section {
-                text-align: center;
-                min-height: auto;
-            }
-            
+            .hero-section { text-align: center; min-height: auto; }
             .hero-section::before {
-                /* Change gradient to bottom-up on mobile for better text reading */
-                background: linear-gradient(to bottom, 
-                    rgba(0, 50, 0, 0.8) 0%, 
-                    rgba(0, 50, 0, 0.5) 100%);
+                background: linear-gradient(to bottom, rgba(0,50,0,0.8) 0%, rgba(0,50,0,0.5) 100%);
             }
-
-            .hero-section .btn-lg {
-                width: 100%;
-                margin-bottom: 10px;
-                margin-right: 0 !important;
-            }
+            .hero-section .btn-lg { width: 100%; margin-bottom: 10px; margin-right: 0 !important; }
         }
 
         @media (max-width: 768px) {
-            .text-highlight {
-                display: block; /* Moves the green text to a new line on mobile for impact */
-                margin-top: 5px;
-            }
+            .text-highlight { display: block; margin-top: 5px; }
         }
     </style>
 
-    <section class="hero-section" style="background-image: url('{{ asset('images/slider/' . $slider->image) }}')">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="hero-badge">{{ $slider->hero_badge }}</div>
-                    
-                    <h1 class="hero-title">
-                        @php
-                            $words = explode(' ', $slider->title);
-                            $firstPart = implode(' ', array_slice($words, 0, 2));
-                            $secondPart = implode(' ', array_slice($words, 2));
-                        @endphp
+    {{-- Carousel Indicators --}}
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
 
-                        <span class="text-white">{{ $firstPart }}</span>
-                        <span class="text-highlight">{{ $secondPart }}</span>
-                    </h1>
-                    
-                    <p class="lead my-4 opacity-75">
-                        {{ $slider->sub_title }}
-                    </p>
+        <div class="carousel-indicators">
+            @foreach($sliders as $index => $slider)
+                <button type="button" 
+                        data-bs-target="#heroCarousel" 
+                        data-bs-slide-to="{{ $index }}"
+                        class="{{ $index === 0 ? 'active' : '' }}"
+                        aria-label="Slide {{ $index + 1 }}">
+                </button>
+            @endforeach
+        </div>
 
-                    <div class="mt-5 mb-5">
-                        @foreach($slider->buttons as $btn)
-                            <a href="{{ $btn['link'] }}" class="btn btn-light btn-lg px-4 me-3 text-success fw-bold rounded-1">
-                                {{ $btn['label'] }} &rarr;
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
+        {{-- Carousel Slides --}}
+        <div class="carousel-inner">
+            @foreach($sliders as $index => $slider)
+                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                    <section class="hero-section" 
+                            style="background-image: url('{{ asset('images/slider/' . $slider->image) }}')">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="hero-badge">{{ $slider->hero_badge }}</div>
 
-                <div class="col-lg-12 stats-container">
-                    <div class="row g-3">
-                        {{-- Directly loop through the attribute --}}
-                        @foreach($slider->stat_card as $stat)
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <h3>{{ $stat['value'] ?? '' }}</h3>
-                                    <p class="mb-0 small opacity-75">{{ $stat['title'] ?? '' }}</p>
+                                    <h1 class="hero-title">
+                                        @php
+                                            $words = explode(' ', $slider->title);
+                                            $firstPart = implode(' ', array_slice($words, 0, 2));
+                                            $secondPart = implode(' ', array_slice($words, 2));
+                                        @endphp
+                                        <span class="text-white">{{ $firstPart }}</span>
+                                        <span class="text-highlight">{{ $secondPart }}</span>
+                                    </h1>
+
+                                    <p class="lead my-4 opacity-75">{{ $slider->sub_title }}</p>
+
+                                    <div class="mt-5 mb-5">
+                                        @foreach($slider->buttons as $btn)
+                                            <a href="{{ $btn['link'] }}" 
+                                            class="btn btn-light btn-lg px-4 me-3 text-success fw-bold rounded-1">
+                                                {{ $btn['label'] }} &rarr;
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 stats-container">
+                                    <div class="row g-3">
+                                        @foreach($slider->stat_card as $stat)
+                                            <div class="col-md-3">
+                                                <div class="stat-card">
+                                                    <h3>{{ $stat['value'] ?? '' }}</h3>
+                                                    <p class="mb-0 small opacity-75">{{ $stat['title'] ?? '' }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    </section>
                 </div>
-            </div>
+            @endforeach
         </div>
-    </section>
+
+        {{-- Prev / Next Controls --}}
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+
+    </div>
 
 
     <section class="py-5 mt-5">

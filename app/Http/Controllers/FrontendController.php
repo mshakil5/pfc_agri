@@ -24,10 +24,10 @@ class FrontendController extends Controller
     
     public function index()
     {
-        $slider = Slider::orderby('id')->first();
+        $sliders = Slider::orderBy('serial')->where('status', 1)->get();
         $categories = Category::with('products')->where('status', 1)->get();
         $about = About::where('pages','homepage')->first();
-        // dd($about);
+        // dd($sliders); 
 
         $company = CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'linkedin', 'website', 'phone1', 'email1', 'address1','address2','company_logo','copyright','google_map')->first();
 
@@ -40,7 +40,7 @@ class FrontendController extends Controller
                 ->get();
 
 
-        return view('frontend.index', compact('slider','categories','about','company','awards','blogs'));
+        return view('frontend.index', compact('sliders','categories','about','company','awards','blogs'));
     }
 
     public function aboutUs()

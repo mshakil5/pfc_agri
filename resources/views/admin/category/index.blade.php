@@ -21,7 +21,7 @@
                     <input type="hidden" id="codeid" name="codeid">
 
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-6 d-none">
                             <label class="form-label">Parent Category</label>
                             <select class="form-control select2" id="parent_id" name="parent_id">
                                 <option value="">Select Parent Category</option>
@@ -31,7 +31,7 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label">Category Image</label>
                             <input type="file" class="form-control" id="image" name="image" accept="image/*"
                                 onchange="previewImage(event, '#preview-image')">
