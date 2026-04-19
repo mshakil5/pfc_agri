@@ -38,6 +38,7 @@ class ProductController extends Controller
             ->where('status', 1)
             ->firstOrFail();
 
+
         return view('frontend.product-detail', compact('product'));
     }
 

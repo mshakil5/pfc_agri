@@ -240,7 +240,7 @@
                             {{ $product->translateOrNew(app()->getLocale())->title }}
                         </h1>
 
-                        <div class="price-tag">
+                        <div class="price-tag d-none">
                             @if($product->price)
                                 {{ number_format($product->price, 2) }}
                             @else
