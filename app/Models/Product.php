@@ -6,7 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ['title', 'slug', 'price', 'image', 'category_id', 'tag_id', 'short_description', 'long_description', 'status', 'stock_status', 'show_in_menu'];
+
+    public $translatable = ['title', 'short_description', 'long_description', 'features'];
+    
+    public $translationModel = ProductTranslation::class;
+
+    protected $fillable = [
+        'title', 'slug', 'category_id', 'tag_id', 'price', 'image', 'images', 'short_description', 'long_description', 'status'
+    ];
+
+    protected $casts = [
+        'images' => 'array',
+    ];
 
     public function translations()
     {

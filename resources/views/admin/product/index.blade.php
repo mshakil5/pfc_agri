@@ -14,6 +14,7 @@
         <div class="card">
             <div class="card-header align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1" id="cardTitle">Add New Product</h4>
+                <small class="text-muted">Auto-translates on save</small>
             </div>
             <div class="card-body">
                 <form id="createThisForm">
@@ -21,17 +22,16 @@
                     <input type="hidden" id="codeid" name="codeid">
 
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select class="form-control select2" id="category_id" name="category_id">
+                            <select class="form-control select2" id="category_id" name="category_id" required>
                                 <option value="">Select Category</option>
-                                @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}">{{ $cat->translateOrNew(app()->getLocale())->name ?? $cat->name }}</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->translateOrNew(app()->getLocale())->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Tag</label>
                             <select class="form-control select2" id="tag_id" name="tag_id">
                                 <option value="">Select Tag</option>
@@ -40,70 +40,73 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        <div class="col-md-6 d-none">
-                            <label class="form-label">Price</label>
-                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0">
+                        <div class="col-md-4">
+                            <label class="form-label">Price (£)</label>
+                            <input type="number" step="0.01" class="form-control" name="price" id="price" placeholder="0.00">
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Product Image</label>
-                            <input type="file" class="form-control" id="image" name="image" accept="image/*"
-                                onchange="previewImage(event, '#preview-image')">
+                            <label class="form-label">Main Thumbnail <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="previewImage(event, '#preview-image')">
+                            <img id="preview-image" src="#" alt="" class="img-thumbnail rounded mt-2" style="max-width:150px; display:none;">
                         </div>
 
+                        {{-- Gallery Images --}}
                         <div class="col-md-6">
-                            <img id="preview-image" src="/placeholder.webp" alt="" class="img-thumbnail rounded"
-                                style="max-width:200px; max-height:200px;">
-                            <button type="button" class="btn btn-sm btn-danger mt-2" id="removeImageBtn" style="display:none;">
-                                Remove Image
-                            </button>
-                        </div>
-
-                        {{-- Language Tabs --}}
-                        <div class="col-md-12">
-                            <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
-                                @foreach(config('translatable.locales') as $index => $locale)
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
-                                           data-bs-toggle="tab" href="#product-tab-{{ $locale }}" role="tab">
-                                            {{ strtoupper($locale) }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            <div class="tab-content">
-                                @foreach(config('translatable.locales') as $index => $locale)
-                                    <div class="tab-pane {{ $index == 0 ? 'active' : '' }}"
-                                         id="product-tab-{{ $locale }}" role="tabpanel">
-                                        <div class="row g-3">
-                                            <div class="col-md-12">
-                                                <label class="form-label">Title ({{ strtoupper($locale) }}) @if($locale === 'en') <span class="text-danger">*</span> @endif</label>
-                                                <input type="text" class="form-control"
-                                                       name="{{ $locale }}[title]" id="{{ $locale }}_title">
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label class="form-label">Short Description ({{ strtoupper($locale) }})</label>
-                                                <textarea class="form-control" name="{{ $locale }}[short_description]"
-                                                          id="{{ $locale }}_short_description" rows="2"></textarea>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label class="form-label">Long Description ({{ strtoupper($locale) }})</label>
-                                                <textarea class="form-control summernote-{{ $locale }}"
-                                                          name="{{ $locale }}[long_description]"
-                                                          id="{{ $locale }}_long_description"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                            <label class="form-label">Gallery Images</label>
+                            <input type="file" class="form-control" id="new_images_input" name="new_images[]" accept="image/*" multiple>
+                            <div id="existing-gallery-container" class="d-flex flex-wrap gap-2 mt-2">
+                                <!-- Existing images will load here via JS -->
                             </div>
                         </div>
+
+                        <div class="col-12"><hr></div>
+                        
+                        <div class="col-12">
+                            <div class="alert alert-info py-2 mb-0">
+                                <i class="ri-translate-2 me-1"></i> 
+                                <small>Fill in English — will be auto-translated to {{ implode(', ', array_diff(config('translatable.locales'), ['en'])) }}</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Product Title (EN) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="title" id="title">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Short Description (EN)</label>
+                            <textarea class="form-control" name="short_description" id="short_description" rows="2"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Full Description (EN)</label>
+                            <textarea class="form-control" id="long_description" name="long_description"></textarea>
+                        </div>
+
+                        {{-- Features List --}}
+                        <div class="col-md-12">
+                            <label class="form-label"><b>Features List (EN)</b> <small class="text-muted">(Translates per language)</small></label>
+                            <div id="features-container">
+                                <div class="row g-2 mb-2 feature-row">
+                                    <div class="col-md-11">
+                                        <input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof, Lightweight, 1 Year Warranty">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-sm mt-2" id="addFeatureBtn">+ Add Feature</button>
+                        </div>
+
                     </div>
                 </form>
             </div>
             <div class="card-footer text-end">
-                <button type="button" id="addBtn" class="btn btn-primary">Create</button>
+                <button type="button" id="addBtn" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Create & Translate
+                </button>
                 <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
             </div>
         </div>
@@ -111,17 +114,6 @@
 
     <div class="container-fluid" id="contentContainer">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Products List</h4>
-                <div style="width:200px;">
-                    <select id="filterCategory" class="form-control select2">
-                        <option value="">All Categories</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->translateOrNew(app()->getLocale())->name ?? $cat->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
             <div class="card-body">
                 <table id="productTable" class="table table-bordered table-striped">
                     <thead>
@@ -130,6 +122,7 @@
                             <th>Image</th>
                             <th>Title</th>
                             <th>Category</th>
+                            <th>Price</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -142,139 +135,203 @@
 @endsection
 
 @section('script')
+<style>
+    #addThisFormContainer .card { position: relative; overflow: hidden; }
+    .form-loader-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(2px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; border-radius: 0.375rem; }
+    .spinner-ring { width: 50px; height: 50px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loader-text { margin-top: 15px; font-size: 14px; color: #374151; font-weight: 500; }
+    .loader-lang-ticker { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
+    .progress-bar-container { width: 200px; height: 4px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #3b82f6; border-radius: 4px; width: 0%; transition: width 0.3s ease; }
+    .gallery-thumb { position: relative; width: 80px; height: 80px; }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+    .gallery-thumb .remove-gallery-btn { position: absolute; top: -6px; right: -6px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+</style>
+
 <script>
-    let currentProductId = null;
+    var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
+    var isEditorInitialized = false;
+    var isSelect2Initialized = false;
 
     $(document).ready(function () {
 
-        // Init summernote for each locale
-        @foreach(config('translatable.locales') as $locale)
-            $('.summernote-{{ $locale }}').summernote({ height: 200, toolbar: [['style',['bold','italic','underline']],['para',['ul','ol']],['insert',['link']]] });
-        @endforeach
-
-        $('.select2').select2({ width: '100%' });
-
-        $('#productTable').DataTable({
+        var table = $('#productTable').DataTable({
             processing: true, serverSide: true, pageLength: 25,
-            ajax: {
-                url: "{{ route('allproducts') }}",
-                data: function (d) { d.category_id = $('#filterCategory').val(); }
-            },
+            ajax: "{{ route('allproducts') }}",
             columns: [
                 { data: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'image', orderable: false, searchable: false },
                 { data: 'title', name: 'title' },
-                { data: 'category_name', orderable: false, searchable: false },
+                { data: 'category_name', name: 'category_name' },
+                { data: 'price', name: 'price' },
                 { data: 'status', orderable: false, searchable: false },
                 { data: 'action', orderable: false, searchable: false }
             ]
         });
 
-        $('#filterCategory').change(function () { reloadTable('#productTable'); });
-
         $(document).on('change', '.toggle-status', function () {
             $.post('/admin/products-status', {
-                _token: '{{ csrf_token() }}',
-                product_id: $(this).data('id'),
-                status: $(this).prop('checked') ? 1 : 0
-            }, function (d) {
-                reloadTable('#productTable');
-                showSuccess(d.message);
-            }).fail(() => showError('Failed to update status'));
+                _token: '{{ csrf_token() }}', product_id: $(this).data('id'), status: $(this).prop('checked') ? 1 : 0
+            }, function (d) { reloadTable('#productTable'); showSuccess(d.message); }).fail(() => showError('Failed'));
         });
 
-        $("#newBtn").click(function () {
-            clearForm();
-            $(this).hide();
-            $("#addThisFormContainer").slideDown(300);
-        });
+        // UI Toggles
+        $("#newBtn").click(function () { clearForm(); $(this).hide(); $("#addThisFormContainer").slideDown(300, initPlugins); });
+        $("#FormCloseBtn").click(function () { $("#addThisFormContainer").slideUp(300); setTimeout(() => $("#newBtn").show(), 300); });
 
-        $("#FormCloseBtn").click(function () {
-            $("#addThisFormContainer").slideUp(300);
-            setTimeout(() => $("#newBtn").show(), 300);
-        });
-
+        // Submit (CSRF Safe)
         $("#addBtn").click(function (e) {
             e.preventDefault();
+            
+            // Sync Summernote before grabbing FormData
+            if(isEditorInitialized) $('#long_description').val($('#long_description').summernote('code'));
+            
+            var formData = new FormData($('#createThisForm')[0]);
+            showFormLoader();
+
             var isUpdate = $("#codeid").val() !== '';
             var url = isUpdate ? "{{ URL::to('/admin/products-update') }}" : "{{ URL::to('/admin/products') }}";
 
             $.ajax({
-                url: url,
-                type: "POST",
-                data: new FormData($('#createThisForm')[0]),
-                contentType: false,
-                processData: false,
-                success: function (d) {
-                    showSuccess(d.message);
-                    $("#FormCloseBtn").click();
-                    reloadTable('#productTable');
-                },
+                url: url, type: "POST", data: formData, contentType: false, processData: false,
+                success: function (d) { hideFormLoader(); showSuccess(d.message); $("#FormCloseBtn").click(); table.draw(); },
                 error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let msgs = [];
-                        Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0]));
-                        showError(msgs.join("<br>"));
-                    } else {
-                        showError(xhr.responseJSON?.message ?? "Something went wrong!");
-                    }
+                    hideFormLoader();
+                    if (xhr.status === 422) { let msgs = []; Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0])); showError(msgs.join("<br>")); }
+                    else { showError(xhr.responseJSON?.message ?? "Something went wrong!"); }
                 }
             });
         });
 
+        // Edit
         $("#contentContainer").on('click', '#EditBtn', function () {
             let id = $(this).attr('rid');
-            currentProductId = id;
-            $.get("/admin/products/" + id + "/edit", function (data) {
-                populateForm(data);
-            });
+            $.get("/admin/products/" + id + "/edit", function (data) { populateForm(data); });
         });
 
-        $("#removeImageBtn").click(function () {
-            if (!currentProductId) return;
-            $.post('/admin/products/' + currentProductId + '/remove-image', { _token: '{{ csrf_token() }}' }, function (d) {
-                $("#preview-image").attr('src', '/placeholder.webp');
-                $("#removeImageBtn").hide();
-                $("#image").val('');
-                showSuccess(d.message);
-            }).fail(() => showError('Failed to remove image'));
+        // Add Feature Row
+        $("#addFeatureBtn").click(function () {
+            var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
+            $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof, Lightweight"></div>');
+            $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
+            $('#features-container').append($row);
         });
 
+        $(document).on('click', '.remove-feature-btn', function () { $(this).closest('.feature-row').remove(); });
+
+        // Remove Gallery Image Logic
+        $(document).on('click', '.remove-gallery-btn', function(e) {
+            e.preventDefault();
+            var thumb = $(this).closest('.gallery-thumb');
+            var path = thumb.data('path');
+            // Change hidden input name to delete_images[]
+            thumb.find('input[name="existing_images[]"]').attr('name', 'delete_images[]');
+            thumb.remove(); // visually remove
+        });
+
+        // --- Helpers ---
         function populateForm(data) {
             $("#codeid").val(data.id);
-            $("#cardTitle").text('Update Product');
-            $("#addBtn").html('Update');
-            $("#category_id").val(data.category_id).trigger('change');
-            $("#tag_id").val(data.tag_id).trigger('change');
+            $("#title").val(data.title);
+            $("#short_description").val(data.short_description);
             $("#price").val(data.price);
-            $("#preview-image").attr('src', data.image || '/placeholder.webp');
-            $("#removeImageBtn").toggle(!!(data.image && data.image !== '/placeholder.webp'));
-            $("#addThisFormContainer").slideDown(300);
-            $("#newBtn").hide();
+            
+            $("#addThisFormContainer").slideDown(300, function() {
+                initPlugins();
+                $("#category_id").val(data.category_id || null).trigger('change');
+                $("#tag_id").val(data.tag_id || null).trigger('change');
+                if(isEditorInitialized) $('#long_description').summernote('code', data.long_description || '');
+            });
 
-            if (data.translations && data.translations.length > 0) {
-                data.translations.forEach(function (t) {
-                    $('#' + t.locale + '_title').val(t.title);
-                    $('#' + t.locale + '_short_description').val(t.short_description);
-                    $('.summernote-' + t.locale).summernote('code', t.long_description ?? '');
+            if (data.image) { $('#preview-image').attr('src', data.image).show(); }
+
+            // SAFE GALLERY IMAGE LOADING (No template literals that can break on quotes)
+            $('#existing-gallery-container').empty();
+            if (data.images && data.images.length > 0) {
+                data.images.forEach(function(img) {
+                    var $thumb = $('<div class="gallery-thumb"></div>').data('path', img);
+                    $thumb.append('<img src="" alt="Gallery">').find('img').attr('src', img);
+                    $thumb.append('<button type="button" class="remove-gallery-btn">X</button>');
+                    $thumb.append('<input type="hidden" name="existing_images[]" value="">').find('input').val(img);
+                    $('#existing-gallery-container').append($thumb);
                 });
             }
+
+            // SAFE FEATURES LOADING (No template literals that can break on quotes like 10" pipe)
+            $('#features-container').empty();
+            if (data.features && data.features.length > 0) {
+                data.features.forEach(function(feat) {
+                    var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
+                    $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control"></div>');
+                    $row.find('input').val(feat); // Safely assigns value without breaking HTML attributes
+                    $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
+                    $('#features-container').append($row);
+                });
+            } else {
+                $('#addFeatureBtn').click(); // Add one empty row
+            }
+
+            $("#newBtn").hide();
+            $("#cardTitle").text('Update Product');
+            $("#addBtn").html('<i class="ri-save-line me-1"></i> Update & Translate');
         }
 
         function clearForm() {
             $('#createThisForm')[0].reset();
-            $("#codeid").val('');
+            $("#codeid").val(''); $("#preview-image").hide();
+            $('#existing-gallery-container').empty();
+            
+            // Reset to one empty feature row safely
+            $('#features-container').empty();
+            var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
+            $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof"></div>');
+            $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
+            $('#features-container').append($row);
+            
+            if(isSelect2Initialized) { $("#category_id").val(null).trigger('change'); $("#tag_id").val(null).trigger('change'); }
+            if(isEditorInitialized) { $('#long_description').summernote('code', ''); }
+            
             $("#cardTitle").text('Add New Product');
-            $("#addBtn").html('Create');
-            $("#category_id").val(null).trigger('change');
-            $("#tag_id").val(null).trigger('change');
-            $("#preview-image").attr('src', '/placeholder.webp');
-            $("#removeImageBtn").hide();
-            currentProductId = null;
+            $("#addBtn").html('<i class="ri-save-line me-1"></i> Create & Translate');
+        }
 
-            @foreach(config('translatable.locales') as $locale)
-                $('.summernote-{{ $locale }}').summernote('code', '');
-            @endforeach
+        function initPlugins() {
+            if(!isSelect2Initialized) { $('.select2').select2({ width: '100%' }); isSelect2Initialized = true; }
+            if(!isEditorInitialized) { $('#long_description').summernote({ height: 250 }); isEditorInitialized = true; }
+        }
+
+        // --- Loader Functions ---
+        function showFormLoader() {
+            $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', true);
+            if(isEditorInitialized) $('#long_description').summernote('disable');
+            $('.select2').prop('disabled', true).trigger('change');
+            var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
+            var tickerMessages = ['Saving English...'];
+            otherLocales.forEach(function(loc) { tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...'); });
+            tickerMessages.push('Finishing up...');
+            var overlay = `<div class="form-loader-overlay" id="formLoader"><div class="spinner-ring"></div><div class="loader-text">Saving & Translating...</div><div class="progress-bar-container"><div class="progress-bar-fill" id="loaderProgress"></div></div><div class="loader-lang-ticker" id="loaderTicker">Preparing...</div></div>`;
+            $('#addThisFormContainer .card').append(overlay);
+            var step = 0;
+            var interval = setInterval(function() {
+                if (step < tickerMessages.length) { $('#loaderProgress').css('width', Math.round(((step + 1) / tickerMessages.length) * 100) + '%'); $('#loaderTicker').text(tickerMessages[step]); step++; }
+                else { clearInterval(interval); $('#loaderTicker').text('Almost done...'); }
+            }, 1200);
+        }
+
+        function hideFormLoader() {
+            $('#formLoader').fadeOut(200, function() { $(this).remove(); });
+            $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', false);
+            if(isEditorInitialized) $('#long_description').summernote('enable');
+            $('.select2').prop('disabled', false).trigger('change');
+        }
+
+        function previewImage(event, imgSelector) {
+            if (event.target.files && event.target.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) { $(imgSelector).attr('src', e.target.result).show(); };
+                reader.readAsDataURL(event.target.files[0]);
+            }
         }
     });
 </script>
