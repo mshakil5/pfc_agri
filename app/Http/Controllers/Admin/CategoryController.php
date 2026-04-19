@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use DataTables;
 use Intervention\Image\Facades\Image;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class CategoryController extends Controller
 {
@@ -72,101 +73,69 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'parent_id' => 'nullable|exists:categories,id',
-            'image'     => 'nullable|image',
-        ];
-
-        foreach (config('translatable.locales') as $locale) {
-            $rules["$locale.name"] = $locale === 'en' ? 'required|string' : 'nullable|string';
-            $rules["$locale.description"] = 'nullable|string';
-        }
-
-        $request->validate($rules);
+        $request->validate([
+            'name'        => 'required|string',
+            'description' => 'nullable|string',
+            'parent_id'   => 'nullable|exists:categories,id',
+            'image'       => 'nullable|image',
+        ]);
 
         $data = new Category;
-        $data->name        = $request->input('en.name');
-        $data->description = $request->input('en.description');
-        $data->slug        = Str::slug($request->input('en.name'));
-        $data->parent_id   = $request->parent_id;
+        $data->name      = $request->name;
+        $data->slug      = Str::slug($request->name);
+        $data->parent_id = $request->parent_id;
 
         if ($request->hasFile('image')) {
-            $randomName      = mt_rand(10000000, 99999999) . '.webp';
-            $destinationPath = public_path('images/category/');
-            if (!file_exists($destinationPath)) mkdir($destinationPath, 0755, true);
-
-            Image::make($request->file('image'))
-                ->resize(800, null, fn($c) => $c->aspectRatio())
-                ->encode('webp', 50)
-                ->save($destinationPath . $randomName);
-
-            $data->image = '/images/category/' . $randomName;
+            $data->image = $this->uploadImage($request->file('image'));
         }
 
         $data->save();
 
-        foreach (config('translatable.locales') as $locale) {
-            $t = $data->translateOrNew($locale);
-            $t->name        = $request->input("$locale.name") ?? $request->input('en.name');
-            $t->description = $request->input("$locale.description");
-            $t->save();
-        }
+        $this->saveTranslations($data, $request->name, $request->description);
 
-        return response()->json(['message' => 'Category created successfully!', 'category' => $data], 200);
+        return response()->json(['message' => 'Category created & translated successfully!'], 200);
     }
 
     public function edit($id)
     {
-        $category = Category::with('translations')->findOrFail($id);
-        return response()->json($category);
+        $category = Category::findOrFail($id);
+        $enTranslation = $category->translate('en');
+        
+        return response()->json([
+            'id'          => $category->id,
+            'name'        => $enTranslation->name,
+            'description' => $enTranslation->description,
+            'parent_id'   => $category->parent_id,
+            'image'       => $category->image,
+        ]);
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'parent_id' => 'nullable|exists:categories,id',
-            'image'     => 'nullable|image',
-        ];
-
-        foreach (config('translatable.locales') as $locale) {
-            $rules["$locale.name"] = $locale === 'en' ? 'required|string' : 'nullable|string';
-            $rules["$locale.description"] = 'nullable|string';
-        }
-
-        $request->validate($rules);
+        $request->validate([
+            'name'        => 'required|string',
+            'description' => 'nullable|string',
+            'parent_id'   => 'nullable|exists:categories,id',
+            'image'       => 'nullable|image',
+        ]);
 
         $data = Category::findOrFail($request->codeid);
-        $data->name        = $request->input('en.name');
-        $data->description = $request->input('en.description');
-        $data->slug        = Str::slug($request->input('en.name'));
-        $data->parent_id   = $request->parent_id;
+        $data->name      = $request->name;
+        $data->slug      = Str::slug($request->name);
+        $data->parent_id = $request->parent_id;
 
         if ($request->hasFile('image')) {
             if ($data->image && file_exists(public_path($data->image))) {
                 @unlink(public_path($data->image));
             }
-            $randomName      = mt_rand(10000000, 99999999) . '.webp';
-            $destinationPath = public_path('images/category/');
-            if (!file_exists($destinationPath)) mkdir($destinationPath, 0755, true);
-
-            Image::make($request->file('image'))
-                ->resize(800, null, fn($c) => $c->aspectRatio())
-                ->encode('webp', 50)
-                ->save($destinationPath . $randomName);
-
-            $data->image = '/images/category/' . $randomName;
+            $data->image = $this->uploadImage($request->file('image'));
         }
 
         $data->save();
 
-        foreach (config('translatable.locales') as $locale) {
-            $t = $data->translateOrNew($locale);
-            $t->name        = $request->input("$locale.name") ?? $request->input('en.name');
-            $t->description = $request->input("$locale.description");
-            $t->save();
-        }
+        $this->saveTranslations($data, $request->name, $request->description);
 
-        return response()->json(['message' => 'Category updated successfully!'], 200);
+        return response()->json(['message' => 'Category updated & translated successfully!'], 200);
     }
 
     public function delete($id)
@@ -197,7 +166,60 @@ class CategoryController extends Controller
 
     public function parentCategories()
     {
-        $parentCategories = Category::with('translations')->where('status', 1)->select('id', 'name')->latest()->get();
-        return response()->json($parentCategories);
+        // Return a clean array with id and the name in the current app locale
+        $parentCategories = Category::where('status', 1)->whereNull('parent_id')->latest()->get();
+        
+        return response()->json(
+            $parentCategories->map(function ($cat) {
+                return [
+                    'id'   => $cat->id,
+                    'name' => $cat->translateOrNew(app()->getLocale())->name
+                ];
+            })
+        );
+    }
+
+    private function saveTranslations($category, $enName, $enDescription)
+    {
+        $otherLocales = array_diff(config('translatable.locales'), ['en']);
+
+        foreach (config('translatable.locales') as $locale) {
+            $translation = $category->translateOrNew($locale);
+
+            if ($locale === 'en') {
+                $translation->name        = $enName;
+                $translation->description = $enDescription;
+            } else {
+                try {
+                    $tr = new GoogleTranslate($locale);
+                    $tr->setSource('en');
+
+                    $translation->name = $tr->translate($enName);
+                    usleep(200000);
+
+                    $translation->description = !empty($enDescription) ? $tr->translate($enDescription) : '';
+                    usleep(200000);
+
+                } catch (\Exception $e) {
+                    $translation->name        = $enName;
+                    $translation->description = $enDescription;
+                }
+            }
+            $translation->save();
+        }
+    }
+
+    private function uploadImage($file)
+    {
+        $randomName      = mt_rand(10000000, 99999999) . '.webp';
+        $destinationPath = public_path('images/category/');
+        if (!file_exists($destinationPath)) mkdir($destinationPath, 0755, true);
+
+        Image::make($file)
+            ->resize(800, null, fn($c) => $c->aspectRatio())
+            ->encode('webp', 50)
+            ->save($destinationPath . $randomName);
+
+        return '/images/category/' . $randomName;
     }
 }
