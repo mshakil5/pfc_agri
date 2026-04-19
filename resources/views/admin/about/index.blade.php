@@ -7,7 +7,8 @@
         <div class="col-xl-10">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Edit About Us</h4>
+                    <h4 class="card-title mb-0 flex-grow-1">Edit {{ $about->pages == 'about' ? 'About Us' : 'Homepage About' }}</h4>
+                    <small class="text-muted">Auto-translates on save</small>
                 </div>
                 <div class="card-body">
                     <form id="createThisForm" enctype="multipart/form-data">
@@ -36,115 +37,79 @@
                                 <div class="col-md-12"><hr></div>
                             @endif
 
-                            {{-- Language Tabs --}}
+                            {{-- Translation Notice --}}
                             <div class="col-md-12">
-                                <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
-                                    @foreach(config('translatable.locales') as $index => $locale)
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
-                                               data-bs-toggle="tab" href="#about-tab-{{ $locale }}" role="tab">
-                                                {{ strtoupper($locale) }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                                <div class="alert alert-info py-2">
+                                    <i class="ri-translate-2 me-1"></i> 
+                                    <small>Fill in English — will be auto-translated to {{ implode(', ', array_diff(config('translatable.locales'), ['en'])) }}</small>
+                                </div>
+                            </div>
 
-                                <div class="tab-content">
-                                    @foreach(config('translatable.locales') as $index => $locale)
-                                        @php
-                                            $isDefault = $locale === 'en';
-                                            $trans = !$isDefault ? ($about->translations[$locale] ?? []) : [];
-                                        @endphp
-                                        <div class="tab-pane {{ $index == 0 ? 'active' : '' }}"
-                                             id="about-tab-{{ $locale }}" role="tabpanel">
-                                            <div class="row g-3">
+                            @if($about->pages == 'about')
+                                <div class="col-md-6">
+                                    <label class="form-label">Header Title (EN) <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="header_title" value="{{ $about->header_title }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Header Subtitle (EN)</label>
+                                    <input type="text" class="form-control" name="header_subtitle" value="{{ $about->header_subtitle }}">
+                                </div>
+                            @endif
 
-                                                @if($about->pages == 'about')
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Header Title ({{ strtoupper($locale) }})</label>
-                                                        <input type="text" class="form-control"
-                                                               name="{{ $isDefault ? 'header_title' : "trans[$locale][header_title]" }}"
-                                                               value="{{ $isDefault ? $about->header_title : ($trans['header_title'] ?? '') }}">
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Header Subtitle ({{ strtoupper($locale) }})</label>
-                                                        <input type="text" class="form-control"
-                                                               name="{{ $isDefault ? 'header_subtitle' : "trans[$locale][header_subtitle]" }}"
-                                                               value="{{ $isDefault ? $about->header_subtitle : ($trans['header_subtitle'] ?? '') }}">
-                                                    </div>
-                                                @endif
+                            <div class="col-md-6">
+                                <label class="form-label">Main Title (EN) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="title" value="{{ $about->title }}">
+                            </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Main Title ({{ strtoupper($locale) }}) @if($isDefault)<span class="text-danger">*</span>@endif</label>
-                                                    <input type="text" class="form-control"
-                                                           name="{{ $isDefault ? 'title' : "trans[$locale][title]" }}"
-                                                           value="{{ $isDefault ? $about->title : ($trans['title'] ?? '') }}">
-                                                </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Sub Title (EN)</label>
+                                <input type="text" class="form-control" name="sub_title" value="{{ $about->sub_title }}">
+                            </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Sub Title ({{ strtoupper($locale) }})</label>
-                                                    <input type="text" class="form-control"
-                                                           name="{{ $isDefault ? 'sub_title' : "trans[$locale][sub_title]" }}"
-                                                           value="{{ $isDefault ? $about->sub_title : ($trans['sub_title'] ?? '') }}">
-                                                </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Long Description (EN)</label>
+                                <textarea class="form-control" id="long_description" name="long_description">{!! $about->long_description !!}</textarea>
+                            </div>
 
-                                                <div class="col-md-12">
-                                                    <label class="form-label">Long Description ({{ strtoupper($locale) }})</label>
-                                                    <textarea class="form-control summernote-{{ $locale }}"
-                                                              name="{{ $isDefault ? 'long_description' : "trans[$locale][long_description]" }}">{!! $isDefault ? $about->long_description : ($trans['long_description'] ?? '') !!}</textarea>
-                                                </div>
-
-                                                {{-- Amenities --}}
-                                                <div class="col-md-12">
-                                                    <label class="form-label"><b>Features / Amenities ({{ strtoupper($locale) }})</b></label>
-                                                    @php
-                                                        $amenities = $isDefault
-                                                            ? (json_decode($about->amenities, true) ?? [])
-                                                            : ($trans['amenities'] ?? []);
-                                                    @endphp
-                                                    <div id="features-container-{{ $locale }}">
-                                                        @php $amenities = $amenities ?: [[]]; @endphp
-                                                        @foreach($amenities as $i => $item)
-                                                            <div class="row g-2 mb-2 button-row">
-                                                                @if($isDefault)
-                                                                    <div class="col-md-2">
-                                                                        <input type="text" name="features[{{ $i }}][icon]" class="form-control"
-                                                                               value="{{ $item['icon'] ?? '' }}" placeholder="Icon Class">
-                                                                    </div>
-                                                                @endif
-                                                                <div class="{{ $isDefault ? 'col-md-3' : 'col-md-5' }}">
-                                                                    <input type="text"
-                                                                           name="{{ $isDefault ? "features[$i][title]" : "trans[$locale][amenities][$i][title]" }}"
-                                                                           class="form-control" value="{{ $item['title'] ?? '' }}" placeholder="Title">
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <input type="text"
-                                                                           name="{{ $isDefault ? "features[$i][subtitle]" : "trans[$locale][amenities][$i][subtitle]" }}"
-                                                                           class="form-control" value="{{ $item['subtitle'] ?? '' }}" placeholder="Sub Title">
-                                                                </div>
-                                                                <div class="col-md-1">
-                                                                    <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                    <button type="button" class="btn btn-dark btn-sm mt-2 add-feature-btn"
-                                                            data-locale="{{ $locale }}" data-default="{{ $isDefault ? '1' : '0' }}">
-                                                        + Add More Feature
-                                                    </button>
-                                                </div>
-
+                            {{-- Features / Amenities --}}
+                            <div class="col-md-12">
+                                <label class="form-label"><b>Features / Amenities (EN)</b></label>
+                                @php
+                                    $amenities = json_decode($about->amenities ?? '[]', true) ?: [[]];
+                                @endphp
+                                <div id="features-container">
+                                    @foreach($amenities as $i => $item)
+                                        <div class="row g-2 mb-2 button-row">
+                                            <div class="col-md-2">
+                                                <input type="text" name="features[{{ $i }}][icon]" class="form-control"
+                                                       value="{{ $item['icon'] ?? '' }}" placeholder="Icon Class">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" name="features[{{ $i }}][title]" class="form-control"
+                                                       value="{{ $item['title'] ?? '' }}" placeholder="Title">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" name="features[{{ $i }}][subtitle]" class="form-control"
+                                                       value="{{ $item['subtitle'] ?? '' }}" placeholder="Sub Title">
+                                            </div>
+                                            <div class="col-md-1">
+                                                <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
+                                <button type="button" class="btn btn-dark btn-sm mt-2" id="addFeatureBtn">
+                                    + Add More Feature
+                                </button>
                             </div>
 
                         </div>
                     </form>
                 </div>
                 <div class="card-footer text-end">
-                    <button type="button" id="addBtn" class="btn btn-primary">Update About Page</button>
+                    <button type="button" id="addBtn" class="btn btn-primary">
+                        <i class="ri-save-line me-1"></i> Update & Translate
+                    </button>
                 </div>
             </div>
         </div>
@@ -154,65 +119,101 @@
 @endsection
 
 @section('script')
+<style>
+    /* Loader Overlay Styles */
+    .card { position: relative; overflow: hidden; }
+    .form-loader-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(2px);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 50; border-radius: 0.375rem;
+    }
+    .spinner-ring { width: 50px; height: 50px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loader-text { margin-top: 15px; font-size: 14px; color: #374151; font-weight: 500; }
+    .loader-lang-ticker { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
+    .progress-bar-container { width: 200px; height: 4px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #3b82f6; border-radius: 4px; width: 0%; transition: width 0.3s ease; }
+</style>
+
 <script>
-    var featureIndex = {};
-    @foreach(config('translatable.locales') as $locale)
-        @php
-            $isDefault = $locale === 'en';
-            $cnt = $isDefault
-                ? count(json_decode($about->amenities ?? '[]', true) ?? [])
-                : count(($about->translations[$locale]['amenities'] ?? []));
-        @endphp
-        featureIndex['{{ $locale }}'] = {{ max($cnt, 1) }};
-    @endforeach
+    var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
+    var featureIndex = {{ max(count(json_decode($about->amenities ?? '[]', true) ?? []), 1) }};
 
     $(document).ready(function () {
-
-        @foreach(config('translatable.locales') as $locale)
-            $('.summernote-{{ $locale }}').summernote({ height: 200, focus: false });
-        @endforeach
+        
+        // Initialize single Summernote instance
+        $('#long_description').summernote({ height: 200, focus: false });
 
         $("#addBtn").click(function (e) {
             e.preventDefault();
+            
+            // CRITICAL: Force Summernote to push its HTML content into the textarea 
+            // so standard FormData picks it up correctly
+            $('#long_description').val($('#long_description').summernote('code'));
+            
+            var formData = new FormData(document.getElementById('createThisForm'));
+            showFormLoader();
+
             $.ajax({
                 url: "{{ URL::to('/admin/about') }}",
                 type: "POST",
-                data: new FormData(document.getElementById('createThisForm')),
+                data: formData,
                 contentType: false,
                 processData: false,
-                success: function (d) { showSuccess(d.message); },
-                error: function (xhr) { showError(xhr.responseJSON?.message ?? 'Something went wrong.'); }
+                success: function (d) { 
+                    hideFormLoader(); 
+                    showSuccess(d.message); 
+                },
+                error: function (xhr) { 
+                    hideFormLoader(); 
+                    showError(xhr.responseJSON?.message ?? 'Something went wrong.'); 
+                }
             });
         });
 
-        $(document).on('click', '.add-feature-btn', function () {
-            var locale    = $(this).data('locale');
-            var isDefault = $(this).data('default') == '1';
-            var idx       = featureIndex[locale]++;
-            var html      = '';
-
-            if (isDefault) {
-                html = `<div class="row g-2 mb-2 button-row">
-                    <div class="col-md-2"><input type="text" name="features[${idx}][icon]" class="form-control" placeholder="Icon Class"></div>
-                    <div class="col-md-3"><input type="text" name="features[${idx}][title]" class="form-control" placeholder="Title"></div>
-                    <div class="col-md-6"><input type="text" name="features[${idx}][subtitle]" class="form-control" placeholder="Sub Title"></div>
-                    <div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-btn">X</button></div>
-                </div>`;
-            } else {
-                html = `<div class="row g-2 mb-2 button-row">
-                    <div class="col-md-5"><input type="text" name="trans[${locale}][amenities][${idx}][title]" class="form-control" placeholder="Title"></div>
-                    <div class="col-md-6"><input type="text" name="trans[${locale}][amenities][${idx}][subtitle]" class="form-control" placeholder="Sub Title"></div>
-                    <div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-btn">X</button></div>
-                </div>`;
-            }
-
-            $('#features-container-' + locale).append(html);
+        $("#addFeatureBtn").click(function () {
+            var idx = featureIndex++;
+            var html = `<div class="row g-2 mb-2 button-row">
+                <div class="col-md-2"><input type="text" name="features[${idx}][icon]" class="form-control" placeholder="Icon Class"></div>
+                <div class="col-md-3"><input type="text" name="features[${idx}][title]" class="form-control" placeholder="Title"></div>
+                <div class="col-md-6"><input type="text" name="features[${idx}][subtitle]" class="form-control" placeholder="Sub Title"></div>
+                <div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-btn">X</button></div>
+            </div>`;
+            $('#features-container').append(html);
         });
 
         $(document).on('click', '.remove-btn', function () {
             $(this).closest('.button-row').remove();
         });
     });
+
+    function showFormLoader() {
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button').prop('disabled', true);
+        $('#long_description').summernote('disable');
+        
+        var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
+        var tickerMessages = ['Saving English...'];
+        otherLocales.forEach(function(loc) { tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...'); });
+        tickerMessages.push('Finishing up...');
+        
+        var overlay = `<div class="form-loader-overlay" id="formLoader"><div class="spinner-ring"></div><div class="loader-text">Updating & Translating...</div><div class="progress-bar-container"><div class="progress-bar-fill" id="loaderProgress"></div></div><div class="loader-lang-ticker" id="loaderTicker">Preparing...</div></div>`;
+        $('.card').append(overlay);
+        
+        var step = 0;
+        var interval = setInterval(function() {
+            if (step < tickerMessages.length) {
+                $('#loaderProgress').css('width', Math.round(((step + 1) / tickerMessages.length) * 100) + '%');
+                $('#loaderTicker').text(tickerMessages[step]); step++;
+            } else { clearInterval(interval); $('#loaderTicker').text('Almost done...'); }
+        }, 1000);
+    }
+
+    function hideFormLoader() {
+        $('#formLoader').fadeOut(200, function() { $(this).remove(); });
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button').prop('disabled', false);
+        $('#long_description').summernote('enable');
+    }
 
     function previewImage(event, imgSelector) {
         if (event.target.files && event.target.files[0]) {

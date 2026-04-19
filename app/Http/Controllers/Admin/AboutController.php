@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\About;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AboutController extends Controller
 {
@@ -31,10 +32,14 @@ class AboutController extends Controller
 
         $about->title            = $request->title;
         $about->sub_title        = $request->sub_title;
-        $about->header_title     = $request->header_title;
-        $about->header_subtitle  = $request->header_subtitle;
         $about->long_description = $request->long_description;
-        $about->year             = $request->year;
+
+        // Only update header fields if it's the main 'about' page
+        if ($about->pages == 'about') {
+            $about->header_title     = $request->header_title;
+            $about->header_subtitle  = $request->header_subtitle;
+            $about->year             = $request->year;
+        }
 
         if ($request->hasFile('image')) {
             if ($about->image && file_exists(public_path('images/about/' . $about->image))) {
@@ -53,30 +58,69 @@ class AboutController extends Controller
             $about->image = $name;
         }
 
-        $about->amenities = json_encode(
-            $request->has('features') ? array_values($request->features) : []
-        );
+        // Save English amenities in main column
+        $enAmenities = array_values(array_filter(
+            $request->input('features', []),
+            fn($a) => !empty($a['title'])
+        ));
+        $about->amenities = json_encode($enAmenities);
 
-        // Save translations
+        // Translate and build JSON for other languages
         $translations = $about->translations ?? [];
-        foreach (config('translatable.locales') as $locale) {
-            if ($locale === 'en') continue;
-            $translations[$locale] = [
-                'title'            => $request->input("trans.$locale.title"),
-                'sub_title'        => $request->input("trans.$locale.sub_title"),
-                'header_title'     => $request->input("trans.$locale.header_title"),
-                'header_subtitle'  => $request->input("trans.$locale.header_subtitle"),
-                'long_description' => $request->input("trans.$locale.long_description"),
-                'amenities'        => array_values(array_filter(
-                    $request->input("trans.$locale.amenities", []),
-                    fn($a) => !empty($a['title'])
-                )),
-            ];
+        $otherLocales = array_diff(config('translatable.locales'), ['en']);
+
+        foreach ($otherLocales as $locale) {
+            try {
+                $tr = new GoogleTranslate($locale);
+                $tr->setSource('en');
+
+                $translations[$locale]['title']            = $tr->translate($request->title);
+                usleep(200000);
+
+                $translations[$locale]['sub_title']        = !empty($request->sub_title) ? $tr->translate($request->sub_title) : '';
+                usleep(200000);
+
+                $translations[$locale]['long_description'] = !empty($request->long_description) ? $tr->translate($request->long_description) : '';
+                usleep(300000); // Longer delay for HTML content
+
+                // Translate amenities (Keep icon classes the same as English)
+                $translatedAmenities = [];
+                foreach ($enAmenities as $amenity) {
+                    $translatedAmenities[] = [
+                        'title'    => $tr->translate($amenity['title']),
+                        'subtitle' => !empty($amenity['subtitle']) ? $tr->translate($amenity['subtitle']) : '',
+                        // Icon is NOT translated, it's a CSS class
+                    ];
+                    usleep(200000);
+                }
+                $translations[$locale]['amenities'] = $translatedAmenities;
+
+                if ($about->pages == 'about') {
+                    $translations[$locale]['header_title']     = $tr->translate($request->header_title);
+                    usleep(200000);
+                    $translations[$locale]['header_subtitle']  = !empty($request->header_subtitle) ? $tr->translate($request->header_subtitle) : '';
+                    usleep(200000);
+                }
+
+            } catch (\Exception $e) {
+                // Fallback to English if translation fails
+                $translations[$locale] = [
+                    'title'            => $request->title,
+                    'sub_title'        => $request->sub_title,
+                    'long_description' => $request->long_description,
+                    'amenities'        => $enAmenities,
+                ];
+                if ($about->pages == 'about') {
+                    $translations[$locale]['header_title']     = $request->header_title;
+                    $translations[$locale]['header_subtitle']  = $request->header_subtitle;
+                }
+            }
         }
+        
         $about->translations = $translations;
 
         if ($about->save()) {
-            return response()->json(['status' => 200, 'message' => 'About page updated successfully!']);
+            return response()->json(['status' => 200, 'message' => 'About page updated & translated successfully!']);
         }
 
         return response()->json(['message' => 'Failed to update data'], 500);
