@@ -87,9 +87,9 @@ class AboutController extends Controller
                 $translatedAmenities = [];
                 foreach ($enAmenities as $amenity) {
                     $translatedAmenities[] = [
+                        'icon'     => $amenity['icon'] ?? '',
                         'title'    => $tr->translate($amenity['title']),
                         'subtitle' => !empty($amenity['subtitle']) ? $tr->translate($amenity['subtitle']) : '',
-                        // Icon is NOT translated, it's a CSS class
                     ];
                     usleep(200000);
                 }

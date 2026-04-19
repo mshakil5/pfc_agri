@@ -2,6 +2,7 @@
 
 @section('content')
 
+<!-- This is about page About section start. -->
 
 <style>
     /* --- About PFC Agri Solutions Header --- */
@@ -117,8 +118,8 @@
 
 <section class="values-section text-center">
     <div class="container">
-        <p class="section-tag mb-1">{{ __('about.what_drives_us') }}</p>
-        <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">{{ __('about.our_core_values') }}</h2>
+        <p class="section-tag mb-1">{{ __('WHAT DRIVES US') }}</p>
+        <h2 class="fw-bold mb-5" style="color: var(--pfc-green);">{{ __('Our Core Values') }}</h2>
 
         <div class="row g-4">
             @php
@@ -142,6 +143,9 @@
     </div>
 </section>
 @endif
+
+
+<!-- About section end. -->
 
 
 <style>
