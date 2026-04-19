@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Slider;
 use Illuminate\Support\Facades\Cache;
 use DataTables;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class SliderController extends Controller
 {
@@ -76,13 +77,10 @@ class SliderController extends Controller
         $rules = [
             'image' => $id ? 'nullable|image' : 'required|image',
             'link'  => 'nullable|string',
+            'title' => 'required|string',
+            'sub_title' => 'nullable|string',
+            'hero_badge' => 'nullable|string',
         ];
-
-        foreach (config('translatable.locales') as $locale) {
-            $rules["$locale.title"]     = 'required|string';
-            $rules["$locale.sub_title"] = 'nullable|string';
-            $rules["$locale.hero_badge"] = 'nullable|string';
-        }
 
         $request->validate($rules);
 
@@ -90,7 +88,7 @@ class SliderController extends Controller
         $data->link = $request->link;
 
         if (!$data->exists) {
-            $lastSerial   = Slider::max('serial');
+            $lastSerial = Slider::max('serial');
             $data->serial = $lastSerial ? $lastSerial + 1 : 1;
             $data->created_by = auth()->id();
         } else {
@@ -117,14 +115,74 @@ class SliderController extends Controller
 
         $data->save();
 
-        // Save translations including per-locale buttons and stat_card
+        // English inputs
+        $enTitle = $request->title;
+        $enSubTitle = $request->sub_title ?? '';
+        $enHeroBadge = $request->hero_badge ?? '';
+        $enButtons = $request->input('buttons', []);
+        $enStatCards = $request->input('stat_card', []);
+
+        // Get other locales (exclude English)
+        $otherLocales = array_diff(config('translatable.locales'), ['en']);
+
+        // Translate and save for each locale
         foreach (config('translatable.locales') as $locale) {
             $translation = $data->translateOrNew($locale);
-            $translation->title      = $request->input("$locale.title");
-            $translation->sub_title  = $request->input("$locale.sub_title");
-            $translation->hero_badge = $request->input("$locale.hero_badge");
-            $translation->buttons    = $request->input("$locale.buttons") ?? [];
-            $translation->stat_card  = $request->input("$locale.stat_card") ?? [];
+
+            if ($locale === 'en') {
+                // Save English directly
+                $translation->title = $enTitle;
+                $translation->sub_title = $enSubTitle;
+                $translation->hero_badge = $enHeroBadge;
+                $translation->buttons = $enButtons;
+                $translation->stat_card = $enStatCards;
+            } else {
+                // Translate to other language
+                try {
+                    $tr = new GoogleTranslate($locale);
+                    $tr->setSource('en');
+
+                    $translation->title = $tr->translate($enTitle);
+                    usleep(200000);
+
+                    $translation->sub_title = !empty($enSubTitle) ? $tr->translate($enSubTitle) : '';
+                    usleep(200000);
+
+                    $translation->hero_badge = !empty($enHeroBadge) ? $tr->translate($enHeroBadge) : '';
+                    usleep(200000);
+
+                    // Translate button labels only (keep links as-is)
+                    $translatedButtons = [];
+                    foreach ($enButtons as $btn) {
+                        $translatedButtons[] = [
+                            'label' => !empty($btn['label']) ? $tr->translate($btn['label']) : '',
+                            'link' => $btn['link'] ?? ''
+                        ];
+                        usleep(200000);
+                    }
+                    $translation->buttons = $translatedButtons;
+
+                    // Translate stat card titles only (keep values as-is)
+                    $translatedStatCards = [];
+                    foreach ($enStatCards as $sc) {
+                        $translatedStatCards[] = [
+                            'value' => $sc['value'] ?? '',
+                            'title' => !empty($sc['title']) ? $tr->translate($sc['title']) : ''
+                        ];
+                        usleep(200000);
+                    }
+                    $translation->stat_card = $translatedStatCards;
+
+                } catch (\Exception $e) {
+                    // If translation fails, save empty or fallback
+                    $translation->title = $enTitle;
+                    $translation->sub_title = $enSubTitle;
+                    $translation->hero_badge = $enHeroBadge;
+                    $translation->buttons = $enButtons;
+                    $translation->stat_card = $enStatCards;
+                }
+            }
+
             $translation->save();
         }
 
@@ -137,7 +195,20 @@ class SliderController extends Controller
     public function sliderEdit($id)
     {
         $slider = Slider::with('translations')->findOrFail($id);
-        return response()->json($slider);
+        
+        // Return only English translation data for editing
+        $enTranslation = $slider->translate('en');
+        
+        return response()->json([
+            'id' => $slider->id,
+            'link' => $slider->link,
+            'image' => $slider->image,
+            'title' => $enTranslation->title,
+            'sub_title' => $enTranslation->sub_title,
+            'hero_badge' => $enTranslation->hero_badge,
+            'buttons' => $enTranslation->buttons,
+            'stat_card' => $enTranslation->stat_card,
+        ]);
     }
 
     public function sliderDelete($id)

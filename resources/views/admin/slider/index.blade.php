@@ -14,6 +14,7 @@
         <div class="card">
             <div class="card-header align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1" id="cardTitle">Add New Slider</h4>
+                <small class="text-muted">Will auto-translate to all languages on save</small>
             </div>
             <div class="card-body">
                 <form id="createThisForm">
@@ -22,7 +23,7 @@
 
                     <div class="row g-3">
 
-                        {{-- Image (shared across locales) --}}
+                        {{-- Image --}}
                         <div class="col-md-6">
                             <label class="form-label">Slider Image</label>
                             <input type="file" class="form-control" id="image" accept="image/*"
@@ -36,98 +37,78 @@
                             <input type="text" class="form-control" id="link" name="link" placeholder="https://">
                         </div>
 
-                        {{-- Language Tabs --}}
+                        {{-- English Fields Only --}}
                         <div class="col-md-12">
-                            <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
-                                @foreach(config('translatable.locales') as $index => $locale)
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
-                                           data-bs-toggle="tab" href="#slider-tab-{{ $locale }}" role="tab">
-                                            {{ strtoupper($locale) }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            <div class="tab-content">
-                                @foreach(config('translatable.locales') as $index => $locale)
-                                    <div class="tab-pane {{ $index == 0 ? 'active' : '' }}"
-                                         id="slider-tab-{{ $locale }}" role="tabpanel">
-                                        <div class="row g-3">
-
-                                            <div class="col-md-12">
-                                                <label class="form-label">Title ({{ strtoupper($locale) }}) <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control"
-                                                       name="{{ $locale }}[title]" id="{{ $locale }}_title">
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label">Sub Title ({{ strtoupper($locale) }})</label>
-                                                <input type="text" class="form-control"
-                                                       name="{{ $locale }}[sub_title]" id="{{ $locale }}_sub_title">
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label">Hero Badge ({{ strtoupper($locale) }})</label>
-                                                <input type="text" class="form-control"
-                                                       name="{{ $locale }}[hero_badge]" id="{{ $locale }}_hero_badge">
-                                            </div>
-
-                                            {{-- Buttons per locale --}}
-                                            <div class="col-md-12">
-                                                <label class="form-label"><b>Buttons ({{ strtoupper($locale) }})</b></label>
-                                                <div id="buttons-container-{{ $locale }}">
-                                                    <div class="row g-2 mb-2 button-row">
-                                                        <div class="col-md-5">
-                                                            <input type="text" name="{{ $locale }}[buttons][0][label]"
-                                                                   class="form-control" placeholder="Button Label">
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <input type="text" name="{{ $locale }}[buttons][0][link]"
-                                                                   class="form-control" placeholder="Button Link">
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <button type="button" class="btn btn-dark btn-sm mt-2 add-button-btn"
-                                                        data-locale="{{ $locale }}">+ Add Button</button>
-                                            </div>
-
-                                            {{-- Stat Cards per locale --}}
-                                            <div class="col-md-12">
-                                                <label class="form-label"><b>Stat Cards ({{ strtoupper($locale) }})</b></label>
-                                                <div id="statcard-container-{{ $locale }}">
-                                                    <div class="row g-2 mb-2 button-row">
-                                                        <div class="col-md-5">
-                                                            <input type="text" name="{{ $locale }}[stat_card][0][value]"
-                                                                   class="form-control" placeholder="Value (e.g. 500+)">
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <input type="text" name="{{ $locale }}[stat_card][0][title]"
-                                                                   class="form-control" placeholder="Title">
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <button type="button" class="btn btn-dark btn-sm mt-2 add-statcard-btn"
-                                                        data-locale="{{ $locale }}">+ Add Stat Card</button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                @endforeach
+                            <div class="alert alert-info py-2 mb-3">
+                                <i class="ri-translate-2 me-1"></i> 
+                                <small>Fill in English — will be auto-translated to {{ implode(', ', array_diff(config('translatable.locales'), ['en'])) }}</small>
                             </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Title (EN) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="title" id="title" placeholder="Enter title in English">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Sub Title (EN)</label>
+                            <input type="text" class="form-control" name="sub_title" id="sub_title" placeholder="Enter subtitle in English">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Hero Badge (EN)</label>
+                            <input type="text" class="form-control" name="hero_badge" id="hero_badge" placeholder="Enter hero badge in English">
+                        </div>
+
+                        {{-- Buttons --}}
+                        <div class="col-md-12">
+                            <label class="form-label"><b>Buttons</b></label>
+                            <div id="buttons-container">
+                                <div class="row g-2 mb-2 button-row">
+                                    <div class="col-md-5">
+                                        <input type="text" name="buttons[0][label]"
+                                               class="form-control" placeholder="Button Label">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="text" name="buttons[0][link]"
+                                               class="form-control" placeholder="Button Link">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-sm mt-2" id="addButtonBtn">+ Add Button</button>
+                        </div>
+
+                        {{-- Stat Cards --}}
+                        <div class="col-md-12">
+                            <label class="form-label"><b>Stat Cards</b></label>
+                            <div id="statcard-container">
+                                <div class="row g-2 mb-2 button-row">
+                                    <div class="col-md-5">
+                                        <input type="text" name="stat_card[0][value]"
+                                               class="form-control" placeholder="Value (e.g. 500+)">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="text" name="stat_card[0][title]"
+                                               class="form-control" placeholder="Title">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-sm mt-2" id="addStatcardBtn">+ Add Stat Card</button>
                         </div>
 
                     </div>
                 </form>
             </div>
             <div class="card-footer text-end">
-                <button type="button" id="addBtn" class="btn btn-primary">Create</button>
+                <button type="button" id="addBtn" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i> Create & Translate
+                </button>
                 <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
             </div>
         </div>
@@ -190,17 +171,81 @@
 
 @section('script')
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<style>
+    /* Loader Overlay */
+    .form-loader-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(2px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        border-radius: 0.375rem;
+    }
+
+    .spinner-ring {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .loader-lang-ticker {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #6b7280;
+        min-height: 18px;
+    }
+
+    .form-loader-overlay .progress-bar-container {
+        width: 200px;
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        margin-top: 12px;
+        overflow: hidden;
+    }
+
+    .form-loader-overlay .progress-bar-fill {
+        height: 100%;
+        background: #3b82f6;
+        border-radius: 4px;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    #addThisFormContainer .card {
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+
 <script>
-// Track dynamic row indices per locale
-var buttonIndex   = {};
-var statCardIndex = {};
+var buttonIndex = 1;
+var statCardIndex = 1;
+var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
 
-@foreach(config('translatable.locales') as $locale)
-    buttonIndex['{{ $locale }}']   = 1;
-    statCardIndex['{{ $locale }}'] = 1;
-@endforeach
-
-$(document).ready(function () {
+ $(document).ready(function () {
 
     // Sortable
     $("#sortable").sortable({
@@ -208,7 +253,7 @@ $(document).ready(function () {
         cursor: "grab",
         forcePlaceholderSize: true,
         opacity: 0.8,
-        update: function (event, ui) {
+        update: function () {
             var order = $(this).sortable('toArray', { attribute: 'data-id' });
             $.ajax({
                 url: "{{ route('sliders.updateOrder') }}",
@@ -240,7 +285,7 @@ $(document).ready(function () {
     // Toggle status
     $(document).on('change', '.toggle-status', function () {
         var slider_id = $(this).data('id');
-        var status    = $(this).prop('checked') ? 1 : 0;
+        var status = $(this).prop('checked') ? 1 : 0;
         $.post('/admin/slider-status', { _token: '{{ csrf_token() }}', slider_id, status }, function (d) {
             reloadTable('#sliderTable');
             showSuccess(d.message);
@@ -253,26 +298,36 @@ $(document).ready(function () {
         $("#addThisFormContainer").slideDown(300);
         $(this).hide();
     });
+
     $("#FormCloseBtn").click(function () {
         $("#addThisFormContainer").slideUp(300);
         setTimeout(() => $("#newBtn").show(), 300);
     });
 
-    // Save
+    // Save with Loader
     $("#addBtn").click(function (e) {
         e.preventDefault();
+        
+        // 1. Create FormData FIRST (before disabling inputs)
+        var formData = new FormData($('#createThisForm')[0]);
+        
+        // 2. Then show loader (which disables inputs)
+        showFormLoader();
+
         $.ajax({
             url: "{{ route('slider.store') }}",
             type: "POST",
-            data: new FormData($('#createThisForm')[0]),
+            data: formData,  // 3. Use the already-created formData
             contentType: false,
             processData: false,
             success: function (d) {
+                hideFormLoader();
                 showSuccess(d.message);
                 $("#FormCloseBtn").click();
                 table.ajax.reload();
             },
             error: function (xhr) {
+                hideFormLoader();
                 if (xhr.status === 422) {
                     let msgs = [];
                     Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0]));
@@ -293,19 +348,13 @@ $(document).ready(function () {
     });
 
     // Add button row
-    $(document).on('click', '.add-button-btn', function () {
-        let locale    = $(this).data('locale');
-        let container = $("#buttons-container-" + locale);
-        let idx       = buttonIndex[locale]++;
-        container.append(buildButtonRow(locale, idx, '', ''));
+    $("#addButtonBtn").click(function () {
+        $("#buttons-container").append(buildButtonRow(buttonIndex++, '', ''));
     });
 
     // Add stat card row
-    $(document).on('click', '.add-statcard-btn', function () {
-        let locale    = $(this).data('locale');
-        let container = $("#statcard-container-" + locale);
-        let idx       = statCardIndex[locale]++;
-        container.append(buildStatCardRow(locale, idx, '', ''));
+    $("#addStatcardBtn").click(function () {
+        $("#statcard-container").append(buildStatCardRow(statCardIndex++, '', ''));
     });
 
     // Remove row
@@ -313,49 +362,101 @@ $(document).ready(function () {
         $(this).closest('.button-row').remove();
     });
 
-    // ---- Helpers ----
+    // ---- Loader Functions ----
+
+    function showFormLoader() {
+        // Disable form inputs
+        $('#createThisForm input, #createThisForm button, #createThisForm select').prop('disabled', true);
+        $('#addBtn, #FormCloseBtn').prop('disabled', true);
+
+        var localeNames = {
+            'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German',
+            'it': 'Italian', 'pt': 'Portuguese', 'ru': 'Russian', 'zh': 'Chinese',
+            'ja': 'Japanese', 'ko': 'Korean', 'bn': 'Bengali', 'hi': 'Hindi',
+            'tr': 'Turkish', 'ur': 'Urdu'
+        };
+
+        var totalLocales = otherLocales.length;
+
+        var overlay = `
+            <div class="form-loader-overlay" id="formLoader">
+                <div class="spinner-ring"></div>
+                <div class="loader-text">Saving & Translating...</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="loaderProgress"></div>
+                </div>
+                <div class="loader-lang-ticker" id="loaderTicker">Preparing...</div>
+            </div>
+        `;
+
+        $('#addThisFormContainer .card').append(overlay);
+
+        // Animate progress & language ticker
+        var step = 0;
+        var tickerMessages = ['Saving English...'];
+
+        otherLocales.forEach(function(loc) {
+            tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...');
+        });
+        tickerMessages.push('Finishing up...');
+
+        var interval = setInterval(function() {
+            if (step < tickerMessages.length) {
+                var progress = Math.round(((step + 1) / tickerMessages.length) * 100);
+                $('#loaderProgress').css('width', progress + '%');
+                $('#loaderTicker').text(tickerMessages[step]);
+                step++;
+            } else {
+                clearInterval(interval);
+                $('#loaderTicker').text('Almost done...');
+            }
+        }, 800); // Adjust timing based on your translation speed
+    }
+
+    function hideFormLoader() {
+        $('#formLoader').fadeOut(200, function() {
+            $(this).remove();
+        });
+        // Re-enable form inputs
+        $('#createThisForm input, #createThisForm button, #createThisForm select').prop('disabled', false);
+        $('#addBtn, #FormCloseBtn').prop('disabled', false);
+    }
+
+    // ---- Form Helpers ----
 
     function populateForm(data) {
         $("#codeid").val(data.id);
         $("#link").val(data.link);
+        $("#title").val(data.title);
+        $("#sub_title").val(data.sub_title);
+        $("#hero_badge").val(data.hero_badge);
         $("#cardTitle").text('Update Slider');
-        $("#addBtn").html('Update');
+        $("#addBtn").html('<i class="ri-save-line me-1"></i> Update & Translate');
 
         if (data.image) {
             $('#preview-image').attr('src', '/images/slider/' + data.image).show();
         }
 
-        if (data.translations && data.translations.length > 0) {
-            data.translations.forEach(function (t) {
-                let locale = t.locale;
-                $('#' + locale + '_title').val(t.title);
-                $('#' + locale + '_sub_title').val(t.sub_title);
-                $('#' + locale + '_hero_badge').val(t.hero_badge);
+        let btnContainer = $("#buttons-container");
+        btnContainer.empty();
+        let buttons = data.buttons || [];
+        if (buttons.length > 0) {
+            buttons.forEach((btn, i) => btnContainer.append(buildButtonRow(i, btn.label, btn.link)));
+            buttonIndex = buttons.length;
+        } else {
+            btnContainer.append(buildButtonRow(0, '', ''));
+            buttonIndex = 1;
+        }
 
-                // Buttons
-                let btnContainer = $("#buttons-container-" + locale);
-                btnContainer.empty();
-                let buttons = t.buttons || [];
-                if (buttons.length > 0) {
-                    buttons.forEach((btn, i) => btnContainer.append(buildButtonRow(locale, i, btn.label, btn.link)));
-                    buttonIndex[locale] = buttons.length;
-                } else {
-                    btnContainer.append(buildButtonRow(locale, 0, '', ''));
-                    buttonIndex[locale] = 1;
-                }
-
-                // Stat Cards
-                let scContainer = $("#statcard-container-" + locale);
-                scContainer.empty();
-                let statCards = t.stat_card || [];
-                if (statCards.length > 0) {
-                    statCards.forEach((sc, i) => scContainer.append(buildStatCardRow(locale, i, sc.value, sc.title)));
-                    statCardIndex[locale] = statCards.length;
-                } else {
-                    scContainer.append(buildStatCardRow(locale, 0, '', ''));
-                    statCardIndex[locale] = 1;
-                }
-            });
+        let scContainer = $("#statcard-container");
+        scContainer.empty();
+        let statCards = data.stat_card || [];
+        if (statCards.length > 0) {
+            statCards.forEach((sc, i) => scContainer.append(buildStatCardRow(i, sc.value, sc.title)));
+            statCardIndex = statCards.length;
+        } else {
+            scContainer.append(buildStatCardRow(0, '', ''));
+            statCardIndex = 1;
         }
 
         $("#addThisFormContainer").slideDown(300);
@@ -366,24 +467,22 @@ $(document).ready(function () {
         $('#createThisForm')[0].reset();
         $("#codeid").val('');
         $("#cardTitle").text('Add New Slider');
-        $("#addBtn").html('Create');
+        $("#addBtn").html('<i class="ri-save-line me-1"></i> Create & Translate');
         $('#preview-image').attr('src', '#').hide();
 
-        @foreach(config('translatable.locales') as $locale)
-            $("#buttons-container-{{ $locale }}").html(buildButtonRow('{{ $locale }}', 0, '', ''));
-            buttonIndex['{{ $locale }}'] = 1;
-            $("#statcard-container-{{ $locale }}").html(buildStatCardRow('{{ $locale }}', 0, '', ''));
-            statCardIndex['{{ $locale }}'] = 1;
-        @endforeach
+        buttonIndex = 1;
+        statCardIndex = 1;
+        $("#buttons-container").html(buildButtonRow(0, '', ''));
+        $("#statcard-container").html(buildStatCardRow(0, '', ''));
     }
 
-    function buildButtonRow(locale, index, label, link) {
+    function buildButtonRow(index, label, link) {
         return `<div class="row g-2 mb-2 button-row">
             <div class="col-md-5">
-                <input type="text" name="${locale}[buttons][${index}][label]" value="${label ?? ''}" class="form-control" placeholder="Button Label">
+                <input type="text" name="buttons[${index}][label]" value="${label ?? ''}" class="form-control" placeholder="Button Label">
             </div>
             <div class="col-md-5">
-                <input type="text" name="${locale}[buttons][${index}][link]" value="${link ?? ''}" class="form-control" placeholder="Button Link">
+                <input type="text" name="buttons[${index}][link]" value="${link ?? ''}" class="form-control" placeholder="Button Link">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
@@ -391,13 +490,13 @@ $(document).ready(function () {
         </div>`;
     }
 
-    function buildStatCardRow(locale, index, value, title) {
+    function buildStatCardRow(index, value, title) {
         return `<div class="row g-2 mb-2 button-row">
             <div class="col-md-5">
-                <input type="text" name="${locale}[stat_card][${index}][value]" value="${value ?? ''}" class="form-control" placeholder="Value (e.g. 500+)">
+                <input type="text" name="stat_card[${index}][value]" value="${value ?? ''}" class="form-control" placeholder="Value (e.g. 500+)">
             </div>
             <div class="col-md-5">
-                <input type="text" name="${locale}[stat_card][${index}][title]" value="${title ?? ''}" class="form-control" placeholder="Title">
+                <input type="text" name="stat_card[${index}][title]" value="${title ?? ''}" class="form-control" placeholder="Title">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
