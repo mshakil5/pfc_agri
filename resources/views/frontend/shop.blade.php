@@ -74,14 +74,14 @@
 <header class="product-hero">
     <div class="container text-center text-md-start">
         <h1 class="fw-bold display-5">
-            {{ $currentCategory ? ($currentCategory->translateOrNew(app()->getLocale())->name ?? $currentCategory->name) : __('shop.our_product_range') }}
+            {{ __('footer.our_products') }}
         </h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 justify-content-center justify-content-md-start">
                 <li class="breadcrumb-item">
-                    <a href="{{ url('/') }}" class="text-white opacity-75 text-decoration-none">{{ __('shop.home') }}</a>
+                    <a href="{{ url('/') }}" class="text-white opacity-75 text-decoration-none">{{ __('header.home') }}</a>
                 </li>
-                <li class="breadcrumb-item active text-white" aria-current="page">{{ __('shop.shop') }}</li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ $currentCategory ? ($currentCategory->translateOrNew(app()->getLocale())->name ?? $currentCategory->name) : __('shop.our_product_range') }}</li>
             </ol>
         </nav>
     </div>
@@ -92,10 +92,10 @@
         <div class="row g-4">
             <aside class="col-lg-3">
                 <div class="category-sidebar">
-                    <h6 class="sidebar-title text-uppercase small">{{ __('shop.categories') }}</h6>
+                    <h6 class="sidebar-title text-uppercase small">{{ __('Categories') }}</h6>
 
                     <a href="{{ route('category.show') }}" class="main-cat {{ !$currentCategory ? 'active' : '' }}">
-                        <span>{{ __('shop.all_products') }}</span>
+                        <span>{{ __('All Products') }}</span>
                         <i class="fas fa-chevron-right small opacity-50"></i>
                     </a>
 
@@ -116,15 +116,15 @@
                     <div>
                         @if($currentCategory)
                             <div class="active-filter-pill">
-                                {{ __('shop.category') }}: {{ $currentCategory->translateOrNew(app()->getLocale())->name ?? $currentCategory->name }}
+                                {{ __('Categories') }}: {{ $currentCategory->translateOrNew(app()->getLocale())->name ?? $currentCategory->name }}
                                 <a href="{{ route('category.show') }}" class="ms-2 text-success"><i class="fas fa-times-circle"></i></a>
                             </div>
                         @else
-                            <span class="text-muted fw-medium">{{ __('shop.all_categories') }}</span>
+                            <span class="text-muted fw-medium">{{ __('Categories') }}</span>
                         @endif
                     </div>
                     <span class="text-muted small">
-                        {{ __('shop.showing') }} <strong>{{ $products->count() }}</strong> {{ __('shop.of') }} {{ $products->total() }} {{ __('shop.results') }}
+                        {{ __('Showing') }} <strong>{{ $products->count() }} </strong> {{ __('products') }}
                     </span>
                 </div>
 

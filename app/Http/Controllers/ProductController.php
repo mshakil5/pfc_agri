@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    // app/Http/Controllers/FrontendController.php
 
     public function shop($slug = null)
     {

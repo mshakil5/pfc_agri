@@ -166,20 +166,20 @@
                         </span>
                         <span class="ms-3 text-muted small">
                             <i class="far fa-calendar"></i>
-                            {{ __('rnd.started') }} {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
+                            {{ __('Started') }} {{ \Carbon\Carbon::parse($project->date)->format('M Y') }}
                         </span>
                     </div>
 
                     <h3 class="fw-bold text-success mb-3">{{ $project->getTranslation(app()->getLocale(), 'title') }}</h3>
                     <p class="text-muted small">{{ $project->getTranslation(app()->getLocale(), 'short_description') }}</p>
 
-                    <h6 class="fw-bold small mt-4">{{ __('rnd.project_details') }}</h6>
+                    <h6 class="fw-bold small mt-4">{{ __('Project Timeline') }}</h6>
                     <div class="project-long-desc mb-3">
                         {!! Str::limit($project->getTranslation(app()->getLocale(), 'long_description'), 200) !!}
                     </div>
 
                     <div class="mt-4 pt-3 border-top">
-                        <span class="text-muted small">{{ __('rnd.target_completion') }} </span>
+                        <span class="text-muted small">{{ __('Target Completion') }} </span>
                         <span class="text-success fw-bold">
                             {{ \Carbon\Carbon::parse($project->deadline)->format('F Y') }}
                         </span>
@@ -194,9 +194,9 @@
         @endforelse
 
         <div class="text-center mt-5 pt-5">
-            <h2 class="fw-bold mb-3 text-success">{{ __('rnd.have_idea') }}</h2>
-            <p class="text-muted mx-auto mb-4" style="max-width: 600px;">{{ __('rnd.idea_description') }}</p>
-            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">{{ __('rnd.share_ideas') }}</a>
+            <h2 class="fw-bold mb-3 text-success">{{ __('Have an Idea for Innovation?') }}</h2>
+            <p class="text-muted mx-auto mb-4" style="max-width: 600px;">{{ __('We\'re always looking for new challenges. If you have a problem that needs solving, we\'d love to hear from you.') }}</p>
+            <a href="{{ url('/contact') }}" class="btn btn-success btn-lg px-5 py-3 shadow">{{ __('Share Your Ideas') }}</a>
         </div>
     </div>
 </section>

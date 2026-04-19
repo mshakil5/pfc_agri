@@ -137,9 +137,9 @@
     "Need immediate help?": "Besoin d'aide immédiate ?",
     "+44 (0) 1234 567890": "+44 (0) 1234 567890",
     "No stats available.": "Aucune statistique disponible.",
-    "OUR PROJECTS": "NOS PROJETS",
-    "Current R&D Initiatives": "Initiatives R&D Actuelles",
-    "Explore the projects we're actively developing to bring new solutions to market.": "Explorez les projets que nous développons activement pour apporter de nouvelles solutions sur le marché.",
+    "rnd.our_projects": "NOS PROJETS",
+    "rnd.current_initiatives": "Initiatives R&D Actuelles",
+    "rnd.initiatives_description": "Explorez les projets que nous développons activement pour apporter de nouvelles solutions sur le marché.",
     "Started": "Démarré",
     "Project Details": "Détails du Projet",
     "Target Completion:": "Achèvement Prévu :",
@@ -155,5 +155,13 @@
     "Results": "Résultats",
     "View Details": "Voir les Détails",
     "No products found in this category.": "Aucun produit trouvé dans cette catégorie.",
-    "Back to All Products": "Retour à Tous les Produits"
+    "Back to All Products": "Retour à Tous les Produits",
+    "rnd.in_progress": "En Cours",
+    "rnd.completed": "Terminé",
+    "Project Timeline": "Calendrier du projet",
+    "rnd.no_projects": "No project available now.",
+    "Showing": "Affichage",
+    "products": "produits",
+    "shop.back_to_all": "Retour à tous",
+    "shop.no_products_found": "Aucun produit trouvé"
 }
