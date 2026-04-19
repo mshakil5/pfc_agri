@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\Award;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AwardController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // We eager load translations to avoid N+1 issues
             $awards = Award::with('translations')->latest();
             
             return DataTables::of($awards)
@@ -38,23 +37,61 @@ class AwardController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validateAward($request);
-        Award::create($data);
-        return response()->json(['message' => 'Award created successfully!']);
+        $request->validate([
+            'icon' => 'required',
+            'year' => 'required|integer',
+            'title' => 'required|string',
+            'organization' => 'required|string',
+            'tag' => 'nullable|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $award = new Award();
+        $award->icon = $request->icon;
+        $award->year = $request->year;
+        $award->save();
+
+        $this->saveTranslations($award, $request);
+
+        return response()->json(['message' => 'Award created & translated successfully!']);
     }
 
     public function edit($id)
     {
-        // returns the award with all its 5 language translations
-        return Award::with('translations')->findOrFail($id);
+        $award = Award::with('translations')->findOrFail($id);
+        $enTranslation = $award->translate('en');
+        
+        return response()->json([
+            'id' => $award->id,
+            'icon' => $award->icon,
+            'year' => $award->year,
+            'title' => $enTranslation->title,
+            'organization' => $enTranslation->organization,
+            'tag' => $enTranslation->tag,
+            'description' => $enTranslation->description,
+        ]);
     }
 
     public function update(Request $request)
     {
         $award = Award::findOrFail($request->codeid);
-        $data = $this->validateAward($request);
-        $award->update($data);
-        return response()->json(['message' => 'Award updated successfully!']);
+        
+        $request->validate([
+            'icon' => 'required',
+            'year' => 'required|integer',
+            'title' => 'required|string',
+            'organization' => 'required|string',
+            'tag' => 'nullable|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $award->icon = $request->icon;
+        $award->year = $request->year;
+        $award->save();
+
+        $this->saveTranslations($award, $request);
+
+        return response()->json(['message' => 'Award updated & translated successfully!']);
     }
 
     public function destroy($id)
@@ -63,20 +100,50 @@ class AwardController extends Controller
         return response()->json(['message' => 'Award deleted successfully!']);
     }
 
-    private function validateAward($request) {
-        $rules = [
-            'icon' => 'required',
-            'year' => 'required|integer',
-        ];
+    private function saveTranslations($award, $request)
+    {
+        $enTitle = $request->title;
+        $enOrganization = $request->organization;
+        $enTag = $request->tag;
+        $enDescription = $request->description;
 
-        // Loop through locales to validate each language input
+        $otherLocales = array_diff(config('translatable.locales'), ['en']);
+
         foreach (config('translatable.locales') as $locale) {
-            $rules["$locale.title"] = 'required|string';
-            $rules["$locale.organization"] = 'required|string';
-            $rules["$locale.tag"] = 'nullable|string';
-            $rules["$locale.description"] = 'nullable|string';
-        }
+            $translation = $award->translateOrNew($locale);
 
-        return $request->validate($rules);
+            if ($locale === 'en') {
+                $translation->title = $enTitle;
+                $translation->organization = $enOrganization;
+                $translation->tag = $enTag;
+                $translation->description = $enDescription;
+            } else {
+                try {
+                    $tr = new GoogleTranslate($locale);
+                    $tr->setSource('en');
+
+                    $translation->title = $tr->translate($enTitle);
+                    usleep(200000);
+
+                    $translation->organization = $tr->translate($enOrganization);
+                    usleep(200000);
+
+                    $translation->tag = !empty($enTag) ? $tr->translate($enTag) : '';
+                    usleep(200000);
+
+                    // Slightly longer delay for HTML descriptions
+                    $translation->description = !empty($enDescription) ? $tr->translate($enDescription) : '';
+                    usleep(300000); 
+
+                } catch (\Exception $e) {
+                    // Fallback to English if translation fails
+                    $translation->title = $enTitle;
+                    $translation->organization = $enOrganization;
+                    $translation->tag = $enTag;
+                    $translation->description = $enDescription;
+                }
+            }
+            $translation->save();
+        }
     }
 }

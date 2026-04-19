@@ -8,7 +8,10 @@
 
 <div class="container-fluid" id="addThisFormContainer" style="display: none;">
     <div class="card">
-        <div class="card-header"><h4 id="cardTitle">Add New Award</h4></div>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 id="cardTitle" class="mb-0">Add New Award</h4>
+            <small class="text-muted">Auto-translates on save</small>
+        </div>
         <div class="card-body">
             <form id="createThisForm">
                 @csrf
@@ -37,44 +40,35 @@
                     </div>
                 </div>
 
-                <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
-                    @foreach(config('translatable.locales') as $index => $locale)
-                        <li class="nav-item">
-                            <a class="nav-link {{ $index == 0 ? 'active' : '' }}" data-bs-toggle="tab" href="#tab-{{ $locale }}" role="tab">
-                                {{ strtoupper($locale) }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
+                <div class="alert alert-info py-2 mb-3">
+                    <i class="ri-translate-2 me-1"></i> 
+                    <small>Fill in English — will be auto-translated to {{ implode(', ', array_diff(config('translatable.locales'), ['en'])) }}</small>
+                </div>
 
-                <div class="tab-content">
-                    @foreach(config('translatable.locales') as $index => $locale)
-                        <div class="tab-pane {{ $index == 0 ? 'active' : '' }}" id="tab-{{ $locale }}" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>Title ({{ strtoupper($locale) }})</label>
-                                    <input type="text" name="{{ $locale }}[title]" id="{{ $locale }}_title" class="form-control">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>Organization ({{ strtoupper($locale) }})</label>
-                                    <input type="text" name="{{ $locale }}[organization]" id="{{ $locale }}_organization" class="form-control">
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label>Tag ({{ strtoupper($locale) }})</label>
-                                    <input type="text" name="{{ $locale }}[tag]" id="{{ $locale }}_tag" class="form-control">
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label>Description ({{ strtoupper($locale) }})</label>
-                                    <textarea name="{{ $locale }}[description]" id="{{ $locale }}_description" class="form-control summernote"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Title (EN) <span class="text-danger">*</span></label>
+                        <input type="text" name="title" id="title" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Organization (EN) <span class="text-danger">*</span></label>
+                        <input type="text" name="organization" id="organization" class="form-control">
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label>Tag (EN)</label>
+                        <input type="text" name="tag" id="tag" class="form-control">
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label>Description (EN)</label>
+                        <textarea name="description" id="description" class="form-control summernote"></textarea>
+                    </div>
                 </div>
             </form>
         </div>
         <div class="card-footer text-end">
-            <button type="button" id="addBtn" class="btn btn-primary">Save Award</button>
+            <button type="button" id="addBtn" class="btn btn-primary">
+                <i class="ri-save-line me-1"></i> Save & Translate
+            </button>
             <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
         </div>
     </div>
@@ -100,78 +94,178 @@
 @endsection
 
 @section('script')
+<style>
+    /* Loader Overlay Styles */
+    #addThisFormContainer .card { position: relative; overflow: hidden; }
+    .form-loader-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(2px);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 50; border-radius: 0.375rem;
+    }
+    .spinner-ring {
+        width: 50px; height: 50px; border: 4px solid #e5e7eb;
+        border-top: 4px solid #3b82f6; border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loader-text { margin-top: 15px; font-size: 14px; color: #374151; font-weight: 500; }
+    .loader-lang-ticker { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
+    .progress-bar-container { width: 200px; height: 4px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #3b82f6; border-radius: 4px; width: 0%; transition: width 0.3s ease; }
+</style>
+
 <script>
+    var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
+    var isEditorInitialized = false;
+    var isSelect2Initialized = false;
+
     $(document).ready(function() {
+
         var table = $('#awardTable').DataTable({
             processing: true, serverSide: true,
             ajax: "{{ route('admin.awards') }}",
             columns: [
-                { 
-                    data: 'DT_RowIndex', 
-                    name: 'DT_RowIndex', 
-                    orderable: false,   // <--- Add this
-                    searchable: false  // <--- Add this
-                },
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'year', name: 'year' },
                 { data: 'title', name: 'title' },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
             ]
         });
 
-        $("#addBtn").click(function() {
+        // Submit Logic (CSRF Safe)
+        $("#addBtn").click(function(e) {
+            e.preventDefault();
+            var formData = new FormData($('#createThisForm')[0]); // Get data BEFORE disabling
+            showFormLoader();
+
             let id = $("#codeid").val();
             let url = id ? "{{ url('/admin/awards-update') }}" : "{{ url('/admin/awards') }}";
-            let form_data = new FormData($('#createThisForm')[0]);
-
+            
             $.ajax({
-                url: url, type: "POST", data: form_data,
+                url: url, type: "POST", data: formData,
                 contentType: false, processData: false,
                 success: function(d) {
+                    hideFormLoader();
                     showSuccess(d.message);
-                    $("#addThisFormContainer").slideUp();
-                    $("#newBtn").show();
+                    $("#FormCloseBtn").click();
                     table.draw();
                 },
                 error: function(xhr) {
-                    showError(xhr.responseJSON.message);
+                    hideFormLoader();
+                    if (xhr.status === 422) {
+                        let msgs = []; Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0]));
+                        showError(msgs.join("<br>"));
+                    } else { showError(xhr.responseJSON?.message || "Something went wrong."); }
                 }
             });
         });
 
+        // Edit Logic
         $('#contentContainer').on('click', '#EditBtn', function() {
             let id = $(this).attr('rid');
             $.get("/admin/awards/" + id + "/edit", function(data) {
                 $("#codeid").val(data.id);
-                $("#icon").val(data.icon).trigger('change');
                 $("#year").val(data.year);
+                $("#title").val(data.title);
+                $("#organization").val(data.organization);
+                $("#tag").val(data.tag);
 
-                // Loop through translations and populate tab fields
-                data.translations.forEach(function(t) {
-                    $(`#${t.locale}_title`).val(t.title);
-                    $(`#${t.locale}_organization`).val(t.organization);
-                    $(`#${t.locale}_tag`).val(t.tag);
-                    $(`#${t.locale}_description`).summernote('code', t.description);
+                $("#addThisFormContainer").slideDown(300, function() {
+                    // Initialize Select2 & Summernote AFTER form is visible
+                    if(!isSelect2Initialized) { initSelect2(); isSelect2Initialized = true; }
+                    if(!isEditorInitialized) { initSummernote(); isEditorInitialized = true; }
+                    
+                    // Set values that require plugins
+                    $("#icon").val(data.icon).trigger('change');
+                    $('#description').summernote('code', data.description);
                 });
-
-                $("#addThisFormContainer").slideDown();
+                
                 $("#newBtn").hide();
                 $("#cardTitle").text('Edit Award');
+                $("#addBtn").html('<i class="ri-save-line me-1"></i> Update & Translate');
             });
         });
         
-        // Form toggle logic same as your provided code...
+        // Toggle Buttons
         $("#newBtn").click(function() {
-            $('#createThisForm')[0].reset();
-            $(".summernote").summernote('code', '');
-            $("#icon").val('').trigger('change');
-            $("#codeid").val('');
-            $("#addThisFormContainer").slideDown();
+            clearForm();
+            $("#addThisFormContainer").slideDown(300, function() {
+                if(!isSelect2Initialized) { initSelect2(); isSelect2Initialized = true; }
+                if(!isEditorInitialized) { initSummernote(); isEditorInitialized = true; }
+            });
             $(this).hide();
         });
+
         $("#FormCloseBtn").click(function() {
-            $("#addThisFormContainer").slideUp();
-            $("#newBtn").show();
+            $("#addThisFormContainer").slideUp(300);
+            setTimeout(() => $("#newBtn").show(), 300);
         });
     });
+
+    // --- Plugin Initializers ---
+    function initSelect2() {
+        $('.select2').select2({ width: '100%' });
+    }
+
+    function initSummernote() {
+        $('.summernote').summernote({
+            height: 200,
+            placeholder: 'Write award description in English here...',
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link']],
+                ['view', ['fullscreen', 'codeview']]
+            ]
+        });
+    }
+
+    function clearForm() {
+        $('#createThisForm')[0].reset();
+        $("#codeid").val('');
+        if(isSelect2Initialized) { $("#icon").val('').trigger('change'); }
+        if(isEditorInitialized) { $('#description').summernote('code', ''); }
+        $("#cardTitle").text('Add New Award');
+        $("#addBtn").html('<i class="ri-save-line me-1"></i> Save & Translate');
+    }
+
+    // --- Loader Functions ---
+    function showFormLoader() {
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', true);
+        $('.summernote').summernote('disable');
+        $('.select2').prop('disabled', true).trigger('change'); // Disable select2 visually
+        
+        var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
+        var tickerMessages = ['Saving English...'];
+        otherLocales.forEach(function(loc) { tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...'); });
+        tickerMessages.push('Finishing up...');
+
+        var overlay = `<div class="form-loader-overlay" id="formLoader">
+            <div class="spinner-ring"></div>
+            <div class="loader-text">Saving & Translating...</div>
+            <div class="progress-bar-container"><div class="progress-bar-fill" id="loaderProgress"></div></div>
+            <div class="loader-lang-ticker" id="loaderTicker">Preparing...</div>
+        </div>`;
+        
+        $('#addThisFormContainer .card').append(overlay);
+
+        var step = 0;
+        var interval = setInterval(function() {
+            if (step < tickerMessages.length) {
+                var progress = Math.round(((step + 1) / tickerMessages.length) * 100);
+                $('#loaderProgress').css('width', progress + '%');
+                $('#loaderTicker').text(tickerMessages[step]);
+                step++;
+            } else { clearInterval(interval); $('#loaderTicker').text('Almost done...'); }
+        }, 1000);
+    }
+
+    function hideFormLoader() {
+        $('#formLoader').fadeOut(200, function() { $(this).remove(); });
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', false);
+        $('.summernote').summernote('enable');
+        $('.select2').prop('disabled', false).trigger('change'); // Enable select2 visually
+    }
 </script>
 @endsection
