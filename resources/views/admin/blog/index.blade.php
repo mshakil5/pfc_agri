@@ -8,7 +8,10 @@
 
 <div class="container-fluid" id="addThisFormContainer" style="display: none;">
     <div class="card">
-        <div class="card-header"><h4 id="cardTitle">Add New Blog</h4></div>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 id="cardTitle" class="mb-0">Add New Blog</h4>
+            <small class="text-muted">Auto-translates on save</small>
+        </div>
         <div class="card-body">
             <form id="createThisForm">
                 @csrf
@@ -32,38 +35,29 @@
                     </div>
                 </div>
 
-                <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
-                    @foreach(config('translatable.locales') as $index => $locale)
-                        <li class="nav-item">
-                            <a class="nav-link {{ $index == 0 ? 'active' : '' }}" data-bs-toggle="tab" href="#blog-{{ $locale }}">
-                                {{ strtoupper($locale) }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
+                <div class="alert alert-info py-2 mb-3">
+                    <i class="ri-translate-2 me-1"></i> 
+                    <small>Fill in English — will be auto-translated to {{ implode(', ', array_diff(config('translatable.locales'), ['en'])) }}</small>
+                </div>
 
-                <div class="tab-content">
-                    @foreach(config('translatable.locales') as $index => $locale)
-                        <div class="tab-pane {{ $index == 0 ? 'active' : '' }}" id="blog-{{ $locale }}">
-                            <div class="mb-3">
-                                <label>Title ({{ strtoupper($locale) }})</label>
-                                <input type="text" name="{{ $locale }}[title]" id="{{ $locale }}_title" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label>Excerpt ({{ strtoupper($locale) }})</label>
-                                <textarea name="{{ $locale }}[excerpt]" id="{{ $locale }}_excerpt" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label>Full Content ({{ strtoupper($locale) }})</label>
-                                <textarea name="{{ $locale }}[description]" id="{{ $locale }}_description" class="form-control summernote"></textarea>
-                            </div>
-                        </div>
-                    @endforeach
+                <div class="mb-3">
+                    <label>Title (EN) <span class="text-danger">*</span></label>
+                    <input type="text" name="title" id="title" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Excerpt (EN) <span class="text-danger">*</span></label>
+                    <textarea name="excerpt" id="excerpt" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label>Full Content (EN) <span class="text-danger">*</span></label>
+                    <textarea name="description" id="description" class="form-control summernote"></textarea>
                 </div>
             </form>
         </div>
         <div class="card-footer text-end">
-            <button type="button" id="addBtn" class="btn btn-primary">Save Post</button>
+            <button type="button" id="addBtn" class="btn btn-primary">
+                <i class="ri-save-line me-1"></i> Save & Translate
+            </button>
             <button type="button" id="FormCloseBtn" class="btn btn-light">Cancel</button>
         </div>
     </div>
@@ -91,8 +85,33 @@
 @endsection
 
 @section('script')
+<style>
+    /* Loader Overlay Styles */
+    #addThisFormContainer .card { position: relative; overflow: hidden; }
+    .form-loader-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(2px);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 50; border-radius: 0.375rem;
+    }
+    .spinner-ring {
+        width: 50px; height: 50px; border: 4px solid #e5e7eb;
+        border-top: 4px solid #3b82f6; border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loader-text { margin-top: 15px; font-size: 14px; color: #374151; font-weight: 500; }
+    .loader-lang-ticker { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
+    .progress-bar-container { width: 200px; height: 4px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #3b82f6; border-radius: 4px; width: 0%; transition: width 0.3s ease; }
+</style>
+
 <script>
+    var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
+    var isEditorInitialized = false;
+
     $(document).ready(function() {
+
         var table = $('#blogTable').DataTable({
             processing: true, serverSide: true,
             ajax: "{{ route('admin.blogs') }}",
@@ -106,18 +125,30 @@
             ]
         });
 
-        // Submit Logic
-        $("#addBtn").click(function() {
+        // Submit Logic (CSRF Safe)
+        $("#addBtn").click(function(e) {
+            e.preventDefault();
+            var formData = new FormData($('#createThisForm')[0]); // Get data BEFORE disabling
+            showFormLoader();
+
             let id = $("#codeid").val();
             let url = id ? "{{ url('/admin/blogs-update') }}" : "{{ url('/admin/blogs') }}";
+            
             $.ajax({
-                url: url, type: "POST", data: new FormData($('#createThisForm')[0]),
+                url: url, type: "POST", data: formData,
                 contentType: false, processData: false,
                 success: function(d) {
+                    hideFormLoader();
                     showSuccess(d.message);
-                    $("#addThisFormContainer").slideUp();
-                    $("#newBtn").show();
+                    $("#FormCloseBtn").click();
                     table.draw();
+                },
+                error: function(xhr) {
+                    hideFormLoader();
+                    if (xhr.status === 422) {
+                        let msgs = []; Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0]));
+                        showError(msgs.join("<br>"));
+                    } else { showError("Something went wrong."); }
                 }
             });
         });
@@ -129,41 +160,100 @@
                 $("#codeid").val(data.id);
                 $("#author_name").val(data.author_name);
                 $("#published_at").val(data.published_at);
-                $("#image").val(data.image);
-
-                data.translations.forEach(function(t) {
-                    $(`#${t.locale}_title`).val(t.title);
-                    $(`#${t.locale}_excerpt`).val(t.excerpt);
-                    $(`#${t.locale}_description`).summernote('code', t.description);
-                });
-
+                $("#title").val(data.title);
+                $("#excerpt").val(data.excerpt);
+                
                 if (data.image) {
                     $("#imagePreview").attr('src', '/' + data.image);
                     $("#imagePreviewContainer").show();
                 } else {
                     $("#imagePreviewContainer").hide();
                 }
-        
 
-                $("#addThisFormContainer").slideDown();
+                $("#addThisFormContainer").slideDown(300, function() {
+                    // Init editor AFTER form is visible, then set content
+                    if(!isEditorInitialized) { initSummernote(); isEditorInitialized = true; }
+                    $('#description').summernote('code', data.description);
+                });
+                
                 $("#newBtn").hide();
                 $("#cardTitle").text('Edit Blog Post');
+                $("#addBtn").html('<i class="ri-save-line me-1"></i> Update & Translate');
             });
         });
 
         // Toggle Buttons
         $("#newBtn").click(function() {
-            $('#createThisForm')[0].reset();
-            $("#imagePreviewContainer").hide();
-            $(".summernote").summernote('code', '');
-            $("#codeid").val('');
-            $("#addThisFormContainer").slideDown();
+            clearForm();
+            $("#addThisFormContainer").slideDown(300, function() {
+                if(!isEditorInitialized) { initSummernote(); isEditorInitialized = true; }
+            });
             $(this).hide();
         });
+
         $("#FormCloseBtn").click(function() {
-            $("#addThisFormContainer").slideUp();
-            $("#newBtn").show();
+            $("#addThisFormContainer").slideUp(300);
+            setTimeout(() => $("#newBtn").show(), 300);
         });
     });
+
+    function initSummernote() {
+        $('.summernote').summernote({
+            height: 250,
+            placeholder: 'Write full blog content in English here...',
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link']],
+                ['view', ['fullscreen', 'codeview']]
+            ]
+        });
+    }
+
+    function clearForm() {
+        $('#createThisForm')[0].reset();
+        $("#codeid").val('');
+        $("#imagePreviewContainer").hide();
+        if(isEditorInitialized) { $('#description').summernote('code', ''); }
+        $("#cardTitle").text('Add New Blog');
+        $("#addBtn").html('<i class="ri-save-line me-1"></i> Save & Translate');
+    }
+
+    // --- Loader Functions ---
+    function showFormLoader() {
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button, #addBtn, #FormCloseBtn').prop('disabled', true);
+        $('.summernote').summernote('disable');
+        
+        var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
+        var tickerMessages = ['Saving English...'];
+        otherLocales.forEach(function(loc) { tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...'); });
+        tickerMessages.push('Finishing up...');
+
+        var overlay = `<div class="form-loader-overlay" id="formLoader">
+            <div class="spinner-ring"></div>
+            <div class="loader-text">Saving & Translating...</div>
+            <div class="progress-bar-container"><div class="progress-bar-fill" id="loaderProgress"></div></div>
+            <div class="loader-lang-ticker" id="loaderTicker">Preparing...</div>
+        </div>`;
+        
+        $('#addThisFormContainer .card').append(overlay);
+
+        var step = 0;
+        var interval = setInterval(function() {
+            if (step < tickerMessages.length) {
+                var progress = Math.round(((step + 1) / tickerMessages.length) * 100);
+                $('#loaderProgress').css('width', progress + '%');
+                $('#loaderTicker').text(tickerMessages[step]);
+                step++;
+            } else { clearInterval(interval); $('#loaderTicker').text('Almost done...'); }
+        }, 1000); // 1000ms because HTML translation takes slightly longer
+    }
+
+    function hideFormLoader() {
+        $('#formLoader').fadeOut(200, function() { $(this).remove(); });
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button, #addBtn, #FormCloseBtn').prop('disabled', false);
+        $('.summernote').summernote('enable');
+    }
 </script>
 @endsection

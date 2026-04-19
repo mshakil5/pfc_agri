@@ -208,7 +208,7 @@
 
 
                 <li class="nav-item">
-                    <a href="{{ route('blog.index') }}" class="nav-link {{ Route::is('blog.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.blogs') }}" class="nav-link {{ Route::is('admin.blogs') ? 'active' : '' }}">
                         <i class="ri-mail-open-line"></i>
                         <span>Blog</span>
                     </a>
