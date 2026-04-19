@@ -140,7 +140,7 @@
                                 <div class="p-4 d-flex flex-column flex-grow-1">
                                     <div class="mb-2">
                                         <span class="badge bg-success bg-opacity-10 text-success uppercase" style="font-size: 10px;">
-                                            {{ $product->category ? ($product->category->translateOrNew(app()->getLocale())->name ?? $product->category->name) : __('shop.agriculture') }}
+                                            {{ $product->category ? ($product->category->translateOrNew(app()->getLocale())->name ?? $product->category->name) : __('Categories') }}
                                         </span>
                                     </div>
                                     <h6 class="fw-bold mb-2">{{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}</h6>
@@ -148,11 +148,11 @@
                                         {{ Str::limit(strip_tags($product->translateOrNew(app()->getLocale())->long_description ?? $product->long_description), 70) }}
                                     </p>
                                     <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold text-success">
+                                        <span class="fw-bold text-success d-none">
                                             {{ $product->price > 0 ? '£' . number_format($product->price, 2) : __('shop.price_on_request') }}
                                         </span>
                                         <a href="{{ route('product.detail', $product->slug) }}" class="btn btn-outline-success btn-sm rounded-pill px-3">
-                                            {{ __('shop.view_details') }}
+                                            {{ __('header.inquire_now') }}
                                         </a>
                                     </div>
                                 </div>
