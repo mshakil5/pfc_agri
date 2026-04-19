@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use DataTables;
 use Intervention\Image\Facades\Image;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class ResearchController extends Controller
 {
@@ -20,8 +21,7 @@ class ResearchController extends Controller
 
     public function researchUpdate(Request $request)
     {
-        $data = Master::find($request->codeid);
-
+        $data = Master::where('pages', 'rnd')->first(); // Safer than find($request->codeid) for single pages
         if (!$data) {
             return response()->json(['message' => 'Record not found!'], 404);
         }
@@ -44,30 +44,57 @@ class ResearchController extends Controller
             $data->meta_image = $name;
         }
 
-        $data->extra1 = json_encode(
-            $request->has('features') ? array_values($request->features) : []
-        );
+        // Save English Counters in extra1
+        $enCounters = array_values(array_filter(
+            $request->input('counters', []),
+            fn($c) => !empty($c['subtitle'])
+        ));
+        $data->extra1 = json_encode($enCounters);
 
-        // Save translations
+        // Translate and build JSON for other languages
         $translations = $data->translations ?? [];
-        foreach (config('translatable.locales') as $locale) {
-            if ($locale === 'en') continue;
-            $translations[$locale] = [
-                'name'        => $request->input("trans.$locale.name"),
-                'short_title' => $request->input("trans.$locale.short_title"),
-                'long_title'  => $request->input("trans.$locale.long_title"),
-                'counters'    => array_values(array_filter(
-                    $request->input("trans.$locale.counters", []),
-                    fn($c) => !empty($c['subtitle'])
-                )),
-            ];
+        $otherLocales = array_diff(config('translatable.locales'), ['en']);
+
+        foreach ($otherLocales as $locale) {
+            try {
+                $tr = new GoogleTranslate($locale);
+                $tr->setSource('en');
+
+                $translations[$locale]['name']        = $tr->translate($request->name);
+                usleep(200000);
+
+                $translations[$locale]['short_title'] = $tr->translate($request->short_title);
+                usleep(200000);
+
+                $translations[$locale]['long_title']  = $tr->translate($request->long_title);
+                usleep(200000);
+
+                // Translate counters (Keep numbers as-is)
+                $translatedCounters = [];
+                foreach ($enCounters as $counter) {
+                    $translatedCounters[] = [
+                        'count'   => $counter['count'],
+                        'subtitle' => $tr->translate($counter['subtitle'])
+                    ];
+                    usleep(200000);
+                }
+                $translations[$locale]['counters'] = $translatedCounters;
+
+            } catch (\Exception $e) {
+                // Fallback to English
+                $translations[$locale] = [
+                    'name'        => $request->name,
+                    'short_title' => $request->short_title,
+                    'long_title'  => $request->long_title,
+                    'counters'    => $enCounters,
+                ];
+            }
         }
         $data->translations = $translations;
 
         if ($data->save()) {
-            return response()->json(['status' => 200, 'message' => 'Data updated successfully!']);
+            return response()->json(['status' => 200, 'message' => 'Data updated & translated successfully!']);
         }
-
         return response()->json(['message' => 'Failed to update data'], 500);
     }
 
@@ -121,7 +148,6 @@ class ResearchController extends Controller
                 ->rawColumns(['status', 'action', 'feature_image'])
                 ->make(true);
         }
-
         return view('admin.research.initiatives');
     }
 
@@ -138,8 +164,7 @@ class ResearchController extends Controller
 
         $data = new Research();
         $this->saveData($data, $request);
-
-        return response()->json(['message' => 'Initiative created successfully!'], 200);
+        return response()->json(['message' => 'Initiative created & translated successfully!'], 200);
     }
 
     public function edit($id)
@@ -162,8 +187,7 @@ class ResearchController extends Controller
 
         $data = Research::findOrFail($request->codeid);
         $this->saveData($data, $request);
-
-        return response()->json(['message' => 'Initiative updated successfully!'], 200);
+        return response()->json(['message' => 'Initiative updated & translated successfully!'], 200);
     }
 
     private function saveData($model, $request)
@@ -185,18 +209,34 @@ class ResearchController extends Controller
             $model->meta_image = $this->uploadImage($request->file('meta_image'), 'images/meta/', $model->meta_image ?? null);
         }
 
-        // Save translations
+        // Auto-translate to JSON column
         $translations = $model->translations ?? [];
-        foreach (config('translatable.locales') as $locale) {
-            if ($locale === 'en') continue;
-            $translations[$locale] = [
-                'title'             => $request->input("trans.$locale.title"),
-                'short_description' => $request->input("trans.$locale.short_description"),
-                'long_description'  => $request->input("trans.$locale.long_description"),
-            ];
-        }
-        $model->translations = $translations;
+        $otherLocales = array_diff(config('translatable.locales'), ['en']);
 
+        foreach ($otherLocales as $locale) {
+            try {
+                $tr = new GoogleTranslate($locale);
+                $tr->setSource('en');
+
+                $translations[$locale]['title'] = $tr->translate($request->title);
+                usleep(200000);
+
+                $translations[$locale]['short_description'] = !empty($request->short_description) ? $tr->translate($request->short_description) : '';
+                usleep(200000);
+
+                $translations[$locale]['long_description'] = !empty($request->long_description) ? $tr->translate($request->long_description) : '';
+                usleep(300000); 
+
+            } catch (\Exception $e) {
+                $translations[$locale] = [
+                    'title'             => $request->title,
+                    'short_description' => $request->short_description,
+                    'long_description'  => $request->long_description,
+                ];
+            }
+        }
+        
+        $model->translations = $translations;
         $model->save();
     }
 

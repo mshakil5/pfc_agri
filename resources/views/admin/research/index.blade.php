@@ -8,6 +8,7 @@
             <div class="card">
                 <div class="card-header align-items-center d-flex">
                     <h4 class="card-title mb-0 flex-grow-1">Edit R&D Page</h4>
+                    <small class="text-muted">Auto-translates on save</small>
                 </div>
                 <div class="card-body">
                     <form id="createThisForm" enctype="multipart/form-data">
@@ -15,87 +16,48 @@
                         <input type="hidden" id="codeid" name="codeid" value="{{ $data->id }}">
 
                         <div class="row g-3">
-
-                            {{-- Language Tabs --}}
                             <div class="col-md-12">
-                                <ul class="nav nav-tabs nav-tabs-custom nav-success mb-3" role="tablist">
-                                    @foreach(config('translatable.locales') as $index => $locale)
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
-                                               data-bs-toggle="tab" href="#rnd-tab-{{ $locale }}" role="tab">
-                                                {{ strtoupper($locale) }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                                <div class="alert alert-info py-2 mb-3">
+                                    <i class="ri-translate-2 me-1"></i> 
+                                    <small>Fill in English — will be auto-translated to {{ implode(', ', array_diff(config('translatable.locales'), ['en'])) }}</small>
+                                </div>
+                            </div>
 
-                                <div class="tab-content">
-                                    @foreach(config('translatable.locales') as $index => $locale)
-                                        @php
-                                            $isDefault = $locale === 'en';
-                                            $trans = !$isDefault ? ($data->translations[$locale] ?? []) : [];
-                                            $amenities = $isDefault
-                                                ? (json_decode($data->extra1, true) ?? [])
-                                                : ($trans['counters'] ?? []);
-                                        @endphp
-                                        <div class="tab-pane {{ $index == 0 ? 'active' : '' }}"
-                                             id="rnd-tab-{{ $locale }}" role="tabpanel">
-                                            <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Small Title (EN)</label>
+                                <input type="text" class="form-control" name="name" value="{{ $data->name }}">
+                            </div>
 
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Small Title ({{ strtoupper($locale) }})</label>
-                                                    <input type="text" class="form-control"
-                                                           name="{{ $isDefault ? 'name' : "trans[$locale][name]" }}"
-                                                           value="{{ $isDefault ? $data->name : ($trans['name'] ?? '') }}">
-                                                </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Header Title (EN)</label>
+                                <input type="text" class="form-control" name="short_title" value="{{ $data->short_title }}">
+                            </div>
 
-                                                <div class="col-md-8">
-                                                    <label class="form-label">Header Title ({{ strtoupper($locale) }})</label>
-                                                    <input type="text" class="form-control"
-                                                           name="{{ $isDefault ? 'short_title' : "trans[$locale][short_title]" }}"
-                                                           value="{{ $isDefault ? $data->short_title : ($trans['short_title'] ?? '') }}">
-                                                </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Header Subtitle (EN)</label>
+                                <input type="text" class="form-control" name="long_title" value="{{ $data->long_title }}">
+                            </div>
 
-                                                <div class="col-md-12">
-                                                    <label class="form-label">Header Subtitle ({{ strtoupper($locale) }})</label>
-                                                    <input type="text" class="form-control"
-                                                           name="{{ $isDefault ? 'long_title' : "trans[$locale][long_title]" }}"
-                                                           value="{{ $isDefault ? $data->long_title : ($trans['long_title'] ?? '') }}">
-                                                </div>
-
-                                                {{-- Counters --}}
-                                                <div class="col-md-12">
-                                                    <label class="form-label"><b>Counters ({{ strtoupper($locale) }})</b></label>
-                                                    <div id="features-container-{{ $locale }}">
-                                                        @php $amenities = $amenities ?: [[]]; @endphp
-                                                        @foreach($amenities as $i => $item)
-                                                            <div class="row g-2 mb-2 button-row">
-                                                                <div class="col-md-5">
-                                                                    <input type="text"
-                                                                           name="{{ $isDefault ? "features[$i][count]" : "trans[$locale][counters][$i][count]" }}"
-                                                                           class="form-control" value="{{ $item['count'] ?? '' }}" placeholder="Number">
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <input type="text"
-                                                                           name="{{ $isDefault ? "features[$i][subtitle]" : "trans[$locale][counters][$i][subtitle]" }}"
-                                                                           class="form-control" value="{{ $item['subtitle'] ?? '' }}" placeholder="Sub Title">
-                                                                </div>
-                                                                <div class="col-md-1">
-                                                                    <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                    <button type="button" class="btn btn-dark btn-sm mt-2 add-counter-btn"
-                                                            data-locale="{{ $locale }}" data-default="{{ $isDefault ? '1' : '0' }}">
-                                                        + Add Counter
-                                                    </button>
-                                                </div>
-
+                            {{-- Counters --}}
+                            <div class="col-md-12">
+                                <label class="form-label"><b>Counters (EN)</b></label>
+                                <div id="counters-container">
+                                    @php $amenities = json_decode($data->extra1, true) ?: [[]]; @endphp
+                                    @foreach($amenities as $i => $item)
+                                        <div class="row g-2 mb-2 button-row">
+                                            <div class="col-md-5">
+                                                <input type="text" name="counters[{{ $i }}][count]" class="form-control" value="{{ $item['count'] ?? '' }}" placeholder="Number (e.g. 500+)">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" name="counters[{{ $i }}][subtitle]" class="form-control" value="{{ $item['subtitle'] ?? '' }}" placeholder="Sub Title">
+                                            </div>
+                                            <div class="col-md-1">
+                                                <button type="button" class="btn btn-danger w-100 remove-btn">X</button>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
+                                <button type="button" class="btn btn-dark btn-sm mt-2" id="addCounterBtn">+ Add Counter</button>
                             </div>
 
                             <hr>
@@ -114,16 +76,20 @@
                             </div>
                             <div class="col-12">
                                 <label>Meta Image</label>
-                                <input type="file" class="form-control" name="meta_image"
-                                    onchange="previewImage(event, '#meta_image_preview')">
-                                <img id="meta_image_preview" src="#" class="img-thumbnail mt-3">
+                                <input type="file" class="form-control" name="meta_image" onchange="previewImage(event, '#meta_image_preview')">
+                                @if($data->meta_image)
+                                    <img id="meta_image_preview" src="{{ asset('images/meta/' . $data->meta_image) }}" class="img-thumbnail mt-3" style="max-width:200px;">
+                                @else
+                                    <img id="meta_image_preview" src="#" class="img-thumbnail mt-3 d-none">
+                                @endif
                             </div>
-
                         </div>
                     </form>
                 </div>
                 <div class="card-footer text-end">
-                    <button type="button" id="addBtn" class="btn btn-primary">Update</button>
+                    <button type="button" id="addBtn" class="btn btn-primary">
+                        <i class="ri-save-line me-1"></i> Update & Translate
+                    </button>
                 </div>
             </div>
         </div>
@@ -133,67 +99,82 @@
 @endsection
 
 @section('script')
+<style>
+    .card { position: relative; overflow: hidden; }
+    .form-loader-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(2px);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 50; border-radius: 0.375rem;
+    }
+    .spinner-ring { width: 50px; height: 50px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loader-text { margin-top: 15px; font-size: 14px; color: #374151; font-weight: 500; }
+    .loader-lang-ticker { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
+    .progress-bar-container { width: 200px; height: 4px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #3b82f6; border-radius: 4px; width: 0%; transition: width 0.3s ease; }
+</style>
+
 <script>
-    var counterIndex = {};
-    @foreach(config('translatable.locales') as $locale)
-        @php
-            $isDefault = $locale === 'en';
-            $cnt = $isDefault
-                ? count(json_decode($data->extra1 ?? '[]', true) ?? [])
-                : count(($data->translations[$locale]['counters'] ?? []));
-        @endphp
-        counterIndex['{{ $locale }}'] = {{ max($cnt, 1) }};
-    @endforeach
+    var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
+    var counterIndex = {{ max(count(json_decode($data->extra1 ?? '[]', true) ?? []), 1) }};
 
     $(document).ready(function () {
-
         $("#addBtn").click(function (e) {
             e.preventDefault();
+            var formData = new FormData(document.getElementById('createThisForm'));
+            showFormLoader();
+
             $.ajax({
                 url: "{{ URL::to('/admin/research') }}",
                 type: "POST",
-                data: new FormData(document.getElementById('createThisForm')),
+                data: formData,
                 contentType: false,
                 processData: false,
-                success: function (d) { showSuccess(d.message); },
-                error: function (xhr) { showError(xhr.responseJSON?.message ?? 'Something went wrong.'); }
+                success: function (d) { hideFormLoader(); showSuccess(d.message); },
+                error: function (xhr) { hideFormLoader(); showError(xhr.responseJSON?.message ?? 'Something went wrong.'); }
             });
         });
 
-        $(document).on('click', '.add-counter-btn', function () {
-            var locale    = $(this).data('locale');
-            var isDefault = $(this).data('default') == '1';
-            var idx       = counterIndex[locale]++;
-            var html      = '';
-
-            if (isDefault) {
-                html = `<div class="row g-2 mb-2 button-row">
-                    <div class="col-md-5"><input type="text" name="features[${idx}][count]" class="form-control" placeholder="Number"></div>
-                    <div class="col-md-6"><input type="text" name="features[${idx}][subtitle]" class="form-control" placeholder="Sub Title"></div>
-                    <div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-btn">X</button></div>
-                </div>`;
-            } else {
-                html = `<div class="row g-2 mb-2 button-row">
-                    <div class="col-md-5"><input type="text" name="trans[${locale}][counters][${idx}][count]" class="form-control" placeholder="Number"></div>
-                    <div class="col-md-6"><input type="text" name="trans[${locale}][counters][${idx}][subtitle]" class="form-control" placeholder="Sub Title"></div>
-                    <div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-btn">X</button></div>
-                </div>`;
-            }
-
-            $('#features-container-' + locale).append(html);
+        $("#addCounterBtn").click(function () {
+            var idx = counterIndex++;
+            var html = `<div class="row g-2 mb-2 button-row">
+                <div class="col-md-5"><input type="text" name="counters[${idx}][count]" class="form-control" placeholder="Number (e.g. 500+)"></div>
+                <div class="col-md-6"><input type="text" name="counters[${idx}][subtitle]" class="form-control" placeholder="Sub Title"></div>
+                <div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-btn">X</button></div>
+            </div>`;
+            $('#counters-container').append(html);
         });
 
-        $(document).on('click', '.remove-btn', function () {
-            $(this).closest('.button-row').remove();
-        });
+        $(document).on('click', '.remove-btn', function () { $(this).closest('.button-row').remove(); });
     });
+
+    function showFormLoader() {
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button').prop('disabled', true);
+        var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
+        var tickerMessages = ['Saving English...'];
+        otherLocales.forEach(function(loc) { tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...'); });
+        tickerMessages.push('Finishing up...');
+        var overlay = `<div class="form-loader-overlay" id="formLoader"><div class="spinner-ring"></div><div class="loader-text">Updating & Translating...</div><div class="progress-bar-container"><div class="progress-bar-fill" id="loaderProgress"></div></div><div class="loader-lang-ticker" id="loaderTicker">Preparing...</div></div>`;
+        $('.card').append(overlay);
+        var step = 0;
+        var interval = setInterval(function() {
+            if (step < tickerMessages.length) {
+                $('#loaderProgress').css('width', Math.round(((step + 1) / tickerMessages.length) * 100) + '%');
+                $('#loaderTicker').text(tickerMessages[step]); step++;
+            } else { clearInterval(interval); $('#loaderTicker').text('Almost done...'); }
+        }, 1000);
+    }
+
+    function hideFormLoader() {
+        $('#formLoader').fadeOut(200, function() { $(this).remove(); });
+        $('#createThisForm input, #createThisForm textarea, #createThisForm button').prop('disabled', false);
+    }
 
     function previewImage(event, imgSelector) {
         if (event.target.files && event.target.files[0]) {
             var reader = new FileReader();
-            reader.onload = function (e) {
-                $(imgSelector).attr('src', e.target.result).removeClass('d-none');
-            };
+            reader.onload = function (e) { $(imgSelector).attr('src', e.target.result).removeClass('d-none'); };
             reader.readAsDataURL(event.target.files[0]);
         }
     }
