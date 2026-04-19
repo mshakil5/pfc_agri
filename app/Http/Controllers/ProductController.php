@@ -37,8 +37,11 @@ class ProductController extends Controller
             ->where('status', 1)
             ->firstOrFail();
 
+        // Fallback for features if empty
+        $locale = app()->getLocale();
+        $features = $product->translateOrNew($locale)->features ?? [];
 
-        return view('frontend.product-detail', compact('product'));
+        return view('frontend.product-detail', compact('product', 'features'));
     }
 
 

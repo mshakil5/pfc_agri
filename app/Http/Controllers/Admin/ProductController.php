@@ -120,7 +120,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
-        $enTranslation = $product->translate('en');
+        $enTranslation = $product->translateOrNew('en'); // <--- FIXED
         
         return response()->json([
             'id'                => $product->id,
@@ -132,7 +132,7 @@ class ProductController extends Controller
             'tag_id'            => $product->tag_id,
             'price'             => $product->price,
             'image'             => $product->image,
-            'images'            => $product->images ?? [], // Array of gallery images
+            'images'            => $product->images ?? [],
         ]);
     }
 
