@@ -96,10 +96,10 @@ class CategoryController extends Controller
         return response()->json(['message' => 'Category created & translated successfully!'], 200);
     }
 
-    public function edit($id)
+        public function edit($id)
     {
         $category = Category::findOrFail($id);
-        $enTranslation = $category->translate('en');
+        $enTranslation = $category->translateOrNew('en');
         
         return response()->json([
             'id'          => $category->id,
