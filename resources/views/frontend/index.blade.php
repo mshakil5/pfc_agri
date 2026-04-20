@@ -371,37 +371,39 @@
 
                 <div class="col-lg-5">
                     <div class="address-list-container" id="dealerList">
-                        <div class="dealer-card active" data-lat="54.6078" data-lng="-5.9264" data-id="1">
-                            <h6 class="dealer-name">Northern Ireland Farm Tech</h6>
-                            <div class="dealer-info"><i class="fas fa-map-marker-alt me-2"></i> Northern Ireland</div>
-                            <div class="dealer-info"><i class="fas fa-phone me-2"></i> +44 28 555 0890</div>
-                            <div class="dealer-info"><i class="fas fa-external-link-alt me-2"></i> Visit Website</div>
-                            <div class="dealer-tags mt-2">
-                                <span class="tag-pill">Field Preparation</span>
-                                <span class="tag-pill">Slurry Management</span>
-                            </div>
-                        </div>
+                        @foreach($dealers as $index => $dealer)
+                            <div class="dealer-card {{ $index == 0 ? 'active' : '' }}" 
+                                data-lat="{{ $dealer->lat }}" 
+                                data-lng="{{ $dealer->lng }}" 
+                                data-id="{{ $dealer->id }}">
+                                
+                                <h6 class="dealer-name">{{ $dealer->name }}</h6>
+                                
+                                <div class="dealer-info">
+                                    <i class="fas fa-map-marker-alt me-2"></i> {{ $dealer->region }}
+                                </div>
 
-                        <div class="dealer-card" data-lat="57.4778" data-lng="-4.2247" data-id="2">
-                            <h6 class="dealer-name">Scottish Highlands Equipment</h6>
-                            <div class="dealer-info"><i class="fas fa-map-marker-alt me-2"></i> Scotland</div>
-                            <div class="dealer-info"><i class="fas fa-phone me-2"></i> +44 131 555 0234</div>
-                            <div class="dealer-info"><i class="fas fa-external-link-alt me-2"></i> Visit Website</div>
-                            <div class="dealer-tags mt-2">
-                                <span class="tag-pill">Field Preparation</span>
-                                <span class="tag-pill">Woodland Management</span>
-                            </div>
-                        </div>
+                                @if($dealer->phone)
+                                <div class="dealer-info">
+                                    <i class="fas fa-phone me-2"></i> {{ $dealer->phone }}
+                                </div>
+                                @endif
 
-                        <div class="dealer-card" data-lat="50.8225" data-lng="-0.1372" data-id="3">
-                            <h6 class="dealer-name">South Coast Farming Solutions</h6>
-                            <div class="dealer-info"><i class="fas fa-map-marker-alt me-2"></i> South East</div>
-                            <div class="dealer-info"><i class="fas fa-phone me-2"></i> +44 1273 555 0789</div>
-                            <div class="dealer-tags mt-2">
-                                <span class="tag-pill">Slurry Management</span>
-                                <span class="tag-pill">Wet Bale Management</span>
+                                @if($dealer->website_url)
+                                <div class="dealer-info">
+                                    <a href="{{ $dealer->website_url }}" target="_blank" class="text-decoration-none text-muted">
+                                        <i class="fas fa-external-link-alt me-2"></i> Visit Website
+                                    </a>
+                                </div>
+                                @endif
+
+                                <div class="dealer-tags mt-2">
+                                    @foreach($dealer->categories as $category)
+                                        <span class="tag-pill">{{ $category->name }}</span>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -476,7 +478,7 @@
 
     <script>
         // Initialize Map
-        const map = L.map('map').setView([54.5, -3.5], 6); // Centered on UK
+        const map = L.map('map').setView([54.5, -3.5], 6); 
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
@@ -484,8 +486,6 @@
 
         const markers = {};
         const cards = document.querySelectorAll('.dealer-card');
-
-        // Custom Icon
         const greenIcon = L.divIcon({
             className: 'custom-div-icon',
             html: "<div style='background-color:#00a651; width:12px; height:12px; border-radius:50%; border:2px solid white; box-shadow:0 0 5px rgba(0,0,0,0.3);'></div>",
@@ -493,25 +493,33 @@
             iconAnchor: [6, 6]
         });
 
-        // Add Markers and Handle Clicks
         cards.forEach(card => {
             const lat = card.dataset.lat;
             const lng = card.dataset.lng;
             const id = card.dataset.id;
+            const name = card.querySelector('.dealer-name').innerText;
 
-            const marker = L.marker([lat, lng], { icon: greenIcon }).addTo(map);
+            // Create Marker
+            const marker = L.marker([lat, lng], { icon: greenIcon })
+                .addTo(map)
+                .bindPopup(`<b>${name}</b>`); // Add a popup with the name
+            
             markers[id] = marker;
 
             card.addEventListener('click', () => {
-                // Remove active class from all
                 cards.forEach(c => c.classList.remove('active'));
-                // Add to clicked
                 card.classList.add('active');
-                // Pan Map
-                map.flyTo([lat, lng], 8);
+                
+                map.flyTo([lat, lng], 10, { duration: 1.5 });
                 marker.openPopup();
             });
         });
+
+        // Optional: Auto-zoom map to fit all markers
+        if (cards.length > 0) {
+            const group = new L.featureGroup(Object.values(markers));
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
     </script>
 
 

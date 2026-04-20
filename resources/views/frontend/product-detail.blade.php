@@ -320,7 +320,7 @@
 
                             <div class="mt-4 pt-4 border-top border-secondary text-center">
                                 <p class="small mb-0 opacity-50">{{ __('Need immediate help?') }}</p>
-                                <p class="fw-bold">{{ __('+44 (0) 1234 567890') }}</p>
+                                <p class="fw-bold">{{ $company->phone1 }}</p>
                             </div>
                         </div>
 

@@ -10,6 +10,7 @@ use App\Models\Award;
 use App\Models\Blog;
 use App\Models\Category;
 use App\Models\CompanyDetails;
+use App\Models\Dealer;
 use App\Models\Master;
 use App\Models\Research;
 use App\Models\Slider;
@@ -38,8 +39,9 @@ class FrontendController extends Controller
                 ->take(3)
                 ->get();
 
+        $dealers = Dealer::where('status', 1)->orderBy('id', 'desc')->get();
 
-        return view('frontend.index', compact('sliders','categories','about','company','awards','blogs'));
+        return view('frontend.index', compact('sliders','categories','about','company','awards','blogs','dealers'));
     }
 
     public function aboutUs()

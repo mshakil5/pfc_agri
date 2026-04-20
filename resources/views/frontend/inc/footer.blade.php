@@ -47,13 +47,10 @@
                     {{ __('footer.contact_us') }}
                 </h6>
 
-                <div class="d-flex gap-3 mb-3">
+                <div class="d-flex gap-3 mb-3 text-light">
                     <i class="fas fa-map-marker-alt mt-1"></i>
-                    <p class="small opacity-75">
-                        {{ __('footer.address_line_1') }}<br>
-                        {{ __('footer.address_line_2') }}<br>
-                        {{ __('footer.address_line_3') }}
-                    </p>
+                    
+                        {!!  $company->address1  !!}
                 </div>
 
                 <div class="d-flex gap-3 mb-3">
