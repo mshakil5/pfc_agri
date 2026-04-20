@@ -111,7 +111,7 @@
                         <div class="info-icon-box"><i class="fas fa-phone"></i></div>
                         <div>
                             <p class="fw-bold mb-0">{{ __('Phone') }}</p>
-                            <p class="text-muted small mb-0">{{ $company->phone1 }}</p>
+                            <p class="text-muted small mb-0">{{ $company->phone1 ?? '07523270710' }}</p>
                         </div>
                     </div>
 

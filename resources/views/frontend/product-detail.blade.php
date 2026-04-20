@@ -295,32 +295,35 @@
                                 {{ __('Our specialists will contact you within 24 hours with a custom quote and configuration advice.') }}
                             </p>
 
-                            <form>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('Full Name') }}">
+                            <form id="inquiryForm">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                
+                                <div class="mb-3 text-start">
+                                    <label class="form-label small text-secondary">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control bg-dark text-white border-secondary" required>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('Email Address') }}">
+                                <div class="mb-3 text-start">
+                                    <label class="form-label small text-secondary">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" name="email" class="form-control bg-dark text-white border-secondary" required>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="tel" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('Phone Number') }}">
+                                <div class="mb-3 text-start">
+                                    <label class="form-label small text-secondary">Phone Number</label>
+                                    <input type="tel" name="phone" class="form-control bg-dark text-white border-secondary">
                                 </div>
-                                <div class="mb-4">
-                                    <select class="form-select bg-dark text-white border-secondary">
-                                        <option selected disabled>{{ __('Select Model') }}</option>
-                                        <option>{{ __('John Deere') }}</option>
-                                        <option>{{ __('New Holland') }}</option>
-                                        <option>{{ __('Other') }}</option>
-                                    </select>
+                                <div class="mb-4 text-start">
+                                    <label class="form-label small text-secondary">Your Query <span class="text-danger">*</span></label>
+                                    <textarea name="message" class="form-control bg-dark text-white border-secondary" rows="4" placeholder="I am interested in this product. Please provide pricing..." required></textarea>
                                 </div>
-                                <button class="btn-pfc-lg" type="button">
+                                
+                                <button type="submit" id="submitInquiryBtn" class="btn-pfc-lg">
                                     {{ __('Submit Inquiry') }} <i class="fas fa-paper-plane ms-2"></i>
                                 </button>
                             </form>
 
                             <div class="mt-4 pt-4 border-top border-secondary text-center">
                                 <p class="small mb-0 opacity-50">{{ __('Need immediate help?') }}</p>
-                                <p class="fw-bold">{{ $company->phone1 }}</p>
+                                <p class="fw-bold">{{ $company->phone1 ?? '07523270710' }}</p>
                             </div>
                         </div>
 
@@ -337,6 +340,7 @@
     {{-- Swiper JS CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var thumbSwiper = new Swiper(".thumb-swiper", {
@@ -358,5 +362,48 @@
                 },
             });
         });
+
+        // Handle Inquiry Form Submission
+        $('#inquiryForm').submit(function(e) {
+            e.preventDefault();
+            
+            var $btn = $('#submitInquiryBtn');
+            var originalText = $btn.html();
+            
+            // Loading state
+            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Sending...');
+
+            $.ajax({
+                url: "{{ route('product.inquiry.submit') }}",
+                type: "POST",
+                data: new FormData(this),
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if(response.success) {
+                        // Show Success Message inside card
+                        var successHtml = `
+                            <div class="text-center py-4">
+                                <i class="fas fa-check-circle fs-1 text-success mb-3"></i>
+                                <h6 class="text-white fw-bold mb-2">${response.message}</h6>
+                            </div>
+                        `;
+                        $('#inquiryForm').replaceWith(successHtml);
+                    }
+                },
+                error: function(xhr) {
+                    $btn.prop('disabled', false).html(originalText);
+                    let errorMsg = 'Something went wrong. Please try again.';
+                    if(xhr.status === 422 && xhr.responseJSON.errors) {
+                        let msgs = Object.values(xhr.responseJSON.errors).flat();
+                        errorMsg = msgs[0];
+                    }
+                    alert(errorMsg);
+                }
+            });
+        });
+
+
+
     </script>
 @endsection

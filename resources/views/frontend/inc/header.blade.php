@@ -1,7 +1,7 @@
 <div class="top-bar">
     <div class="container d-flex justify-content-between align-items-center">
         <div>
-            <i class="fas fa-phone me-2"></i> {{ $company->phone1 }}
+            <i class="fas fa-phone me-2"></i> {{ $company->phone1 ?? '07523270710' }}
             <i class="fas fa-envelope ms-4 me-2"></i> {{ $company->email1 }}
         </div>
 

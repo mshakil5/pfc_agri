@@ -299,7 +299,7 @@
                 <div class="contact-method-card">
                     <div class="contact-icon-circle"><i class="fas fa-phone"></i></div>
                     <h5 class="fw-bold mb-2">{{ __('Call Us') }}</h5>
-                    <p class="mb-0 opacity-90">{{ $company->phone1 }}</p>
+                    <p class="mb-0 opacity-90">{{ $company->phone1 ?? '07523270710' }}</p>
                 </div>
             </div>
             <div class="col-lg-4">

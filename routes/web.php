@@ -7,6 +7,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\Frontend\ProductInquiryController;
 
 Route::get('/lang/{locale}', function ($locale) {
 
@@ -59,6 +60,8 @@ Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('aboutUs')
 Route::get('/shop/{slug?}', [ProductController::class, 'shop'])->name('category.show');
 Route::get('/product/{slug}', [ProductController::class, 'productDetail'])->name('product.detail');
 Route::get('/blog/{slug?}', [FrontendController::class, 'blogDetails'])->name('blog.show');
+
+Route::post('/product-inquiry', [ProductInquiryController::class, 'submit'])->name('product.inquiry.submit');
 
 Route::group(['prefix' =>'user/', 'middleware' => ['auth', 'is_user', 'verified']], function(){
   

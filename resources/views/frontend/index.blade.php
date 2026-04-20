@@ -771,7 +771,7 @@
                                 <div class="contact-icon-box"><i class="fas fa-phone"></i></div>
                                 <div>
                                     <h6 class="mb-0 fw-bold">{{ __('Call Us') }}</h6>
-                                    <p class="mb-0 text-muted"> {{ $company->phone1 }}</p>
+                                    <p class="mb-0 text-muted"> {{ $company->phone1 ?? '07523270710' }}</p>
                                 </div>
                             </div>
                         </div>

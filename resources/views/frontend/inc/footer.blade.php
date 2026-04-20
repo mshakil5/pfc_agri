@@ -55,7 +55,7 @@
 
                 <div class="d-flex gap-3 mb-3">
                     <i class="fas fa-phone"></i>
-                    <p class="small opacity-75">{{ $company->phone1 }}</p>
+                    <p class="small opacity-75">{{ $company->phone1 ?? '07523270710' }}</p>
                 </div>
 
                 <div class="d-flex gap-3">
