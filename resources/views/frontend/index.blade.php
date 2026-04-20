@@ -149,7 +149,10 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col-lg-7">
+                                    @if ($slider->hero_badge)
+                                        
                                     <div class="hero-badge">{{ $slider->hero_badge }}</div>
+                                    @endif
 
                                     <h1 class="hero-title">
                                         @php
@@ -207,9 +210,9 @@
 
     <section class="py-5 mt-5">
         <div class="container text-center mb-5">
-            <p class="section-tag mb-1">{{ __('index.what_we_offer') }}</p>
+            <p class="section-tag mb-1 d-none">{{ __('index.what_we_offer') }}</p>
             <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('index.our_product_categories') }}</h2>
-            <p class="text-muted mx-auto" style="max-width: 600px;">
+            <p class="text-muted mx-auto" style="max-width: 800px;">
                 {{ __('index.product_categories_description') }}
             </p>
         </div>
@@ -513,44 +516,92 @@
 
 
 <style>
-    .awards-section { padding: 80px 0; background-color: #ffffff; }
+    .awards-section { 
+        padding: 80px 0; 
+        background-color: #ffffff; 
+    }
 
     .awardSwiper {
         padding: 20px 10px 50px;
+        overflow: hidden;
     }
 
     .award-card {
         background: #f8fdfa;
         border: 1px solid #e9f7ef;
         border-radius: 20px;
-        padding: 40px;
-        max-width: 700px; 
+        overflow: hidden;
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        transition: 0.3s;
+        flex-direction: row; /* Left/Right split */
+        align-items: stretch;
+        text-align: left;
+        max-width: 900px; 
+        margin: 0 auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: transform 0.3s ease;
     }
 
-    .award-icon-circle {
-        width: 70px;
-        height: 70px;
-        background: #00a651;
-        color: white;
-        border-radius: 50%;
+    .award-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 166, 81, 0.1);
+    }
+
+    /* LEFT SIDE (Image) */
+    .award-image-wrapper {
+        width: 35%;
+        background: #e9f7ef;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.8rem;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(0, 166, 81, 0.2);
+        flex-shrink: 0;
+    }
+
+    .award-image-wrapper img {
+        max-width: 100%;
+        max-height: 220px;
+        object-fit: contain;
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+    }
+
+    /* RIGHT SIDE (Data) */
+    .award-content {
+        width: 65%;
+        padding: 35px 35px 35px 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .award-meta {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .award-meta strong {
+        color: #334155;
+    }
+
+    .tag-pill {
+        background: #00a651;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 15px;
+        width: fit-content;
     }
 
     .description-container {
-        max-height: 3.6em; 
+        max-height: 4.5em; 
         overflow: hidden;
         transition: max-height 0.4s ease;
-        margin-top: 15px;
+        font-size: 0.9rem;
+        color: #64748b;
+        line-height: 1.6;
     }
 
     .description-container.expanded {
@@ -560,69 +611,97 @@
     .toggle-btn {
         color: #00a651;
         cursor: pointer;
-        font-weight: bold;
-        font-size: 0.85rem;
+        font-weight: 600;
+        font-size: 0.8rem;
         margin-top: 10px;
         display: inline-block;
+        transition: 0.2s;
     }
 
-    .tag-pill {
-        background: #e9f7ef;
-        color: #00a651;
-        padding: 5px 15px;
-        border-radius: 30px;
-        font-size: 0.8rem;
-        display: inline-block;
+    .toggle-btn:hover {
+        color: #008d44;
     }
 
-    /* Swiper Pagination Color */
+    /* Swiper Settings */
     .swiper-pagination-bullet-active {
         background: #00a651 !important;
     }
+
+    /* Responsive Design */
+    @media (max-width: 767px) {
+        .award-card {
+            flex-direction: column;
+            text-align: center;
+            max-width: 400px;
+        }
+        .award-image-wrapper {
+            width: 100%;
+            padding: 25px 25px 0;
+        }
+        .award-content {
+            width: 100%;
+            padding: 25px;
+        }
+        .tag-pill {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
 </style>
 
-    <section class="awards-section">
-        <div class="container">
-            <div class="text-center mb-5">
-                <p class="section-tag mb-1">{{ __('RECOGNITION') }}</p>
-                <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('Awards & Achievements') }}</h2>
-            </div>
+<section class="awards-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-tag mb-1">{{ __('RECOGNITION') }}</p>
+            <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('Awards & Achievements') }}</h2>
+        </div>
 
-            <div class="swiper awardSwiper">
-                <div class="swiper-wrapper">
-                    @foreach($awards as $award)
-                        <div class="swiper-slide">
-                            <div class="award-card mx-auto">
-                                <div class="award-icon-circle">
-                                    <i class="{{ $award->icon }}"></i>
-                                </div>
+        <div class="swiper awardSwiper">
+            <div class="swiper-wrapper">
+                @foreach($awards as $index => $award)
+                    @php
+                        // Safely get translation based on your custom model setup
+                        $trans = $award->translateOrNew(app()->getLocale());
+                    @endphp
+                    <div class="swiper-slide">
+                        <div class="award-card">
+                            {{-- LEFT SIDE: Image --}}
+                            <div class="award-image-wrapper">
+                                <img src="{{ $award->image ? asset($award->image) : asset('placeholder.webp') }}" alt="{{ $trans->title }}">
+                            </div>
+                            
+                            {{-- RIGHT SIDE: Content --}}
+                            <div class="award-content">
+                                @if($trans->tag)
+                                    <span class="tag-pill">{{ $trans->tag }}</span>
+                                @endif
+
+                                <h4 class="fw-bold mb-2" style="color: #1a1a1a; font-size: 1.3rem;">{{ $trans->title }}</h4>
                                 
-                                <div class="award-content">
-                                    <h4 class="fw-bold">{{ $award->title }}</h4>
-                                    <p class="text-muted mb-2"><strong>{{ $award->organization }}</strong> • {{ $award->year }}</p>
-                                    
-                                    @if($award->tag)
-                                        <span class="tag-pill mb-3">{{ $award->tag }}</span>
-                                    @endif
+                                <p class="award-meta">
+                                    <strong>{{ $trans->organization }}</strong> • {{ $award->year }}
+                                </p>
 
-                                    <div class="description-wrapper">
-                                        <div class="small text-muted description-container" id="desc-{{ $loop->index }}">
-                                            {!! $award->description !!}
-                                        </div>
-                                        <span class="toggle-btn" onclick="toggleDescription({{ $loop->index }}, this)">
-                                            {{ __('Show More') }}
-                                        </span>
+                                <div class="description-wrapper">
+                                    <div class="description-container" id="desc-{{ $loop->index }}">
+                                        {!! $trans->description !!}
                                     </div>
+                                    @if(!empty($trans->description))
+                                        <span class="toggle-btn" onclick="toggleDescription({{ $loop->index }}, this)">
+                                            {{ __('Read More') }} <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-                
-                <div class="swiper-pagination"></div>
+                    </div>
+                @endforeach
             </div>
+            
+            <div class="swiper-pagination mt-4"></div>
         </div>
-    </section>
+    </div>
+</section>
 
 
 
@@ -712,11 +791,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-    // Initialize Swiper
-    const swiper = new Swiper('.awardSwiper', {
+    const awardSwiper = new Swiper('.awardSwiper', {
         loop: true,
         autoplay: {
-            delay: 4000,
+            delay: 5000,
             disableOnInteraction: false,
         },
         pagination: {
@@ -727,18 +805,18 @@
         grabCursor: true,
     });
 
-    // Show More/Less Function
     function toggleDescription(index, btn) {
         const desc = document.getElementById(`desc-${index}`);
+        const icon = btn.querySelector('i'); // Grab the chevron icon
         
         if (desc.classList.contains('expanded')) {
             desc.classList.remove('expanded');
-            btn.innerText = "{{ __('Show More') }}";
-            swiper.update();
+            btn.innerHTML = `{{ __('Read More') }} <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem;"></i>`;
+            awardSwiper.update(); // Recalculate slide height
         } else {
             desc.classList.add('expanded');
-            btn.innerText = "{{ __('Show Less') }}";
-            swiper.update();
+            btn.innerHTML = `{{ __('Show Less') }} <i class="fas fa-chevron-up ms-1" style="font-size: 0.7rem;"></i>`;
+            awardSwiper.update(); // Recalculate slide height
         }
     }
 </script>

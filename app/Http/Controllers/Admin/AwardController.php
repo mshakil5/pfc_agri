@@ -7,6 +7,7 @@ use App\Models\Award;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use Intervention\Image\Facades\Image;
 
 class AwardController extends Controller
 {
@@ -20,6 +21,13 @@ class AwardController extends Controller
                 ->addColumn('title', function($row) {
                     return $row->translateOrNew(app()->getLocale())->title;
                 })
+                ->addColumn('image', function($row) {
+                    if ($row->image) {
+                        return '<img src="'.asset($row->image).'" class="img-thumbnail" width="50">';
+                    }
+                    // Fallback to old icon if image doesn't exist yet
+                    return $row->icon ? '<i class="'. $row->icon .' fs-2 text-primary"></i>' : '-';
+                })
                 ->addColumn('action', function($row) {
                     return '
                         <div class="dropdown">
@@ -30,6 +38,7 @@ class AwardController extends Controller
                             </ul>
                         </div>';
                 })
+                ->rawColumns(['image', 'action'])
                 ->make(true);
         }
         return view('admin.awards.index');
@@ -38,7 +47,7 @@ class AwardController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'icon' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'year' => 'required|integer',
             'title' => 'required|string',
             'organization' => 'required|string',
@@ -47,8 +56,12 @@ class AwardController extends Controller
         ]);
 
         $award = new Award();
-        $award->icon = $request->icon;
         $award->year = $request->year;
+        
+        if ($request->hasFile('image')) {
+            $award->image = $this->uploadImage($request->file('image'));
+        }
+        
         $award->save();
 
         $this->saveTranslations($award, $request);
@@ -58,13 +71,13 @@ class AwardController extends Controller
 
     public function edit($id)
     {
-        $award = Award::with('translations')->findOrFail($id);
-        $enTranslation = $award->translate('en');
+        $award = Award::findOrFail($id);
+        $enTranslation = $award->translateOrNew('en'); // <--- FIXED BUG HERE
         
         return response()->json([
             'id' => $award->id,
-            'icon' => $award->icon,
             'year' => $award->year,
+            'image' => $award->image,
             'title' => $enTranslation->title,
             'organization' => $enTranslation->organization,
             'tag' => $enTranslation->tag,
@@ -77,7 +90,7 @@ class AwardController extends Controller
         $award = Award::findOrFail($request->codeid);
         
         $request->validate([
-            'icon' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Nullable on update
             'year' => 'required|integer',
             'title' => 'required|string',
             'organization' => 'required|string',
@@ -85,8 +98,16 @@ class AwardController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $award->icon = $request->icon;
         $award->year = $request->year;
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($award->image && file_exists(public_path($award->image))) {
+                @unlink(public_path($award->image));
+            }
+            $award->image = $this->uploadImage($request->file('image'));
+        }
+
         $award->save();
 
         $this->saveTranslations($award, $request);
@@ -96,7 +117,14 @@ class AwardController extends Controller
 
     public function destroy($id)
     {
-        Award::destroy($id);
+        $award = Award::findOrFail($id);
+        
+        // Delete image file from server
+        if ($award->image && file_exists(public_path($award->image))) {
+            @unlink(public_path($award->image));
+        }
+        
+        $award->delete();
         return response()->json(['message' => 'Award deleted successfully!']);
     }
 
@@ -131,12 +159,10 @@ class AwardController extends Controller
                     $translation->tag = !empty($enTag) ? $tr->translate($enTag) : '';
                     usleep(200000);
 
-                    // Slightly longer delay for HTML descriptions
                     $translation->description = !empty($enDescription) ? $tr->translate($enDescription) : '';
                     usleep(300000); 
 
                 } catch (\Exception $e) {
-                    // Fallback to English if translation fails
                     $translation->title = $enTitle;
                     $translation->organization = $enOrganization;
                     $translation->tag = $enTag;
@@ -145,5 +171,18 @@ class AwardController extends Controller
             }
             $translation->save();
         }
+    }
+
+    private function uploadImage($file)
+    {
+        $name = mt_rand(10000000, 99999999) . '.webp';
+        $path = public_path('images/awards/');
+        if (!file_exists($path)) mkdir($path, 0755, true);
+
+        Image::make($file)
+            ->encode('webp', 80)
+            ->save($path . $name);
+
+        return '/images/awards/' . $name;
     }
 }

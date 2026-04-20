@@ -19,20 +19,10 @@
                 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="icon">Award Icon</label>
-                        <select class="form-control select2" name="icon" id="icon">
-                            <option value="">Select Icon</option>
-                            <option value="fas fa-trophy">Trophy (Standard Award)</option>
-                            <option value="fas fa-medal">Medal (Achievement)</option>
-                            <option value="fas fa-award">Award Badge</option>
-                            <option value="fas fa-leaf">Leaf (Sustainability/Eco)</option>
-                            <option value="fas fa-star">Star (Excellence)</option>
-                            <option value="fas fa-crown">Crown (Leadership)</option>
-                            <option value="fas fa-certificate">Certificate</option>
-                            <option value="fas fa-globe">Globe (International)</option>
-                            <option value="fas fa-microscope">Microscope (Innovation/Research)</option>
-                            <option value="fas fa-lightbulb">Lightbulb (Idea/Innovation)</option>
-                        </select>
+                        <label>Award Image <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*"
+                               onchange="previewImage(event, '#preview-image')">
+                        <img id="preview-image" src="#" alt="Preview" class="img-thumbnail mt-2" style="max-width:150px; display:none;">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label>Year</label>
@@ -81,6 +71,7 @@
                 <thead>
                     <tr>
                         <th>Sl</th>
+                        <th>Image</th>
                         <th>Year</th>
                         <th>Title (Current Language)</th>
                         <th>Action</th>
@@ -118,7 +109,6 @@
 <script>
     var otherLocales = @json(array_values(array_diff(config('translatable.locales'), ['en'])));
     var isEditorInitialized = false;
-    var isSelect2Initialized = false;
 
     $(document).ready(function() {
 
@@ -127,6 +117,7 @@
             ajax: "{{ route('admin.awards') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'image', name: 'image', orderable: false, searchable: false },
                 { data: 'year', name: 'year' },
                 { data: 'title', name: 'title' },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
@@ -136,7 +127,7 @@
         // Submit Logic (CSRF Safe)
         $("#addBtn").click(function(e) {
             e.preventDefault();
-            var formData = new FormData($('#createThisForm')[0]); // Get data BEFORE disabling
+            var formData = new FormData($('#createThisForm')[0]); 
             showFormLoader();
 
             let id = $("#codeid").val();
@@ -172,15 +163,15 @@
                 $("#tag").val(data.tag);
 
                 $("#addThisFormContainer").slideDown(300, function() {
-                    // Initialize Select2 & Summernote AFTER form is visible
-                    if(!isSelect2Initialized) { initSelect2(); isSelect2Initialized = true; }
                     if(!isEditorInitialized) { initSummernote(); isEditorInitialized = true; }
-                    
-                    // Set values that require plugins
-                    $("#icon").val(data.icon).trigger('change');
                     $('#description').summernote('code', data.description);
                 });
                 
+                // Handle Image Preview
+                if (data.image) {
+                    $('#preview-image').attr('src', data.image).show();
+                }
+
                 $("#newBtn").hide();
                 $("#cardTitle").text('Edit Award');
                 $("#addBtn").html('<i class="ri-save-line me-1"></i> Update & Translate');
@@ -191,7 +182,6 @@
         $("#newBtn").click(function() {
             clearForm();
             $("#addThisFormContainer").slideDown(300, function() {
-                if(!isSelect2Initialized) { initSelect2(); isSelect2Initialized = true; }
                 if(!isEditorInitialized) { initSummernote(); isEditorInitialized = true; }
             });
             $(this).hide();
@@ -204,10 +194,6 @@
     });
 
     // --- Plugin Initializers ---
-    function initSelect2() {
-        $('.select2').select2({ width: '100%' });
-    }
-
     function initSummernote() {
         $('.summernote').summernote({
             height: 200,
@@ -224,7 +210,7 @@
     function clearForm() {
         $('#createThisForm')[0].reset();
         $("#codeid").val('');
-        if(isSelect2Initialized) { $("#icon").val('').trigger('change'); }
+        $('#preview-image').attr('src', '#').hide();
         if(isEditorInitialized) { $('#description').summernote('code', ''); }
         $("#cardTitle").text('Add New Award');
         $("#addBtn").html('<i class="ri-save-line me-1"></i> Save & Translate');
@@ -234,7 +220,6 @@
     function showFormLoader() {
         $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', true);
         $('.summernote').summernote('disable');
-        $('.select2').prop('disabled', true).trigger('change'); // Disable select2 visually
         
         var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
         var tickerMessages = ['Saving English...'];
@@ -265,7 +250,14 @@
         $('#formLoader').fadeOut(200, function() { $(this).remove(); });
         $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', false);
         $('.summernote').summernote('enable');
-        $('.select2').prop('disabled', false).trigger('change'); // Enable select2 visually
+    }
+
+    function previewImage(event, imgSelector) {
+        if (event.target.files && event.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) { $(imgSelector).attr('src', e.target.result).show(); };
+            reader.readAsDataURL(event.target.files[0]);
+        }
     }
 </script>
 @endsection

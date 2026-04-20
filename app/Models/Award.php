@@ -14,5 +14,5 @@ class Award extends Model implements TranslatableContract
     public $translatedAttributes = ['title', 'organization', 'tag', 'description'];
 
     // 2. Define which attributes can be mass-assigned (non-translated ones)
-    protected $fillable = ['icon', 'year'];
+    protected $fillable = ['icon', 'year', 'image'];
 }
