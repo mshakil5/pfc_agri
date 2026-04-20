@@ -393,10 +393,28 @@
 <script>
     $(document).ready(function() {
         $('.summernote').summernote({
-            height: 200, // set editor height
-            minHeight: null, // set minimum height of editor
-            maxHeight: null, // set maximum height of editor
-            focus: true // set focus to editable area after initializing summernote
+            height: 200,
+            minHeight: null,
+            maxHeight: null,
+            focus: true,
+            // Custom Toolbar Features
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                // This 'color' option adds both Foreground and Background color pickers
+                ['color', ['color']], 
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']],
+                ['height', ['height']] // Adds Line Height support
+            ],
+            // Optional: Define a default list of colors
+            colors: [
+                ['#000000', '#424242', '#636363', '#9C9C94', '#CEC6CE', '#EFEFEF', '#F7F7F7', '#FFFFFF'],
+                ['#FF0000', '#FF9C00', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#9C00FF', '#FF00FF']
+            ]
         });
     });
 </script>
