@@ -37,11 +37,15 @@ class ProductController extends Controller
             ->where('status', 1)
             ->firstOrFail();
 
-        // Fallback for features if empty
         $locale = app()->getLocale();
-        $features = $product->translateOrNew($locale)->features ?? [];
+        $trans = $product->translateOrNew($locale);
 
-        return view('frontend.product-detail', compact('product', 'features'));
+        // Grab all required translated and JSON data
+        $features  = $trans->features ?? [];
+        $specs     = $trans->specs ?? '';      // HTML content from Summernote
+        $downloads = $product->downloads ?? []; // JSON array from DB
+
+        return view('frontend.product-detail', compact('product', 'features', 'specs', 'downloads'));
     }
 
 

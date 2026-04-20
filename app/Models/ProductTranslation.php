@@ -12,7 +12,7 @@ class ProductTranslation extends Model
         'title',
         'short_description',
         'long_description',
-        'features'
+        'features', 'specs'
     ];
 
     // THIS FIXES THE ERROR: Tells Laravel to convert the array to JSON for the DB

@@ -100,6 +100,22 @@
                             <button type="button" class="btn btn-dark btn-sm mt-2" id="addFeatureBtn">+ Add Feature</button>
                         </div>
 
+                        {{-- Technical Specs --}}
+                        <div class="col-md-12 mt-4">
+                            <label class="form-label"><b>Technical Specs (EN)</b> <small class="text-muted">(Translates per language)</small></label>
+                            <textarea class="form-control" id="specs" name="specs"></textarea>
+                        </div>
+
+                        {{-- Downloads --}}
+                        <div class="col-md-12 mt-4">
+                            <label class="form-label"><b>Downloads (PDFs/Docs)</b></label>
+                            <input type="file" class="form-control" id="new_downloads_input" name="new_downloads[]" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple>
+                            <div id="existing-downloads-container" class="mt-2">
+                                <!-- Existing downloads will load here via JS -->
+                            </div>
+                        </div>
+
+
                     </div>
                 </form>
             </div>
@@ -147,6 +163,7 @@
     .gallery-thumb { position: relative; width: 80px; height: 80px; }
     .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
     .gallery-thumb .remove-gallery-btn { position: absolute; top: -6px; right: -6px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .download-item { transition: 0.2s; } .download-item:hover { background: #f1f5f9 !important; }
 </style>
 
 <script>
@@ -176,17 +193,15 @@
             }, function (d) { reloadTable('#productTable'); showSuccess(d.message); }).fail(() => showError('Failed'));
         });
 
-        // UI Toggles
         $("#newBtn").click(function () { clearForm(); $(this).hide(); $("#addThisFormContainer").slideDown(300, initPlugins); });
         $("#FormCloseBtn").click(function () { $("#addThisFormContainer").slideUp(300); setTimeout(() => $("#newBtn").show(), 300); });
 
-        // Submit (CSRF Safe)
         $("#addBtn").click(function (e) {
             e.preventDefault();
-            
-            // Sync Summernote before grabbing FormData
-            if(isEditorInitialized) $('#long_description').val($('#long_description').summernote('code'));
-            
+            if(isEditorInitialized) { 
+                $('#long_description').val($('#long_description').summernote('code'));
+                $('#specs').val($('#specs').summernote('code')); 
+            }
             var formData = new FormData($('#createThisForm')[0]);
             showFormLoader();
 
@@ -204,30 +219,36 @@
             });
         });
 
-        // Edit
         $("#contentContainer").on('click', '#EditBtn', function () {
             let id = $(this).attr('rid');
             $.get("/admin/products/" + id + "/edit", function (data) { populateForm(data); });
         });
 
-        // Add Feature Row
         $("#addFeatureBtn").click(function () {
             var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
-            $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof, Lightweight"></div>');
+            $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof"></div>');
             $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
             $('#features-container').append($row);
         });
 
         $(document).on('click', '.remove-feature-btn', function () { $(this).closest('.feature-row').remove(); });
 
-        // Remove Gallery Image Logic
+        // Remove Gallery Image
         $(document).on('click', '.remove-gallery-btn', function(e) {
             e.preventDefault();
             var thumb = $(this).closest('.gallery-thumb');
-            var path = thumb.data('path');
-            // Change hidden input name to delete_images[]
             thumb.find('input[name="existing_images[]"]').attr('name', 'delete_images[]');
-            thumb.remove(); // visually remove
+            thumb.remove();
+        });
+
+        // Remove Download File
+        $(document).on('click', '.remove-download-btn', function(e) {
+            e.preventDefault();
+            var item = $(this).closest('.download-item');
+            var path = item.data('path');
+            var $delInput = $('<input type="hidden" name="delete_downloads[]" value="">').val(path);
+            $('#createThisForm').append($delInput);
+            item.remove();
         });
 
         // --- Helpers ---
@@ -241,12 +262,15 @@
                 initPlugins();
                 $("#category_id").val(data.category_id || null).trigger('change');
                 $("#tag_id").val(data.tag_id || null).trigger('change');
-                if(isEditorInitialized) $('#long_description').summernote('code', data.long_description || '');
+                if(isEditorInitialized) { 
+                    $('#long_description').summernote('code', data.long_description || ''); 
+                    $('#specs').summernote('code', data.specs || ''); 
+                }
             });
 
             if (data.image) { $('#preview-image').attr('src', data.image).show(); }
 
-            // SAFE GALLERY IMAGE LOADING (No template literals that can break on quotes)
+            // Gallery Images
             $('#existing-gallery-container').empty();
             if (data.images && data.images.length > 0) {
                 data.images.forEach(function(img) {
@@ -258,18 +282,34 @@
                 });
             }
 
-            // SAFE FEATURES LOADING (No template literals that can break on quotes like 10" pipe)
+            // PDF Downloads
+            $('#existing-downloads-container').empty();
+            if (data.downloads && data.downloads.length > 0) {
+                data.downloads.forEach(function(dl) {
+                    var $item = $('<div class="download-item d-flex align-items-center justify-content-between border p-2 rounded mb-2 bg-light"></div>').data('path', dl.path);
+                    var $text = $('<div class="d-flex align-items-center"></div>');
+                    $text.append('<i class="fas fa-file-pdf text-danger me-2"></i>');
+                    var $name = $('<span class="fw-bold small"></span>').text(dl.name);
+                    $text.append($name);
+                    $item.append($text);
+                    $item.append('<button type="button" class="btn btn-sm btn-danger remove-download-btn">X</button>');
+                    $item.append($('<input type="hidden" name="existing_downloads[]" value="">').val(dl.path));
+                    $('#existing-downloads-container').append($item);
+                });
+            }
+
+            // Features
             $('#features-container').empty();
             if (data.features && data.features.length > 0) {
                 data.features.forEach(function(feat) {
                     var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
                     $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control"></div>');
-                    $row.find('input').val(feat); // Safely assigns value without breaking HTML attributes
+                    $row.find('input').val(feat);
                     $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
                     $('#features-container').append($row);
                 });
             } else {
-                $('#addFeatureBtn').click(); // Add one empty row
+                $('#addFeatureBtn').click();
             }
 
             $("#newBtn").hide();
@@ -281,8 +321,8 @@
             $('#createThisForm')[0].reset();
             $("#codeid").val(''); $("#preview-image").hide();
             $('#existing-gallery-container').empty();
+            $('#existing-downloads-container').empty();
             
-            // Reset to one empty feature row safely
             $('#features-container').empty();
             var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
             $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof"></div>');
@@ -290,7 +330,7 @@
             $('#features-container').append($row);
             
             if(isSelect2Initialized) { $("#category_id").val(null).trigger('change'); $("#tag_id").val(null).trigger('change'); }
-            if(isEditorInitialized) { $('#long_description').summernote('code', ''); }
+            if(isEditorInitialized) { $('#long_description').summernote('code', ''); $('#specs').summernote('code', ''); }
             
             $("#cardTitle").text('Add New Product');
             $("#addBtn").html('<i class="ri-save-line me-1"></i> Create & Translate');
@@ -298,13 +338,16 @@
 
         function initPlugins() {
             if(!isSelect2Initialized) { $('.select2').select2({ width: '100%' }); isSelect2Initialized = true; }
-            if(!isEditorInitialized) { $('#long_description').summernote({ height: 250 }); isEditorInitialized = true; }
+            if(!isEditorInitialized) { 
+                $('#long_description').summernote({ height: 250 }); 
+                $('#specs').summernote({ height: 200 }); 
+                isEditorInitialized = true; 
+            }
         }
 
-        // --- Loader Functions ---
         function showFormLoader() {
             $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', true);
-            if(isEditorInitialized) $('#long_description').summernote('disable');
+            if(isEditorInitialized) { $('#long_description').summernote('disable'); $('#specs').summernote('disable'); }
             $('.select2').prop('disabled', true).trigger('change');
             var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
             var tickerMessages = ['Saving English...'];
@@ -322,7 +365,7 @@
         function hideFormLoader() {
             $('#formLoader').fadeOut(200, function() { $(this).remove(); });
             $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', false);
-            if(isEditorInitialized) $('#long_description').summernote('enable');
+            if(isEditorInitialized) { $('#long_description').summernote('enable'); $('#specs').summernote('enable'); }
             $('.select2').prop('disabled', false).trigger('change');
         }
 

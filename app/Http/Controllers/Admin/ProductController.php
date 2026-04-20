@@ -95,12 +95,10 @@ class ProductController extends Controller
         $product->tag_id      = $request->tag_id;
         $product->price       = $request->price ?? 0;
 
-        // Handle Main Thumbnail
         if ($request->hasFile('image')) {
             $product->image = $this->uploadImage($request->file('image'));
         }
 
-        // Handle Multiple Gallery Images
         $galleryImages = [];
         if ($request->hasFile('new_images')) {
             foreach ($request->file('new_images') as $file) {
@@ -109,10 +107,12 @@ class ProductController extends Controller
         }
         $product->images = $galleryImages;
 
+        // Handle Multiple PDF Downloads
+        $product->downloads = $this->handleDownloads($request, []);
+
         $product->save();
 
-        // Save Translations & Features
-        $this->saveTranslations($product, $request->title, $request->short_description, $request->long_description, $request->features);
+        $this->saveTranslations($product, $request->title, $request->short_description, $request->long_description, $request->features, $request->specs);
 
         return response()->json(['message' => 'Product created & translated successfully!'], 200);
     }
@@ -120,7 +120,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
-        $enTranslation = $product->translateOrNew('en'); // <--- FIXED
+        $enTranslation = $product->translateOrNew('en');
         
         return response()->json([
             'id'                => $product->id,
@@ -128,11 +128,13 @@ class ProductController extends Controller
             'short_description' => $enTranslation->short_description,
             'long_description'  => $enTranslation->long_description,
             'features'          => $enTranslation->features ?? [],
+            'specs'             => $enTranslation->specs ?? '',
             'category_id'       => $product->category_id,
             'tag_id'            => $product->tag_id,
             'price'             => $product->price,
             'image'             => $product->image,
             'images'            => $product->images ?? [],
+            'downloads'         => $product->downloads ?? [],
         ]);
     }
 
@@ -153,7 +155,6 @@ class ProductController extends Controller
         $product->tag_id      = $request->tag_id;
         $product->price       = $request->price ?? 0;
 
-        // Handle Main Thumbnail Update
         if ($request->hasFile('image')) {
             if ($product->image && file_exists(public_path($product->image))) {
                 @unlink(public_path($product->image));
@@ -165,17 +166,11 @@ class ProductController extends Controller
         $existingImages = $request->input('existing_images', []);
         $deleteImages = $request->input('delete_images', []);
 
-        // Delete specified images from server
         foreach ($deleteImages as $delImg) {
-            if (file_exists(public_path($delImg))) {
-                @unlink(public_path($delImg));
-            }
+            if (file_exists(public_path($delImg))) @unlink(public_path($delImg));
         }
 
-        // Keep images that were not marked for deletion
         $finalImages = array_diff($existingImages, $deleteImages);
-
-        // Upload new images and merge
         if ($request->hasFile('new_images')) {
             foreach ($request->file('new_images') as $file) {
                 $finalImages[] = $this->uploadImage($file);
@@ -183,10 +178,12 @@ class ProductController extends Controller
         }
         $product->images = array_values($finalImages);
 
+        // Handle PDF Downloads Update
+        $product->downloads = $this->handleDownloads($request, $product->downloads ?? [], true);
+
         $product->save();
 
-        // Save Translations & Features
-        $this->saveTranslations($product, $request->title, $request->short_description, $request->long_description, $request->features);
+        $this->saveTranslations($product, $request->title, $request->short_description, $request->long_description, $request->features, $request->specs);
 
         return response()->json(['message' => 'Product updated & translated successfully!'], 200);
     }
@@ -195,15 +192,18 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         
-        // Delete Main Image
         if ($product->image && file_exists(public_path($product->image))) {
             @unlink(public_path($product->image));
         }
-        
-        // Delete All Gallery Images
         if ($product->images) {
             foreach ($product->images as $img) {
                 if (file_exists(public_path($img))) @unlink(public_path($img));
+            }
+        }
+        // Delete PDFs
+        if ($product->downloads) {
+            foreach ($product->downloads as $dl) {
+                if (file_exists(public_path($dl['path']))) @unlink(public_path($dl['path']));
             }
         }
         
@@ -218,7 +218,7 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product status updated successfully.'], 200);
     }
 
-    private function saveTranslations($product, $enTitle, $enShortDesc, $enLongDesc, $enFeatures)
+    private function saveTranslations($product, $enTitle, $enShortDesc, $enLongDesc, $enFeatures, $enSpecs)
     {
         $otherLocales = array_diff(config('translatable.locales'), ['en']);
 
@@ -230,6 +230,7 @@ class ProductController extends Controller
                 $translation->short_description = $enShortDesc;
                 $translation->long_description  = $enLongDesc;
                 $translation->features          = array_values(array_filter($enFeatures ?? []));
+                $translation->specs             = $enSpecs;
             } else {
                 try {
                     $tr = new GoogleTranslate($locale);
@@ -244,7 +245,6 @@ class ProductController extends Controller
                     $translation->long_description = !empty($enLongDesc) ? $tr->translate($enLongDesc) : '';
                     usleep(300000);
 
-                    // Translate features list
                     $translatedFeatures = [];
                     foreach (array_filter($enFeatures ?? []) as $feature) {
                         $translatedFeatures[] = $tr->translate($feature);
@@ -252,15 +252,61 @@ class ProductController extends Controller
                     }
                     $translation->features = $translatedFeatures;
 
+                    // Translate Specs
+                    $translation->specs = !empty($enSpecs) ? $tr->translate($enSpecs) : '';
+                    usleep(300000);
+
                 } catch (\Exception $e) {
                     $translation->title             = $enTitle;
                     $translation->short_description = $enShortDesc;
                     $translation->long_description  = $enLongDesc;
                     $translation->features          = array_values(array_filter($enFeatures ?? []));
+                    $translation->specs             = $enSpecs;
                 }
             }
             $translation->save();
         }
+    }
+
+    private function handleDownloads($request, $existingDownloads, $isUpdate = false)
+    {
+        $finalDownloads = [];
+
+        // If updating, keep the ones that weren't deleted
+        if ($isUpdate) {
+            $keepPaths = $request->input('existing_downloads', []);
+            $deletePaths = $request->input('delete_downloads', []);
+
+            // Delete removed files from server
+            foreach ($deletePaths as $delPath) {
+                if (file_exists(public_path($delPath))) @unlink(public_path($delPath));
+            }
+
+            // Keep existing ones
+            foreach ($existingDownloads as $dl) {
+                if (in_array($dl['path'], $keepPaths)) {
+                    $finalDownloads[] = $dl;
+                }
+            }
+        }
+
+        // Upload new PDFs
+        if ($request->hasFile('new_downloads')) {
+            $path = public_path('downloads/products');
+            if (!file_exists($path)) mkdir($path, 0755, true);
+
+            foreach ($request->file('new_downloads') as $file) {
+                $safeName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $safeName);
+                
+                $finalDownloads[] = [
+                    'name' => $file->getClientOriginalName(),
+                    'path' => '/downloads/products/' . $safeName
+                ];
+            }
+        }
+
+        return $finalDownloads;
     }
 
     private function uploadImage($file)

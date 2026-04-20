@@ -12,11 +12,11 @@ class Product extends Model
     public $translationModel = ProductTranslation::class;
 
     protected $fillable = [
-        'title', 'slug', 'category_id', 'tag_id', 'price', 'image', 'images', 'short_description', 'long_description', 'status'
+        'title', 'slug', 'category_id', 'tag_id', 'price', 'image', 'images', 'short_description', 'long_description', 'status', 'downloads'
     ];
 
     protected $casts = [
-        'images' => 'array',
+        'images' => 'array','downloads' => 'array',
     ];
 
     public function translations()

@@ -155,7 +155,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item">
-                        <a href="{{ route('allproducts') }}" class="text-decoration-none text-muted">{{ __('Products') }}</a>
+                        <a href="{{ route('category.show') }}" class="text-decoration-none text-muted">{{ __('Products') }}</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a href="#" class="text-decoration-none text-muted">
@@ -228,31 +228,32 @@
                                 {!! $product->translateOrNew(app()->getLocale())->long_description !!}
                             </div>
 
-                            {{-- TECHNICAL SPECS (Now Dynamic from Features Array) --}}
+                            {{-- TECHNICAL SPECS (Dynamic Summernote Content) --}}
                             <div class="tab-pane fade" id="specs">
-                                @if(count($features) > 0)
-                                    <ul class="dynamic-specs-list">
-                                        @foreach($features as $feature)
-                                            <li>{{ $feature }}</li>
-                                        @endforeach
-                                    </ul>
+                                @if(!empty($specs))
+                                    {!! $specs !!}
                                 @else
                                     <p class="text-muted py-4 text-center">{{ __('No specifications added yet.') }}</p>
                                 @endif
                             </div>
 
-                            {{-- DOWNLOADS (Kept static as requested, you can hook this to a DB column later) --}}
+                            {{-- DOWNLOADS (Dynamic PDF Files) --}}
                             <div class="tab-pane fade" id="docs">
-                                <div class="list-group">
-                                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                        <span><i class="far fa-file-pdf me-2 text-danger"></i> {{ __('Installation Manual.pdf') }}</span>
-                                        <i class="fas fa-download text-muted"></i>
-                                    </a>
-                                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                        <span><i class="far fa-file-pdf me-2 text-danger"></i> {{ __('Product Brochure.pdf') }}</span>
-                                        <i class="fas fa-download text-muted"></i>
-                                    </a>
-                                </div>
+                                @if(count($downloads) > 0)
+                                    <div class="list-group">
+                                        @foreach($downloads as $dl)
+                                            <a href="{{ asset($dl['path']) }}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                                <span>
+                                                    <i class="far fa-file-pdf me-2 text-danger"></i>
+                                                    {{ $dl['name'] }}
+                                                </span>
+                                                <i class="fas fa-download text-muted"></i>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-muted py-4 text-center">{{ __('No downloads available for this product.') }}</p>
+                                @endif
                             </div>
                         </div>
                     </div>
