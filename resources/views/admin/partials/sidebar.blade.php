@@ -237,6 +237,14 @@
                     </a>
                 </li>
 
+                
+                <li class="nav-item">
+                    <a href="{{ route('admin.team.index') }}" class="nav-link {{ Route::is('admin.team.index') ? 'active' : '' }}">
+                        <i class="ri-mail-open-line"></i>
+                        <span>Team</span>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ $settingsRoute ? 'active' : '' }}" 
                       href="#sidebarSettings" data-bs-toggle="collapse" role="button" 

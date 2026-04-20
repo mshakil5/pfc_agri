@@ -58,7 +58,7 @@
 
                 @foreach ($categories as $category)
                     <a class="footer-link" href="{{ route('category.show', $category->slug) }}">
-                        {{ $category->name }}
+                        {{ $category->translateOrNew(app()->getLocale())->name }}
                     </a>
                 @endforeach
             </div>

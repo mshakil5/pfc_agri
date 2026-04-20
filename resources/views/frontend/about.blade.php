@@ -248,46 +248,41 @@
         <h2 class="fw-bold mb-3" style="color: var(--pfc-green);">{{ __('Meet Our Team') }}</h2>
         <p class="text-muted mx-auto mb-5" style="max-width: 600px;">{{ __('Our dedicated team combines farming experience with technical expertise to serve you better.') }}</p>
         
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="team-card">
-                    <div class="team-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80" alt="James Fletcher">
+        <div class="row g-4 justify-content-center">
+            @php $members = \App\Models\TeamMember::where('status', 1)->orderBy('serial')->get(); @endphp
+            
+            @foreach($members as $member)
+                @php $trans = $member->translateOrNew(app()->getLocale()); @endphp
+                <div class="col-lg-4 col-md-6">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="{{ $member->image ? asset($member->image) : asset('placeholder.webp') }}" alt="{{ $member->name }}">
+                        </div>
+                        <h5 class="fw-bold mb-1">{{ $member->name }}</h5> {{-- Always English --}}
+                        <div class="team-role">{{ $trans->designation }}</div> {{-- Translated --}}
+                        <p class="small text-muted mb-4">{{ $trans->bio }}</p> {{-- Translated --}}
+                        
+                        @if($member->phone)
+                            <a href="tel:{{ $member->phone }}" class="team-contact-link">
+                                <i class="fas fa-phone me-2 text-success"></i> {{ $member->phone }}
+                            </a>
+                        @endif
+                        
+                        @if($member->email)
+                            <a href="mailto:{{ $member->email }}" class="team-contact-link">
+                                <i class="fas fa-envelope me-2 text-success"></i> {{ $member->email }}
+                            </a>
+                        @endif
                     </div>
-                    <h5 class="fw-bold mb-1">James Fletcher</h5>
-                    <div class="team-role">Managing Director</div>
-                    <p class="small text-muted mb-4">Third generation farmer with 30 years of industry experience. James leads our strategic direction and customer relationships.</p>
-                    <a href="tel:+441234567890" class="team-contact-link"><i class="fas fa-phone me-2 text-success"></i> +44 1234 567890</a>
-                    <a href="mailto:james@pfcagri.co.uk" class="team-contact-link"><i class="fas fa-envelope me-2 text-success"></i> james@pfcagri.co.uk</a>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="team-card">
-                    <div class="team-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Sarah Fletcher">
-                    </div>
-                    <h5 class="fw-bold mb-1">Sarah Fletcher</h5>
-                    <div class="team-role">Operations Director</div>
-                    <p class="small text-muted mb-4">With a background in agricultural engineering, Sarah ensures smooth operations and product quality across all departments.</p>
-                    <a href="tel:+441234567891" class="team-contact-link"><i class="fas fa-phone me-2 text-success"></i> +44 1234 567891</a>
-                    <a href="mailto:sarah@pfcagri.co.uk" class="team-contact-link"><i class="fas fa-envelope me-2 text-success"></i> sarah@pfcagri.co.uk</a>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="team-card">
-                    <div class="team-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" alt="Tom Williams">
-                    </div>
-                    <h5 class="fw-bold mb-1">Tom Williams</h5>
-                    <div class="team-role">Technical Sales Manager</div>
-                    <p class="small text-muted mb-4">Tom brings extensive knowledge of agricultural machinery and is dedicated to finding the right solutions for our customers.</p>
-                    <a href="tel:+441234567892" class="team-contact-link"><i class="fas fa-phone me-2 text-success"></i> +44 1234 567892</a>
-                    <a href="mailto:tom@pfcagri.co.uk" class="team-contact-link"><i class="fas fa-envelope me-2 text-success"></i> tom@pfcagri.co.uk</a>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
+<!-- our team section end. -->
+
+
+
 
 <section class="get-in-touch-section">
     <div class="container text-center">

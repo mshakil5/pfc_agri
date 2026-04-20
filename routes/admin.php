@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PropertyController;
 use App\Http\Controllers\Admin\ResearchController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\TenantController;
 use Illuminate\Support\Facades\Route;
 
@@ -155,5 +156,11 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::delete('/awards/{id}', [AwardController::class, 'destroy'])->name('awards.destroy');
 
 
+    // Team Members
+    Route::get('/team-members', [TeamController::class, 'index'])->name('admin.team.index');
+    Route::post('/team-members', [TeamController::class, 'store'])->name('admin.team.store');
+    Route::get('/team-members/{id}/edit', [TeamController::class, 'edit']);
+    Route::post('/team-members-update', [TeamController::class, 'update']);
+    Route::delete('/team-members/{id}', [TeamController::class, 'destroy'])->name('admin.team.destroy');
 
 });
