@@ -4,17 +4,17 @@
 <head>
 
     @php
-        $company = App\Models\CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'linkedin', 'website', 'phone1', 'email1', 'address1','company_logo','copyright','google_map')->first();
+        $company = App\Models\CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'whatsapp', 'linkedin', 'website', 'phone1', 'email1', 'address1','company_logo','copyright','google_map','meta_title')->first();
     @endphp
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFC Agri Solutions - Innovative Agricultural Solutions</title>
+    <title>{{ $company->meta_title ?? $company->company_name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <title>{{ $company->meta_title ?? $company->company_name }}</title>
         {!! SEOMeta::generate() !!}
         {!! OpenGraph::generate() !!}
         {!! Twitter::generate() !!}
@@ -319,66 +319,59 @@
     @include('frontend.inc.footer')
 
 
-
-
-    {{-- <a href="https://wa.me/447392597296" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp" >
-    <i class="bi bi-whatsapp"></i>
+        <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/{{ $company->whatsapp ?? '07523270710' }}" 
+       class="whatsapp-float" 
+       target="_blank" 
+       aria-label="Chat on WhatsApp">
+        <i class="bi bi-whatsapp"></i>
     </a>
+
     <style>
-    .whatsapp-float {
-        position: fixed;
-        bottom: 50px;
-        right: 25px;
-        width: 60px;
-        height: 60px;
-        background-color: #ff708a;
-        color: #fff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 30px;
-        z-index: 9999;
-        box-shadow: 0 6px 15px #ff708a;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .whatsapp-float:hover {
-        transform: scale(1.1);
-        box-shadow: 0 8px 25px #ff708a;
-        color: #fff;
-    }
-
-    /* Glow animation for attention */
-    @keyframes pulse {
-        0% {
-        box-shadow: 0 0 0 0 #ff708a;
-        }
-        70% {
-        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
-        }
-        100% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-        }
-    }
-
-    .whatsapp-float {
-        animation: pulse 2s infinite;
-    }
-
-    /* Mobile responsive adjustments */
-    @media (max-width: 576px) {
         .whatsapp-float {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        bottom: 20px;
-        right: 20px;
+            position: fixed;
+            bottom: 50px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #00A651;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            z-index: 9999;
+            box-shadow: 0 6px 15px #00A651;
+            transition: all 0.3s ease-in-out;
         }
-    }
-    </style> --}}
 
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px #00A651;
+            color: #fff;
+        }
 
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 #00A651; }
+            70% { box-shadow: 0 0 0 15px rgba(255, 112, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 112, 138, 0); }
+        }
+
+        .whatsapp-float {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 576px) {
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

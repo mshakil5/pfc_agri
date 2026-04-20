@@ -11,10 +11,31 @@
                 <p class="small opacity-75 mb-4">{{ $company->footer_content }}</p>
 
                 <div class="d-flex">
-                    <a href="{{ $company->facebook }}" class="social-circle"><i class="fab fa-facebook-f"></i></a>
-                    <a href="{{ $company->instagram }}" class="social-circle"><i class="fab fa-instagram"></i></a>
-                    <a href="{{ $company->linkedin }}" class="social-circle"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="{{ $company->youtube }}" class="social-circle"><i class="fab fa-youtube"></i></a>
+                    @if(!empty($company->facebook))
+                        <a href="{{ $company->facebook }}" class="social-circle" target="_blank">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    @endif
+
+                    @if(!empty($company->instagram))
+                        <a href="{{ $company->instagram }}" class="social-circle" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    @endif
+
+                    @if(!empty($company->linkedin))
+                        <a href="{{ $company->linkedin }}" class="social-circle" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    @endif
+
+                    @if(!empty($company->youtube))
+                        <a href="{{ $company->youtube }}" class="social-circle" target="_blank">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    @endif
+
+
                 </div>
             </div>
 
@@ -66,7 +87,7 @@
         </div>
 
         <div class="footer-bottom text-center">
-            <p class="mb-0">{{ $company->copyright }}</p>
+            <p class="mb-0">{!! $company->copyright !!}</p>
         </div>
     </div>
 </footer>

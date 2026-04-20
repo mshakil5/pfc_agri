@@ -6,10 +6,30 @@
         </div>
 
         <div class="d-flex align-items-center">
-            <a href="{{ $company->facebook }}" class="social-link"><i class="fab fa-facebook-f me-3"></i></a>
-            <a href="{{ $company->instagram }}" class="social-link"><i class="fab fa-instagram me-3"></i></a>
-            <a href="{{ $company->linkedin }}" class="social-link"><i class="fab fa-linkedin-in me-3"></i></a>
-            <a href="{{ $company->website }}" class="social-link"><i class="fas fa-globe me-2"></i></a>
+            @if(!empty($company->facebook))
+                <a href="{{ $company->facebook }}" class="social-link" target="_blank">
+                    <i class="fab fa-facebook-f me-3"></i>
+                </a>
+            @endif
+
+            @if(!empty($company->instagram))
+                <a href="{{ $company->instagram }}" class="social-link" target="_blank">
+                    <i class="fab fa-instagram me-3"></i>
+                </a>
+            @endif
+
+            @if(!empty($company->linkedin))
+                <a href="{{ $company->linkedin }}" class="social-link" target="_blank">
+                    <i class="fab fa-linkedin-in me-3"></i>
+                </a>
+            @endif
+
+            @if(!empty($company->website))
+                <a href="{{ $company->website }}" class="social-link" target="_blank">
+                    <i class="fas fa-globe me-2"></i>
+                </a>
+            @endif
+
 
             @php
                 $locale = app()->getLocale();

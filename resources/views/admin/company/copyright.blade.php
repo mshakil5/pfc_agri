@@ -1,6 +1,14 @@
 @extends('admin.pages.master')
 @section('title', 'Copyright')
 @section('content')
+<!-- Summernote CSS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+
+<!-- jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Summernote JS -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
 
     <div class="container-fluid">
         <div class="row justify-content-center">
@@ -32,7 +40,8 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Copyright <span class="text-danger">*</span></label>
-                                        <textarea name="copyright" class="form-control ckeditor-classic @error('copyright') is-invalid @enderror"
+                                        <textarea id="summernote" name="copyright"
+                                            class="form-control @error('copyright') is-invalid @enderror"
                                             rows="4">{!! $companyDetails->copyright !!}</textarea>
                                     </div>
                                 </div>
@@ -48,5 +57,26 @@
             </div>
         </div>
     </div>
+
+@endsection
+
+@section('script')
+<script>
+    $(document).ready(function() {
+        $('#summernote').summernote({
+            height: 200,
+            placeholder: 'Write copyright text...',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link']],
+                ['view', ['fullscreen', 'codeview']]
+            ]
+        });
+    });
+</script>
+
 
 @endsection
