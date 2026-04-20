@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('product_inquiries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products')->nullOnDelete();
+            $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
             $table->string('name');
             $table->string('email');
             $table->string('phone')->nullable();
             $table->text('message');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
+
         });
     }
 
