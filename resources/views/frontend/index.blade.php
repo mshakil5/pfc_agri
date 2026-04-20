@@ -1,6 +1,7 @@
 @extends('frontend.layouts.master')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 
     <style>
@@ -511,41 +512,123 @@
     </script>
 
 
+<style>
+    .awards-section { padding: 80px 0; background-color: #ffffff; }
+
+    .awardSwiper {
+        padding: 20px 10px 50px;
+    }
+
+    .award-card {
+        background: #f8fdfa;
+        border: 1px solid #e9f7ef;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 700px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+    .award-icon-circle {
+        width: 70px;
+        height: 70px;
+        background: #00a651;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 166, 81, 0.2);
+    }
+
+    .description-container {
+        max-height: 3.6em; 
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        margin-top: 15px;
+    }
+
+    .description-container.expanded {
+        max-height: 1000px;
+    }
+
+    .toggle-btn {
+        color: #00a651;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.85rem;
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .tag-pill {
+        background: #e9f7ef;
+        color: #00a651;
+        padding: 5px 15px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+
+    /* Swiper Pagination Color */
+    .swiper-pagination-bullet-active {
+        background: #00a651 !important;
+    }
+</style>
+
+    <section class="awards-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <p class="section-tag mb-1">{{ __('RECOGNITION') }}</p>
+                <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('Awards & Achievements') }}</h2>
+            </div>
+
+            <div class="swiper awardSwiper">
+                <div class="swiper-wrapper">
+                    @foreach($awards as $award)
+                        <div class="swiper-slide">
+                            <div class="award-card mx-auto">
+                                <div class="award-icon-circle">
+                                    <i class="{{ $award->icon }}"></i>
+                                </div>
+                                
+                                <div class="award-content">
+                                    <h4 class="fw-bold">{{ $award->title }}</h4>
+                                    <p class="text-muted mb-2"><strong>{{ $award->organization }}</strong> • {{ $award->year }}</p>
+                                    
+                                    @if($award->tag)
+                                        <span class="tag-pill mb-3">{{ $award->tag }}</span>
+                                    @endif
+
+                                    <div class="description-wrapper">
+                                        <div class="small text-muted description-container" id="desc-{{ $loop->index }}">
+                                            {!! $award->description !!}
+                                        </div>
+                                        <span class="toggle-btn" onclick="toggleDescription({{ $loop->index }}, this)">
+                                            {{ __('Show More') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
     <style>
-        /* --- Awards Section --- */
-        .awards-section {
-            padding: 80px 0;
-            background-color: #fff;
-        }
-
-        .award-card {
-            background: #f8fdfa; /* Light tint for card contrast on white bg */
-            border: 1px solid #e9f7ef;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            height: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .award-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 166, 81, 0.1);
-            border-color: var(--pfc-green);
-        }
-
-        .award-icon-circle {
-            width: 60px;
-            height: 60px;
-            background: var(--pfc-green);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 1.5rem;
-        }
 
         /* --- CTA Section --- */
         .cta-section {
@@ -577,51 +660,6 @@
 
 
     </style>
-
-
-
-
-    <section class="awards-section">
-        <div class="container text-center">
-            <p class="section-tag mb-1">{{ __('RECOGNITION') }}</p>
-            <h2 class="fw-bold mb-3" style="color: #00a651;">{{ __('Awards & Achievements') }}</h2>
-            <p class="text-muted mx-auto mb-5" style="max-width: 600px;">
-                {{ __('Our commitment to excellence has been recognized by industry leaders and organizations.') }}
-            </p>
-                        
-            <div class="row g-4 text-start">
-                @foreach($awards as $award)
-                    <div class="col-md-4">
-                        <div class="award-card">
-                            {{-- Non-translatable data (icon) --}}
-                            <div class="award-icon-circle">
-                                <i class="{{ $award->icon }}"></i>
-                            </div>
-
-                            {{-- Translatable data (title) --}}
-                            <h5 class="fw-bold">{{ $award->title }}</h5>
-
-                            {{-- Combination of translatable (organization) and static (year) --}}
-                            <p class="small text-muted mb-2">
-                                {{ $award->organization }} • {{ $award->year }}
-                            </p>
-
-                            {{-- Translatable Tag --}}
-                            @if($award->tag)
-                                <span class="tag-pill mb-3">{{ $award->tag }}</span>
-                            @endif
-
-                            {{-- Translatable Description --}}
-                            <div class="small text-muted mt-2">
-                                {!! $award->description !!}
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
     <section class="cta-section">
         <div class="container">
             <div class="row align-items-center g-4">
@@ -672,5 +710,37 @@
 
 @section('script')
 
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    // Initialize Swiper
+    const swiper = new Swiper('.awardSwiper', {
+        loop: true,
+        autoplay: {
+            delay: 4000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        speed: 800,
+        grabCursor: true,
+    });
+
+    // Show More/Less Function
+    function toggleDescription(index, btn) {
+        const desc = document.getElementById(`desc-${index}`);
+        
+        if (desc.classList.contains('expanded')) {
+            desc.classList.remove('expanded');
+            btn.innerText = "{{ __('Show More') }}";
+            swiper.update();
+        } else {
+            desc.classList.add('expanded');
+            btn.innerText = "{{ __('Show Less') }}";
+            swiper.update();
+        }
+    }
+</script>
 
 @endsection
