@@ -242,43 +242,48 @@
     }
 </style>
 
-<section class="team-section">
-    <div class="container text-center">
-        <p class="section-tag mb-1">{{ __('THE PEOPLE BEHIND PFC') }}</p>
-        <h2 class="fw-bold mb-3" style="color: var(--pfc-green);">{{ __('Meet Our Team') }}</h2>
-        <p class="text-muted mx-auto mb-5" style="max-width: 600px;">{{ __('Our dedicated team combines farming experience with technical expertise to serve you better.') }}</p>
-        
-        <div class="row g-4 justify-content-center">
-            @php $members = \App\Models\TeamMember::where('status', 1)->orderBy('serial')->get(); @endphp
-            
-            @foreach($members as $member)
-                @php $trans = $member->translateOrNew(app()->getLocale()); @endphp
-                <div class="col-lg-4 col-md-6">
-                    <div class="team-card">
-                        <div class="team-img-wrapper">
-                            <img src="{{ $member->image ? asset($member->image) : asset('placeholder.webp') }}" alt="{{ $member->name }}">
+    @php $members = \App\Models\TeamMember::where('status', 1)->orderBy('serial')->get(); @endphp
+
+
+    @if ($members->count() > 0)
+        <section class="team-section">
+            <div class="container text-center">
+                <p class="section-tag mb-1">{{ __('THE PEOPLE BEHIND PFC') }}</p>
+                <h2 class="fw-bold mb-3" style="color: var(--pfc-green);">{{ __('Meet Our Team') }}</h2>
+                <p class="text-muted mx-auto mb-5" style="max-width: 600px;">{{ __('Our dedicated team combines farming experience with technical expertise to serve you better.') }}</p>
+                
+                <div class="row g-4 justify-content-center">
+                    
+                    @foreach($members as $member)
+                        @php $trans = $member->translateOrNew(app()->getLocale()); @endphp
+                        <div class="col-lg-4 col-md-6">
+                            <div class="team-card">
+                                <div class="team-img-wrapper">
+                                    <img src="{{ $member->image ? asset($member->image) : asset('placeholder.webp') }}" alt="{{ $member->name }}">
+                                </div>
+                                <h5 class="fw-bold mb-1">{{ $member->name }}</h5> {{-- Always English --}}
+                                <div class="team-role">{{ $trans->designation }}</div> {{-- Translated --}}
+                                <p class="small text-muted mb-4">{{ $trans->bio }}</p> {{-- Translated --}}
+                                
+                                @if($member->phone)
+                                    <a href="tel:{{ $member->phone }}" class="team-contact-link">
+                                        <i class="fas fa-phone me-2 text-success"></i> {{ $member->phone }}
+                                    </a>
+                                @endif
+                                
+                                @if($member->email)
+                                    <a href="mailto:{{ $member->email }}" class="team-contact-link">
+                                        <i class="fas fa-envelope me-2 text-success"></i> {{ $member->email }}
+                                    </a>
+                                @endif
+                            </div>
                         </div>
-                        <h5 class="fw-bold mb-1">{{ $member->name }}</h5> {{-- Always English --}}
-                        <div class="team-role">{{ $trans->designation }}</div> {{-- Translated --}}
-                        <p class="small text-muted mb-4">{{ $trans->bio }}</p> {{-- Translated --}}
-                        
-                        @if($member->phone)
-                            <a href="tel:{{ $member->phone }}" class="team-contact-link">
-                                <i class="fas fa-phone me-2 text-success"></i> {{ $member->phone }}
-                            </a>
-                        @endif
-                        
-                        @if($member->email)
-                            <a href="mailto:{{ $member->email }}" class="team-contact-link">
-                                <i class="fas fa-envelope me-2 text-success"></i> {{ $member->email }}
-                            </a>
-                        @endif
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
-        </div>
-    </div>
-</section>
+            </div>
+        </section>
+    @endif
+
 <!-- our team section end. -->
 
 
