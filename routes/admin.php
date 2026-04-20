@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DealerController;
 use App\Http\Controllers\Admin\SubSubCategoryController;
 use App\Http\Controllers\Admin\LandlordController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductInquiryController;
 use App\Http\Controllers\Admin\PropertyController;
 use App\Http\Controllers\Admin\ResearchController;
 use App\Http\Controllers\Admin\TagController;
@@ -162,5 +163,10 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/team-members/{id}/edit', [TeamController::class, 'edit']);
     Route::post('/team-members-update', [TeamController::class, 'update']);
     Route::delete('/team-members/{id}', [TeamController::class, 'destroy'])->name('admin.team.destroy');
+
+    // Product Inquiries (Admin View)
+    Route::get('/product-inquiries', [ProductInquiryController::class, 'index'])->name('admin.inquiries.index');
+    Route::get('/product-inquiries/{id}', [ProductInquiryController::class, 'show']);
+    Route::delete('/product-inquiries/{id}', [ProductInquiryController::class, 'destroy'])->name('admin.inquiries.destroy');
 
 });

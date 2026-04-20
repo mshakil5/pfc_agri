@@ -231,6 +231,13 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="{{ route('admin.inquiries.index') }}" class="nav-link {{ Route::is('admin.inquiries.index') ? 'active' : '' }}">
+                        <i class="ri-mail-open-line"></i>
+                        <span> Product Inquiry</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="{{ route('user.index') }}" class="nav-link {{ Route::is('user.index') ? 'active' : '' }}">
                         <i class="ri-user-3-line"></i>
                         <span>Admin</span>
