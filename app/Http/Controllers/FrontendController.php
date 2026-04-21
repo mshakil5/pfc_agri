@@ -143,6 +143,15 @@ class FrontendController extends Controller
         return view('frontend.blog-detail', compact('blog', 'relatedPosts'));
     }
 
+    public function blogList()
+    {
+        $blogs = \App\Models\Blog::where('status', 1)
+                    ->latest('published_at')
+                    ->paginate(9); // 9 = 3 per row × 3 rows
+
+        return view('frontend.blog-list', compact('blogs'));
+    }
+
 
 
 

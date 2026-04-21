@@ -163,5 +163,7 @@
     "Showing": "Affichage",
     "products": "produits",
     "shop.back_to_all": "Retour à tous",
-    "shop.no_products_found": "Aucun produit trouvé"
+    "shop.no_products_found": "Aucun produit trouvé",
+    "blog.our_blog": "Notre blog",
+    "Blog": "Blog"
 }

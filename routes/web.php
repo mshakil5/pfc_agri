@@ -60,6 +60,7 @@ Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('aboutUs')
 Route::get('/shop/{slug?}', [ProductController::class, 'shop'])->name('category.show');
 Route::get('/product/{slug}', [ProductController::class, 'productDetail'])->name('product.detail');
 Route::get('/blog/{slug?}', [FrontendController::class, 'blogDetails'])->name('blog.show');
+Route::get('/blogs', [FrontendController::class, 'blogList'])->name('blogs');
 
 Route::post('/product-inquiry', [ProductInquiryController::class, 'submit'])->name('product.inquiry.submit');
 

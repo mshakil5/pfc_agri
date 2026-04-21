@@ -49,11 +49,12 @@
 
                 <a href="{{ route('home') }}" class="footer-link">{{ __('footer.home') }}</a>
                 <a href="{{ route('aboutUs') }}" class="footer-link">{{ __('footer.about_us') }}</a>
+                <a href="{{ route('blogs') }}" class="footer-link">{{ __('Blog') }}</a>
                 <a href="{{ route('category.show') }}" class="footer-link">{{ __('footer.products') }}</a>
                 <a href="{{ route('rAndD') }}" class="footer-link">{{ __('footer.r_and_d_projects') }}</a>
                 <a href="{{ route('inquire') }}" class="footer-link">{{ __('footer.inquire_now') }}</a>
             </div>
-
+            
             <div class="col-lg-3 col-6">
                 <h6 class="fw-bold mb-4 text-uppercase letter-spacing-1">
                     {{ __('footer.our_products') }}

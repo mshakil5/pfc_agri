@@ -55,8 +55,35 @@
     }
     .p-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
     
-    .p-img-box { height: 200px; overflow: hidden; background: #f8f9fa; }
-    .p-img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .p-img-box { 
+        height: 200px; 
+        overflow: hidden; 
+        background: #f8f9fa; 
+    }
+    .p-img-box a {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .p-img-box img { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        transition: transform 0.4s ease;
+    }
+    .p-card:hover .p-img-box img {
+        transform: scale(1.05);
+    }
+
+    /* Clickable Title */
+    .p-title-link {
+        color: #222;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .p-title-link:hover {
+        color: var(--pfc-green);
+    }
 
     .active-filter-pill {
         background: #f0fdf4;
@@ -132,10 +159,13 @@
                     @forelse($products as $product)
                         <div class="col-md-6 col-xl-4">
                             <div class="p-card">
+                                {{-- CLICKABLE IMAGE --}}
                                 <div class="p-img-box">
-                                    <img src="{{ asset($product->image) }}"
-                                         alt="{{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}"
-                                         onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+                                    <a href="{{ route('product.detail', $product->slug) }}">
+                                        <img src="{{ asset($product->image) }}"
+                                             alt="{{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}"
+                                             onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+                                    </a>
                                 </div>
                                 <div class="p-4 d-flex flex-column flex-grow-1">
                                     <div class="mb-2">
@@ -143,7 +173,12 @@
                                             {{ $product->category ? ($product->category->translateOrNew(app()->getLocale())->name ?? $product->category->name) : __('Categories') }}
                                         </span>
                                     </div>
-                                    <h6 class="fw-bold mb-2">{{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}</h6>
+                                    {{-- CLICKABLE TITLE --}}
+                                    <h6 class="fw-bold mb-2">
+                                        <a href="{{ route('product.detail', $product->slug) }}" class="p-title-link">
+                                            {{ $product->translateOrNew(app()->getLocale())->title ?? $product->title }}
+                                        </a>
+                                    </h6>
                                     <p class="text-muted small mb-3">
                                         {{ Str::limit(strip_tags($product->translateOrNew(app()->getLocale())->long_description ?? $product->long_description), 70) }}
                                     </p>

@@ -119,6 +119,10 @@
                     <a class="nav-link" href="{{ route('aboutUs') }}">{{ __('header.about_us') }}</a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('blogs') }}">{{ __('Blog') }}</a>
+                </li>
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="prodDrop" role="button" data-bs-toggle="dropdown">
                         {{ __('header.products') }}
