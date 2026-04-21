@@ -270,7 +270,13 @@
                             {{ $product->translateOrNew(app()->getLocale())->title }}
                         </h1>
 
-                        {{-- Price Removed Completely --}}
+                        <h3 class="text-success fw-bold mb-4">
+                        @if ($product->price > 0)
+                            £{{$product->price }}
+                        @else
+                            Price on Request
+                        @endif
+                        </h3>
 
                         <p class="text-muted mb-4">
                             {!! $product->translateOrNew(app()->getLocale())->short_description !!}

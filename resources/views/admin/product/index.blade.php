@@ -152,6 +152,7 @@
 
 @section('script')
 <style>
+    /* Loader Overlay Styles */
     #addThisFormContainer .card { position: relative; overflow: hidden; }
     .form-loader-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(2px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; border-radius: 0.375rem; }
     .spinner-ring { width: 50px; height: 50px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -194,14 +195,20 @@
         });
 
         $("#newBtn").click(function () { clearForm(); $(this).hide(); $("#addThisFormContainer").slideDown(300, initPlugins); });
-        $("#FormCloseBtn").click(function () { $("#addThisFormContainer").slideUp(300); setTimeout(() => $("#newBtn").show(), 300); });
+        $("#FormCloseBtn").click(function () { 
+            $("#addThisFormContainer").slideUp(300); 
+            setTimeout(() => $("#newBtn").show(), 300); 
+        });
 
+        // Submit Logic
         $("#addBtn").click(function (e) {
             e.preventDefault();
+            
             if(isEditorInitialized) { 
                 $('#long_description').val($('#long_description').summernote('code'));
                 $('#specs').val($('#specs').summernote('code')); 
             }
+            
             var formData = new FormData($('#createThisForm')[0]);
             showFormLoader();
 
@@ -210,18 +217,39 @@
 
             $.ajax({
                 url: url, type: "POST", data: formData, contentType: false, processData: false,
-                success: function (d) { hideFormLoader(); showSuccess(d.message); $("#FormCloseBtn").click(); table.draw(); },
+                success: function (d) { 
+                    hideFormLoader(); 
+                    showSuccess(d.message); 
+                    $("#FormCloseBtn").click(); 
+                    table.draw(); 
+                },
                 error: function (xhr) {
                     hideFormLoader();
-                    if (xhr.status === 422) { let msgs = []; Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0])); showError(msgs.join("<br>")); }
-                    else { showError(xhr.responseJSON?.message ?? "Something went wrong!"); }
+                    if (xhr.status === 422) { 
+                        let msgs = []; Object.values(xhr.responseJSON.errors).forEach(m => msgs.push(m[0])); 
+                        showError(msgs.join("<br>")); 
+                    } else { 
+                        showError(xhr.responseJSON?.message ?? "Something went wrong!"); 
+                    }
                 }
             });
         });
 
+        // Edit Logic
         $("#contentContainer").on('click', '#EditBtn', function () {
             let id = $(this).attr('rid');
-            $.get("/admin/products/" + id + "/edit", function (data) { populateForm(data); });
+            
+            // 1. CLEAR old data first!
+            clearForm();
+            
+            // 2. SCROLL to top of page so user sees the form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // 3. Open form, THEN fetch new data
+            $("#addThisFormContainer").slideDown(300, function() {
+                initPlugins();
+                $.get("/admin/products/" + id + "/edit", function (data) { populateForm(data); });
+            });
         });
 
         $("#addFeatureBtn").click(function () {
@@ -233,22 +261,16 @@
 
         $(document).on('click', '.remove-feature-btn', function () { $(this).closest('.feature-row').remove(); });
 
-        // Remove Gallery Image
+        // Remove Gallery Image - removes hidden input too so it won't be submitted
         $(document).on('click', '.remove-gallery-btn', function(e) {
             e.preventDefault();
-            var thumb = $(this).closest('.gallery-thumb');
-            thumb.find('input[name="existing_images[]"]').attr('name', 'delete_images[]');
-            thumb.remove();
+            $(this).closest('.gallery-thumb').remove();
         });
 
-        // Remove Download File
+        // Remove Download File - removes hidden input too so it won't be submitted
         $(document).on('click', '.remove-download-btn', function(e) {
             e.preventDefault();
-            var item = $(this).closest('.download-item');
-            var path = item.data('path');
-            var $delInput = $('<input type="hidden" name="delete_downloads[]" value="">').val(path);
-            $('#createThisForm').append($delInput);
-            item.remove();
+            $(this).closest('.download-item').remove();
         });
 
         // --- Helpers ---
@@ -270,40 +292,46 @@
 
             if (data.image) { $('#preview-image').attr('src', data.image).show(); }
 
-            // Gallery Images
+            // Gallery Images - with hidden input to track
             $('#existing-gallery-container').empty();
             if (data.images && data.images.length > 0) {
                 data.images.forEach(function(img) {
                     var $thumb = $('<div class="gallery-thumb"></div>').data('path', img);
-                    $thumb.append('<img src="" alt="Gallery">').find('img').attr('src', img);
+                    $thumb.append($('<img alt="Gallery">').attr('src', img));
                     $thumb.append('<button type="button" class="remove-gallery-btn">X</button>');
-                    $thumb.append('<input type="hidden" name="existing_images[]" value="">').find('input').val(img);
+                    $thumb.append($('<input type="hidden" name="existing_images[]">').val(img));
                     $('#existing-gallery-container').append($thumb);
                 });
             }
 
-            // PDF Downloads
+            // PDF Downloads - with hidden input to track (THIS WAS MISSING!)
             $('#existing-downloads-container').empty();
             if (data.downloads && data.downloads.length > 0) {
                 data.downloads.forEach(function(dl) {
                     var $item = $('<div class="download-item d-flex align-items-center justify-content-between border p-2 rounded mb-2 bg-light"></div>').data('path', dl.path);
+                    
                     var $text = $('<div class="d-flex align-items-center"></div>');
                     $text.append('<i class="fas fa-file-pdf text-danger me-2"></i>');
-                    var $name = $('<span class="fw-bold small"></span>').text(dl.name);
-                    $text.append($name);
+                    // FIX: Use raw value, NOT encodeURIComponent
+                    $text.append($('<span class="fw-bold small"></span>').text(dl.name));
                     $item.append($text);
+                    
                     $item.append('<button type="button" class="btn btn-sm btn-danger remove-download-btn">X</button>');
-                    $item.append($('<input type="hidden" name="existing_downloads[]" value="">').val(dl.path));
+                    
+                    // FIX: Add hidden input to track existing downloads (THIS WAS MISSING!)
+                    $item.append($('<input type="hidden" name="existing_downloads[]">').val(dl.path));
+                    
                     $('#existing-downloads-container').append($item);
                 });
             }
 
-            // Features
+            // Features - FIX: Use raw value, NOT encodeURIComponent
             $('#features-container').empty();
             if (data.features && data.features.length > 0) {
                 data.features.forEach(function(feat) {
                     var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
                     $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control"></div>');
+                    // FIX: Use raw value directly, NOT encodeURIComponent
                     $row.find('input').val(feat);
                     $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
                     $('#features-container').append($row);
@@ -319,18 +347,26 @@
 
         function clearForm() {
             $('#createThisForm')[0].reset();
-            $("#codeid").val(''); $("#preview-image").hide();
+            $("#codeid").val(''); 
+            $("#preview-image").hide();
             $('#existing-gallery-container').empty();
             $('#existing-downloads-container').empty();
             
+            // Reset features to 1 empty row
             $('#features-container').empty();
             var $row = $('<div class="row g-2 mb-2 feature-row"></div>');
             $row.append('<div class="col-md-11"><input type="text" name="features[]" class="form-control" placeholder="e.g. Waterproof"></div>');
             $row.append('<div class="col-md-1"><button type="button" class="btn btn-danger w-100 remove-feature-btn">X</button></div>');
             $('#features-container').append($row);
             
-            if(isSelect2Initialized) { $("#category_id").val(null).trigger('change'); $("#tag_id").val(null).trigger('change'); }
-            if(isEditorInitialized) { $('#long_description').summernote('code', ''); $('#specs').summernote('code', ''); }
+            if(isSelect2Initialized) { 
+                $("#category_id").val(null).trigger('change'); 
+                $("#tag_id").val(null).trigger('change'); 
+            }
+            if(isEditorInitialized) { 
+                $('#long_description').summernote('code', ''); 
+                $('#specs').summernote('code', ''); 
+            }
             
             $("#cardTitle").text('Add New Product');
             $("#addBtn").html('<i class="ri-save-line me-1"></i> Create & Translate');
@@ -349,6 +385,7 @@
             $('#createThisForm input, #createThisForm textarea, #createThisForm button, #createThisForm select, #addBtn, #FormCloseBtn').prop('disabled', true);
             if(isEditorInitialized) { $('#long_description').summernote('disable'); $('#specs').summernote('disable'); }
             $('.select2').prop('disabled', true).trigger('change');
+            
             var localeNames = {'ar': 'Arabic', 'fr': 'French', 'es': 'Spanish', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'bn': 'Bengali', 'hi': 'Hindi', 'tr': 'Turkish', 'ur': 'Urdu'};
             var tickerMessages = ['Saving English...'];
             otherLocales.forEach(function(loc) { tickerMessages.push('Translating to ' + (localeNames[loc] || loc.toUpperCase()) + '...'); });

@@ -26,7 +26,7 @@ class FrontendController extends Controller
     public function index()
     {
         $sliders = Slider::orderBy('serial')->where('status', 1)->get();
-        $categories = Category::with('products')->where('status', 1)->get();
+        $categories = Category::with('products')->where('status', 1)->limit(6)->get();
         $about = About::where('pages','homepage')->first();
 
         $company = CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'linkedin', 'website', 'phone1', 'email1', 'address1','address2','company_logo','copyright','google_map')->first();
