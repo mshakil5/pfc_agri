@@ -153,7 +153,7 @@
                     <div class="mt-4 p-3 rounded" style="background-color: #00a651; color: #fff;">
                         <h5>{{ __('Need Expert Advice?') }}</h5>
                         <p class="small">{{ __('Contact our team for a free consultation on your storage needs.') }}</p>
-                        <a href="{{ route('contact') }}" class="btn btn-light btn-sm fw-bold">{{ __('Contact Us') }}</a>
+                        <a href="{{ route('inquire') }}" class="btn btn-light btn-sm fw-bold">{{ __('Contact Us') }}</a>
                     </div>
                 </aside>
             </div>
