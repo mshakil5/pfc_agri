@@ -71,6 +71,12 @@ class FrontendController extends Controller
         return view('frontend.inquire', compact('categories'));
     }
 
+    public function contact()
+    {
+        $categories = Category::with('products')->where('status', 1)->get();
+        return view('frontend.inquire', compact('categories'));
+    }
+
     public function storeContact(Request $request)
     {
         try {
