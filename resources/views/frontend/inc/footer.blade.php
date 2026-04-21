@@ -7,7 +7,10 @@
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-3">
-                <h4 class="fw-bold mb-4">{{ __('footer.company_name') }}</h4>
+                {{-- <h4 class="fw-bold mb-4">{{ __('footer.company_name') }}</h4>  --}}
+                <a class="navbar-brand fw-bold text-success" href="{{ route('home') }}">
+                    <img src="{{ asset('images/company/' . $company->footer_logo) }}" alt="Company Logo" height="80">
+                </a>
                 <p class="small opacity-75 mb-4">{{ $company->footer_content }}</p>
 
                 <div class="d-flex">

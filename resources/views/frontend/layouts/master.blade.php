@@ -4,7 +4,7 @@
 <head>
 
     @php
-        $company = App\Models\CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'whatsapp', 'linkedin', 'website', 'phone1', 'email1', 'address1','company_logo','copyright','google_map','meta_title')->first();
+        $company = App\Models\CompanyDetails::select('company_name', 'fav_icon', 'google_site_verification', 'footer_content', 'facebook', 'twitter', 'whatsapp', 'linkedin', 'website', 'phone1', 'email1', 'address1','company_logo','copyright','google_map','meta_title','footer_logo')->first();
     @endphp
 
     <meta charset="UTF-8">
