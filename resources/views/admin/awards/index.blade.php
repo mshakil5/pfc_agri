@@ -41,7 +41,7 @@
                         <input type="text" name="title" id="title" class="form-control">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label>Organization (EN) <span class="text-danger">*</span></label>
+                        <label>Organization (EN)</label> 
                         <input type="text" name="organization" id="organization" class="form-control">
                     </div>
                     <div class="col-md-12 mb-3">

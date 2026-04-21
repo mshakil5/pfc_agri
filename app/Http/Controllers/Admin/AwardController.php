@@ -50,7 +50,7 @@ class AwardController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'year' => 'required|integer',
             'title' => 'required|string',
-            'organization' => 'required|string',
+            'organization' => 'nullable|string',
             'tag' => 'nullable|string',
             'description' => 'nullable|string',
         ]);
@@ -93,7 +93,7 @@ class AwardController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Nullable on update
             'year' => 'required|integer',
             'title' => 'required|string',
-            'organization' => 'required|string',
+            'organization' => 'nullable|string',
             'tag' => 'nullable|string',
             'description' => 'nullable|string',
         ]);

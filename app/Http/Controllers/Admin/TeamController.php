@@ -57,7 +57,7 @@ class TeamController extends Controller
         ]);
 
         $member = new TeamMember();
-        $member->name = $request->name; // STRICTLY NON-TRANSLATABLE
+        $member->name = $request->name;
         $member->phone = $request->phone;
         $member->email = $request->email;
         $member->serial = TeamMember::max('serial') + 1;
@@ -128,6 +128,15 @@ class TeamController extends Controller
         }
         $member->delete();
         return response()->json(['message' => 'Team member deleted successfully.']);
+    }
+
+    // ← THIS WAS MISSING
+    public function toggleStatus(Request $request)
+    {
+        $member = TeamMember::findOrFail($request->id);
+        $member->update(['status' => $request->status]);
+        
+        return response()->json(['message' => 'Status updated successfully.']);
     }
 
     private function saveTranslations($member, $enDesignation, $enBio)

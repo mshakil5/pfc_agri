@@ -163,6 +163,7 @@ Route::group(['prefix' =>'admin/', 'middleware' => ['auth', 'is_admin']], functi
     Route::get('/team-members/{id}/edit', [TeamController::class, 'edit']);
     Route::post('/team-members-update', [TeamController::class, 'update']);
     Route::delete('/team-members/{id}', [TeamController::class, 'destroy'])->name('admin.team.destroy');
+    Route::post('/team-status', [TeamController::class, 'toggleStatus']); 
 
     // Product Inquiries (Admin View)
     Route::get('/product-inquiries', [ProductInquiryController::class, 'index'])->name('admin.inquiries.index');
