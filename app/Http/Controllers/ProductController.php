@@ -25,6 +25,14 @@ class ProductController extends Controller
             $query->where('category_id', $currentCategory->id);
         }
 
+        // 4. Search filter
+        if ($search = request('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                ->orWhere('long_description', 'LIKE', "%{$search}%");
+            });
+        }
+
         $products = $query->latest()->paginate(12);
 
         return view('frontend.shop', compact('categories', 'products', 'currentCategory'));

@@ -15,68 +15,84 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 class ProductController extends Controller
 {
     public function index(Request $request)
-    {
-        if ($request->ajax()) {
-            $products = Product::select(['id', 'title', 'price', 'status', 'image', 'category_id', 'show_in_menu', 'stock_status'])
-                ->with(['category.translations', 'translations'])
-                ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
-                ->latest();
+{
+    if ($request->ajax()) {
+        // 1. FIX: Removed 'title' from select() because it's in the translation table
+        $products = Product::select(['id', 'price', 'status', 'image', 'category_id', 'show_in_menu', 'stock_status'])
+            ->with(['category.translations', 'translations'])
+            ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
+            ->latest();
 
-            return DataTables::of($products)
-                ->addIndexColumn()
-                ->addColumn('title', function ($row) {
-                    return $row->translateOrNew(app()->getLocale())->title ?? $row->title;
-                })
-                ->addColumn('price', fn($row) => '£' . number_format($row->price, 2))
-                ->addColumn('category_name', function ($row) {
-                    return $row->category ? ($row->category->translateOrNew(app()->getLocale())->name ?? $row->category->name) : '-';
-                })
-                ->addColumn('image', function ($row) {
-                    $src = $row->image ? asset($row->image) : asset('/placeholder.webp');
-                    return '<img src="' . $src . '" class="img-thumbnail" width="50">';
-                })
-                ->addColumn('status', function ($row) {
-                    $checked = $row->status == 1 ? 'checked' : '';
-                    return '<div class="form-check form-switch" dir="ltr">
-                                <input type="checkbox" class="form-check-input toggle-status"
-                                       id="customSwitchStatus' . $row->id . '" data-id="' . $row->id . '" ' . $checked . '>
-                                <label class="form-check-label" for="customSwitchStatus' . $row->id . '"></label>
-                            </div>';
-                })
-                ->addColumn('action', function ($row) {
-                    return '
-                        <div class="dropdown">
-                            <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ri-more-fill align-middle"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <button class="dropdown-item" id="EditBtn" rid="' . $row->id . '">
-                                        <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit
-                                    </button>
-                                </li>
-                                <li class="dropdown-divider"></li>
-                                <li>
-                                    <button class="dropdown-item deleteBtn"
-                                        data-delete-url="' . route('product.destroy', $row->id) . '"
-                                        data-method="DELETE"
-                                        data-table="#productTable">
-                                        <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete
-                                    </button>
-                                </li>
-                            </ul>
+        return DataTables::of($products)
+            ->addIndexColumn()
+            ->addColumn('title', function ($row) {
+                return $row->translateOrNew(app()->getLocale())->title ?? 'N/A';
+            })
+            ->addColumn('price', fn($row) => '£' . number_format($row->price, 2))
+            ->addColumn('category_name', function ($row) {
+                return $row->category ? ($row->category->translateOrNew(app()->getLocale())->name ?? $row->category->name) : '-';
+            })
+            ->addColumn('image', function ($row) {
+                $src = $row->image ? asset($row->image) : asset('/placeholder.webp');
+                return '<img src="' . $src . '" class="img-thumbnail" width="50">';
+            })
+            ->addColumn('status', function ($row) {
+                $checked = $row->status == 1 ? 'checked' : '';
+                return '<div class="form-check form-switch" dir="ltr">
+                            <input type="checkbox" class="form-check-input toggle-status"
+                                   id="customSwitchStatus' . $row->id . '" data-id="' . $row->id . '" ' . $checked . '>
+                            <label class="form-check-label" for="customSwitchStatus' . $row->id . '"></label>
                         </div>';
-                })
-                ->rawColumns(['status', 'action', 'image'])
-                ->make(true);
-        }
-
-        $categories = Category::with('translations')->where('status', 1)->get();
-        $tags = Tag::where('status', 1)->get();
-        return view('admin.product.index', compact('categories', 'tags'));
+            })
+            ->addColumn('action', function ($row) {
+                return '
+                    <div class="dropdown">
+                        <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ri-more-fill align-middle"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item" id="EditBtn" rid="' . $row->id . '">
+                                    <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit
+                                </button>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item deleteBtn"
+                                    data-delete-url="' . route('product.destroy', $row->id) . '"
+                                    data-method="DELETE"
+                                    data-table="#productTable">
+                                    <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete
+                                </button>
+                            </li>
+                        </ul>
+                    </div>';
+            })
+            ->rawColumns(['status', 'action', 'image'])
+            
+            // 2. FIX: Tell DataTables to search inside the translations table relationship
+            ->filterColumn('title', function ($query, $keyword) {
+                $query->whereHas('translations', function ($q) use ($keyword) {
+                    $q->where('title', 'like', "%{$keyword}%");
+                });
+            })
+            
+            // 3. FIX: Do the same for category name so that search works there too
+            ->filterColumn('category_name', function ($query, $keyword) {
+                $query->whereHas('category.translations', function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%");
+                });
+            })
+            
+            ->make(true);
     }
+
+    $categories = Category::with('translations')->where('status', 1)->get();
+    $tags = Tag::where('status', 1)->get();
+    return view('admin.product.index', compact('categories', 'tags'));
+}
 
     public function store(Request $request)
     {

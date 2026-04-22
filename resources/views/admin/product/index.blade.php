@@ -53,13 +53,16 @@
 
                         {{-- Gallery Images --}}
                         <div class="col-md-6">
-                            <label class="form-label">Gallery Images</label>
+                            <label class="form-label">Gallery Images
+                                <small class="text-muted">(Max 2MB per image, JPEG/JPG/PNG/WEBP only)</small>
+                            </label>
                             <input type="file" class="form-control" id="new_images_input" name="new_images[]" accept="image/*" multiple>
                             <div id="existing-gallery-container" class="d-flex flex-wrap gap-2 mt-2">
                                 <!-- Existing images will load here via JS -->
                             </div>
                         </div>
 
+                        
                         <div class="col-12"><hr></div>
                         
                         <div class="col-12">
