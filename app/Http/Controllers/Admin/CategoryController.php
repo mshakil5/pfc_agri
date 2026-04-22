@@ -64,6 +64,11 @@ class CategoryController extends Controller
                         </div>';
                 })
                 ->rawColumns(['image', 'parent_category', 'status', 'action'])
+                ->filterColumn('name', function ($query, $keyword) {
+                    $query->whereHas('translations', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    });
+                })
                 ->make(true);
         }
 

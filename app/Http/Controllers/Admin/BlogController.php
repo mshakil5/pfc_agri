@@ -35,6 +35,11 @@ class BlogController extends Controller
                         </div>';
                 })
                 ->rawColumns(['image', 'action'])
+                ->filterColumn('title', function ($query, $keyword) {
+                    $query->whereHas('translations', function ($q) use ($keyword) {
+                        $q->where('title', 'like', "%{$keyword}%");
+                    });
+                })
                 ->make(true);
         }
         return view('admin.blog.index');

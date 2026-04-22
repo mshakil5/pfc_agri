@@ -14,18 +14,24 @@ class TeamController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $members = TeamMember::latest();
+            $members = TeamMember::with('translations')->latest();
 
             return DataTables::of($members)
                 ->addIndexColumn()
-                ->addColumn('name', fn($row) => $row->name)
+                
+                // ✅ FIX 1: Changed addColumn to editColumn for 'name'
+                ->editColumn('name', fn($row) => $row->name)
+                
                 ->addColumn('image', fn($row) => $row->image ? '<img src="'.asset($row->image).'" class="img-thumbnail rounded-circle" width="50">' : '-')
+                
+                // designation stays as addColumn because it doesn't exist on the main table
                 ->addColumn('designation', fn($row) => $row->translateOrNew(app()->getLocale())->designation)
+                
                 ->addColumn('status', function ($row) {
                     $checked = $row->status ? 'checked' : '';
                     return '<div class="form-check form-switch" dir="ltr">
                                 <input type="checkbox" class="form-check-input toggle-status"
-                                       data-id="' . $row->id . '" ' . $checked . '>
+                                    data-id="' . $row->id . '" ' . $checked . '>
                                 <label class="form-check-label"></label>
                             </div>';
                 })
@@ -40,6 +46,19 @@ class TeamController extends Controller
                         </div>';
                 })
                 ->rawColumns(['image', 'status', 'action'])
+                
+                // ✅ FIX 2: Explicit search fallback for name (just to be 100% bulletproof)
+                ->filterColumn('name', function ($query, $keyword) {
+                    $query->where('name', 'like', "%{$keyword}%");
+                })
+                
+                // ✅ FIX 3: Search inside translation table for designation
+                ->filterColumn('designation', function ($query, $keyword) {
+                    $query->whereHas('translations', function ($q) use ($keyword) {
+                        $q->where('designation', 'like', "%{$keyword}%");
+                    });
+                })
+                
                 ->make(true);
         }
         return view('admin.team.index');
