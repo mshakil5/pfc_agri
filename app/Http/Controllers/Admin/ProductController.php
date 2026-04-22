@@ -325,7 +325,7 @@ class ProductController extends Controller
         return $finalDownloads;
     }
 
-    private function uploadImage($file)
+    private function uploadImage2($file)
     {
         $name = mt_rand(10000000, 99999999) . '.webp';
         $path = public_path('images/products/');
@@ -338,4 +338,20 @@ class ProductController extends Controller
 
         return '/images/products/' . $name;
     }
+
+    private function uploadImage($file)
+    {
+        $name = mt_rand(10000000, 99999999) . '.webp';
+        $path = public_path('images/products/');
+        if (!file_exists($path)) mkdir($path, 0755, true);
+        Image::make($file)
+            ->fit(1200, 900, function ($constraint) {
+                $constraint->upsize(); 
+            })
+            ->encode('webp', 80) 
+            ->save($path . $name);
+
+        return '/images/products/' . $name;
+    }
+
 }

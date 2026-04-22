@@ -30,14 +30,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: white;
+            background: #f1f5f9; /* Light grey background so cropped transparent/white edges aren't visible */
             border-radius: 12px;
             overflow: hidden;
+            aspect-ratio: 4 / 3; /* ✅ FORCES ALL IMAGES INTO A 4:3 BOX */
         }
         .main-swiper .swiper-slide img {
-            max-width: 100%;
-            max-height: 450px;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ✅ CHANGED from 'contain' to 'cover' - fills the box and crops excess */
         }
 
         .thumb-swiper {
